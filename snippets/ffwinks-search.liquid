@@ -1,0 +1,42 @@
+{% comment %}
+  FFWinks — Search Island
+  Slide-down search panel that appears below the header.
+  Triggered by any element matching [aria-label*="search"],
+  [data-search-toggle], .search-toggle, .header-search-toggle.
+  JS lives in ffwinks-js.liquid.
+
+  CSS: search in header.liquid for "► SECTION: ffwinks-search.liquid"
+{% endcomment %}
+
+<div id="ffwinks-search-bar" aria-hidden="true" role="search">
+  <div class="ffwinks-island-section">
+    <div class="ffwinks-island">
+      <div class="ffwinks-container">
+        <div class="ffwinks-input-row">
+          <form id="ffwinks-search-form" action="{{ routes.search_url }}" method="get">
+            <input
+              type="search"
+              name="q"
+              placeholder="I desire..."
+              class="ffwinks-main-input"
+              id="ffwinks-search-input"
+              autocomplete="off"
+            />
+          </form>
+        </div>
+        <div class="ffwinks-suggestions-row">
+          <span class="ffwinks-suggestions-label">Suggestions</span>
+          <div class="ffwinks-suggestions-list">
+            <a href="{{ routes.collections_url }}" class="ffwinks-suggestion-link">New In</a>
+            <a href="{{ routes.all_products_collection_url }}" class="ffwinks-suggestion-link">Shop</a>
+            <a href="/pages/about" class="ffwinks-suggestion-link">About</a>
+          </div>
+        </div>
+      </div>
+      <div class="ffwinks-search-star-wrap">
+        <img src="{{ 'soul.svg' | asset_url }}" alt="" class="ffwinks-search-star" aria-hidden="true">
+        <button type="submit" form="ffwinks-search-form" class="ffwinks-bottom-label ffwinks-submit-btn">Search</button>
+      </div>
+    </div>
+  </div>
+</div>

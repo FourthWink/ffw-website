@@ -1,0 +1,62 @@
+<div id="intro-overlay">
+  <div id="eye-container">
+    <div id="eye-wrapper">
+      <img 
+        src="{{ 'eye.svg' | asset_url }}" 
+        id="eye" 
+        alt="eye logo" 
+      >
+    </div>
+    <p id="intro-text"></p>
+  </div>
+</div>
+
+<style>
+/* 1. RESET & FULLSCREEN */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #ffffff;
+  z-index: 999999;
+  display: flex;         /* Use flex to center everything */
+  align-items: center;    /* Vertical center */
+  justify-content: center;/* Horizontal center */
+  transition: opacity 0.8s ease-in-out;
+}
+
+/* 2. STACK TEXT UNDER EYE */
+#eye-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+#eye {
+  width: 100px;
+  height: auto;
+  display: block;
+  transition: transform 0.6s ease;
+  cursor: pointer;
+}
+
+#intro-text {
+  margin-top: 20px; /* Space between eye and text */
+  font-family: inherit;
+  transition: opacity 0.6s ease;
+  white-space: nowrap;
+}
+/* This applies to everyone (Windows stays at 45px) */
+/* Windows stays at 45px */
+#eye-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transform: translateY(0px); 
+}
+
+/* This only triggers if the device is a Mac */
+body.is-mac #eye-container {
+  transform: translateY(0px); /* Adjust this number for your Mac specifically */
+}</style>

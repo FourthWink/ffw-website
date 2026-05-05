@@ -1,0 +1,485 @@
+{% doc %}
+  @prompt
+    Create a custom section that recreates this exact layout:
+    
+    A perfectly centered 2×2 grid of four large rounded rectangles.
+    Each rectangle has:
+    – very light grey background (#F3F3F3)
+    – large 40–50px rounded corners
+    – equal spacing between the 4 blocks
+    
+    In the center, where the four rectangles meet, create the exact curved inward cross shape shown in the reference image:
+    – four smooth inward curves
+    – thin grey stroke
+    – perfectly symmetrical
+    – identical spacing and curve sharpness as the reference
+    
+    In the center, add the text: “44’s Picks” in small, thin, grey font.
+    
+    
+    Functionality:
+    Each of the four rectangles must be clickable and link to a selected product. 
+    Add settings to choose the 4 products (Top Left, Top Right, Bottom Left, Bottom Right). 
+    
+    Structure:
+    – Full-width section
+    – Keep everything centered
+    – Different max width controls for desktop and mobile, at about 80% on mobile and 70% on desktop
+    – Maintain exact proportions from the reference
+    – Maintain giant rounded corners exactly like the image
+    – The center curved cross must be rendered using SVG so it stays sharp and identical to the screenshot.
+    
+    Responsive Behavior:
+    On mobile:
+    – Stack into two rows
+    – Curved cross simplifies but still keeps a soft inward curve in the center
+    – Text remains centered
+    
+    Section Settings Needed:
+    – Collection picker (x4)
+    – Center text field (“44’s Picks”)
+    – Side label text field (“Unveil the soul”)
+    – Background color control for the rectangles
+    – Padding controls
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-picks-grid-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.padding_top }}px 0 {{ block.settings.padding_bottom }}px;
+  }
+
+  .ai-picks-grid-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.desktop_width }}%;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .ai-picks-grid-wrapper-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: {{ block.settings.gap }}px;
+    position: relative;
+  }
+
+  .ai-picks-grid-item-{{ ai_gen_id }} {
+    background-color: {{ block.settings.rectangle_bg_color }};
+    border-radius: {{ block.settings.corner_radius }}px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ai-picks-grid-item-{{ ai_gen_id }}:hover {
+    transform: scale(1.02);
+  }
+
+  .ai-picks-grid-item-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-picks-grid-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: {{ block.settings.rectangle_bg_color }};
+  }
+
+  .ai-picks-grid-placeholder-{{ ai_gen_id }} svg {
+    width: 50%;
+    height: 50%;
+    opacity: 0.3;
+  }
+
+  .ai-picks-grid-center-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .ai-picks-grid-center-text-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: 300;
+    color: {{ block.settings.center_text_color }};
+    z-index: 11;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .ai-picks-grid-side-label-{{ ai_gen_id }} {
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 9px;
+    font-weight: 300;
+    color: {{ block.settings.side_label_color }};
+    white-space: nowrap;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-picks-grid-container-{{ ai_gen_id }} {
+      max-width: {{ block.settings.mobile_width }}%;
+    }
+
+    .ai-picks-grid-wrapper-{{ ai_gen_id }} {
+      gap: {{ block.settings.gap_mobile }}px;
+    }
+
+    .ai-picks-grid-item-{{ ai_gen_id }} {
+      border-radius: {{ block.settings.corner_radius_mobile }}px;
+    }
+
+    .ai-picks-grid-center-text-{{ ai_gen_id }} {
+      font-size: 10px;
+    }
+
+    .ai-picks-grid-side-label-{{ ai_gen_id }} {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+<picks-grid-{{ ai_gen_id }} class="ai-picks-grid-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-picks-grid-container-{{ ai_gen_id }}">
+    <div class="ai-picks-grid-wrapper-{{ ai_gen_id }}">
+      {% for i in (1..4) %}
+        {% liquid
+          case i
+            when 1
+              assign product = block.settings.product_top_left
+            when 2
+              assign product = block.settings.product_top_right
+            when 3
+              assign product = block.settings.product_bottom_left
+            when 4
+              assign product = block.settings.product_bottom_right
+          endcase
+        %}
+
+        {% if product != blank %}
+          <a href="{{ product.url }}" class="ai-picks-grid-item-{{ ai_gen_id }}">
+            {% if product.featured_image %}
+              <img
+                src="{{ product.featured_image | image_url: width: 800 }}"
+                alt="{{ product.featured_image.alt | escape }}"
+                loading="lazy"
+                width="800"
+                height="800"
+              >
+            {% else %}
+              <div class="ai-picks-grid-placeholder-{{ ai_gen_id }}">
+                {{ 'product-1' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+          </a>
+        {% else %}
+          <div class="ai-picks-grid-item-{{ ai_gen_id }}">
+            <div class="ai-picks-grid-placeholder-{{ ai_gen_id }}">
+              {{ 'product-1' | placeholder_svg_tag }}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <div class="ai-picks-grid-center-overlay-{{ ai_gen_id }}">
+        <svg
+          width="{{ block.settings.svg_size }}"
+          height="{{ block.settings.svg_size }}"
+          viewBox="0 0 100 100"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M 0,50 Q 15,50 25,40 Q 35,30 50,30 Q 65,30 75,40 Q 85,50 100,50"
+            stroke="{{ block.settings.cross_stroke_color }}"
+            stroke-width="{{ block.settings.cross_stroke_width }}"
+            fill="none"
+          />
+          <path
+            d="M 50,0 Q 50,15 40,25 Q 30,35 30,50 Q 30,65 40,75 Q 50,85 50,100"
+            stroke="{{ block.settings.cross_stroke_color }}"
+            stroke-width="{{ block.settings.cross_stroke_width }}"
+            fill="none"
+          />
+        </svg>
+      </div>
+
+      {% if block.settings.center_text != blank %}
+        <div class="ai-picks-grid-center-text-{{ ai_gen_id }}">
+          {{ block.settings.center_text }}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if block.settings.side_label != blank %}
+      <div class="ai-picks-grid-side-label-{{ ai_gen_id }}">
+        {{ block.settings.side_label }}
+      </div>
+    {% endif %}
+  </div>
+</picks-grid-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class PicksGrid{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.adjustSVGSize();
+        window.addEventListener('resize', () => this.adjustSVGSize());
+      }
+
+      adjustSVGSize() {
+        const wrapper = this.querySelector('.ai-picks-grid-wrapper-{{ ai_gen_id }}');
+        const overlay = this.querySelector('.ai-picks-grid-center-overlay-{{ ai_gen_id }}');
+        
+        if (wrapper && overlay) {
+          const gap = parseFloat(getComputedStyle(wrapper).gap);
+          const svg = overlay.querySelector('svg');
+          if (svg) {
+            const size = gap * 3;
+            svg.setAttribute('width', size);
+            svg.setAttribute('height', size);
+          }
+        }
+      }
+    }
+
+    customElements.define('picks-grid-{{ ai_gen_id }}', PicksGrid{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product picks grid",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "product",
+      "id": "product_top_left",
+      "label": "Top left product"
+    },
+    {
+      "type": "product",
+      "id": "product_top_right",
+      "label": "Top right product"
+    },
+    {
+      "type": "product",
+      "id": "product_bottom_left",
+      "label": "Bottom left product"
+    },
+    {
+      "type": "product",
+      "id": "product_bottom_right",
+      "label": "Bottom right product"
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "text",
+      "id": "center_text",
+      "label": "Center text",
+      "default": "44's Picks"
+    },
+    {
+      "type": "range",
+      "id": "center_text_size",
+      "label": "Center text size",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "center_text_color",
+      "label": "Center text color",
+      "default": "#999999"
+    },
+    {
+      "type": "text",
+      "id": "side_label",
+      "label": "Side label text",
+      "default": "Unveil the soul"
+    },
+    {
+      "type": "range",
+      "id": "side_label_size",
+      "label": "Side label size",
+      "min": 8,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "side_label_color",
+      "label": "Side label color",
+      "default": "#999999"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "mobile_width",
+      "label": "Mobile width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between rectangles",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "label": "Gap on mobile",
+      "min": 5,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "rectangle_bg_color",
+      "label": "Rectangle background",
+      "default": "#F3F3F3"
+    },
+    {
+      "type": "range",
+      "id": "corner_radius",
+      "label": "Corner radius",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "corner_radius_mobile",
+      "label": "Corner radius mobile",
+      "min": 15,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Center cross"
+    },
+    {
+      "type": "color",
+      "id": "cross_stroke_color",
+      "label": "Stroke color",
+      "default": "#CCCCCC"
+    },
+    {
+      "type": "range",
+      "id": "cross_stroke_width",
+      "label": "Stroke width",
+      "min": 0.5,
+      "max": 3,
+      "step": 0.5,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "svg_size",
+      "label": "Cross size",
+      "min": 40,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product picks grid"
+    }
+  ]
+}
+{% endschema %}

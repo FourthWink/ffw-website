@@ -1,0 +1,118 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "17690349093da47b93": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_2aaeb7a_hPG9bh": {
+          "type": "ai_gen_block_2aaeb7a",
+          "name": "Block separator",
+          "settings": {
+            "background_color": "#ffffff",
+            "full_width": false,
+            "hide_on_mobile": false,
+            "padding_vertical": 5,
+            "padding_horizontal": 40
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_c2afca1_bE3z8X": {
+          "type": "ai_gen_block_c2afca1",
+          "settings": {
+            "background_color": "#ffffff",
+            "text_color": "#666666",
+            "text_hover_color": "#000000",
+            "font_size_desktop": 10,
+            "font_size_mobile": 10,
+            "line_height": 1.5,
+            "padding_vertical": 36,
+            "padding_horizontal": 40,
+            "link_1_text": "Privacy Policy",
+            "link_1_url": "shopify://policies/privacy-policy",
+            "link_2_text": "Terms & Conditions",
+            "link_2_url": "/policies/terms-of-service",
+            "link_3_text": "Contact Us",
+            "link_3_url": "shopify://pages/contact",
+            "link_spacing": 8,
+            "brand_paragraph": "Join the realms where dreams meet reality. Each message brings you closer to the hidden soul within, inviting you to explore the stories and visions that shape",
+            "brand_name": "Fourth Wink.",
+            "brand_letter_spacing": 0,
+            "center_max_width": 280,
+            "youtube_url": "",
+            "instagram_url": "https://www.instagram.com/fourthwink?igsh=djVueGZmZTlkOXh6",
+            "youtube_icon_size": 22,
+            "youtube_icon_height": 22,
+            "instagram_icon_size": 18,
+            "instagram_offset": 3,
+            "icon_spacing": 92,
+            "email_placeholder": "Email",
+            "input_width": 260,
+            "input_padding": 6,
+            "input_border_color": "#dddddd",
+            "input_top_spacing": 12,
+            "mobile_spacing": 12,
+            "desktop_width_percent": 100
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_2aaeb7a_hPG9bh",
+        "ai_gen_block_c2afca1_bE3z8X"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 40,
+        "section_width": "full-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_tYtYMm": {
+      "type": "custom-liquid",
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<style>\n  /* MOBILE ONLY - max-width: 768px */\n  @media (max-width: 768px) {\n    /* Main footer container - vertical stack */\n    .ff-footer {\n      display: flex !important;\n      flex-direction: column !important;\n      align-items: flex-start !important;\n      gap: 18px !important;\n      width: 100% !important;\n    }\n\n    /* 1. Brand paragraph + name - at top */\n    .ff-middle {\n      order: 1 !important;\n      width: 100% !important;\n      max-width: 100% !important;\n      text-align: left !important;\n      margin: 0 !important;\n      padding: 0 !important;\n    }\n\n    .ff-middle p {\n      margin: 0 0 8px 0 !important;\n      font-size: 11px !important;\n      line-height: 1.5 !important;\n      color: #555555 !important;\n    }\n\n    .ff-middle .brand-name {\n      font-size: 11px !important;\n     color: #555555 !important;\n      margin: 0 !important;\n    }\n\n    /* 2. Links - each on own line, left-aligned */\n    .ff-left {\n      order: 2 !important;\n      width: 100% !important;\n      display: flex !important;\n      flex-direction: column !important;\n      align-items: flex-start !important;\n      gap: 8px !important;\n      margin: 0 !important;\n      padding: 0 !important;\n    }\n\n    .ff-left a {\n      display: block !important;\n      font-size: 11px !important;\n      color: #555555 !important;\n      text-decoration: none !important;\n      line-height: 1.5 !important;\n      margin: 0 !important;\n      padding: 0 !important;\n    }\n\n    .ff-left a:hover {\n      color: #333333 !important;\n    }\n\n    /* 3. Social icons - single row, left-aligned */\n    .ff-icons {\n      order: 3 !important;\n      width: 100% !important;\n      display: flex !important;\n      flex-direction: row !important;\n      align-items: center !important;\n      gap: 16px !important;\n      margin: 0 !important;\n      padding: 0 !important;\n    }\n\n    .ff-icons a {\n      display: inline-flex !important;\n      align-items: center !important;\n      justify-content: center !important;\n      width: 22px !important;\n      height: 22px !important;\n      color: #555555 !important;\n      text-decoration: none !important;\n      margin: 0 !important;\n      padding: 0 !important;\n    }\n\n    .ff-icons a:hover {\n      color: #333333 !important;\n    }\n\n    .ff-icons svg {\n      width: 22px !important;\n      height: 22px !important;\n    }\n\n    /* 4. Email input - full width at bottom */\n    .ff-email {\n      order: 4 !important;\n      width: 100% !important;\n      display: flex !important;\n      flex-direction: column !important;\n      align-items: flex-start !important;\n      margin: 0 !important;\n      padding: 0 !important;\n      margin-top: 8px !important;\n    }\n\n    .ff-email input {\n      width: 100% !important;\n      max-width: 100% !important;\n      padding: 10px 0 !important;\n      font-size: 11px !important;\n      color: #555555 !important;\n      background: transparent !important;\n      border: none !important;\n      border-bottom: 1px solid #dddddd !important;\n      outline: none !important;\n      font-family: inherit !important;\n      box-sizing: border-box !important;\n    }\n\n    .ff-email input::placeholder {\n      color: #999999 !important;\n    }\n\n    .ff-email input:focus {\n      border-bottom-color: #555555 !important;\n      box-shadow: none !important;\n    }\n\n    .ff-email input:hover {\n      border-bottom-color: #777777 !important;\n    }\n  }\n</style>",
+        "fixed_bottom": false,
+        "color_scheme": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    }
+  },
+  "order": [
+    "17690349093da47b93",
+    "custom_liquid_tYtYMm"
+  ]
+}

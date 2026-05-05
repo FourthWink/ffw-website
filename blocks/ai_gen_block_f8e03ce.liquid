@@ -1,0 +1,549 @@
+{% doc %}
+  @prompt
+    **“Create a product-grid section inspired by the layout of Forty Four Winks.
+    Use rounded capsule-shaped product cards (very large border-radius ~120px).
+    Each product card includes:
+    – Product image
+    – Product title
+    – Product price
+    – A small star icon under the price that instantly adds the product to cart when tapped (no redirect, no popup).
+    Make the star icon minimal, thin-line, black.
+    On hover (desktop), the star slightly glows.
+    On click, the product is added to cart directly.
+    
+    GRID BEHAVIOR:
+    – Desktop: 4 products per row
+    – Mobile: 2 products per row 
+    – Even spacing between items
+    – Fade-to-white gradient at the bottom of the grid (same as reference)
+    
+    CARD DESIGN:
+    – Background: #F5F5F5
+    – Rounded shape: large, soft, capsule shape
+    – Image fits inside card without touching edges
+    – Text centered
+    – Very minimal aesthetic
+    
+    STAR ADD-TO-CART FUNCTION (IMPORTANT):
+    – The star icon must run JS: add the product variant to cart in the background
+    – Do not redirect to cart page
+    – After adding, briefly change the icon color to black for 0.2s then return to normal
+    – Use fetch('/cart/add.js') method
+    
+    Make sure HTML, CSS, and JS are clean and inserted inside the custom liquid block automatically.
+    
+    Also ensure the section works whether the user is logged in or not.”**, Please update this product-grid section to match these requirements:
+    
+    Card shape
+    – Make every product card a tall rounded rectangle (capsule), not a circle/oval around the icon.
+    – The card should be clearly taller than it is wide (similar to 3:4 proportion).
+    – Use a large border radius only on the corners, like border-radius: 120px;, so it looks like a rounded rectangle, not a circle.
+    – Keep the card background a very light grey (#F5F5F5) and remove any visible border.
+    – Center the product image, title and price vertically inside the card with lots of empty space at the top and bottom, like the reference.
+    
+    Star icon as Add to Cart button
+    – The small star under the price must be an interactive add-to-cart button for that p, Please make the product capsules shorter on both desktop and mobile.
+    
+    Right now they are too tall and I have to scroll to see the whole shape.
+    
+    – Keep the same style, color and rounded corners.
+    – Just reduce the height of each capsule so the full card (top curve, image, text, star, bottom curve) is visible without scrolling.
+    – Keep the grid the same: 4 per row on desktop, 2 per row on mobile.
+    – Don’t change the star add-to-cart behavior, only the capsule height and internal spacing., The mobile product cards are still too circular.
+    Please adjust the card shape so it matches the tall rounded rectangles (capsules) from the reference:
+    
+    – Each product card should be clearly taller than it is wide, not a circle around the content.
+    – On mobile, set the card to roughly a 3:4 proportion (for example: width about 48% of the container and a fixed min-height of about 320–360px).
+    – Keep the soft corners but do not make it fully round: use a large corner radius only (for example border-radius: 80px or similar), so it looks like a tall rounded rectangle.
+    – The light grey background should fill the entire capsule from top to bottom, with the image, title, price and star sitting inside it (star near the bottom, not touching the edge).
+    – Keep 2 cards per row on mobile and don’t change the grid or star behavior, only the card shape and proportions.
+    
+    Do not change any other parts of the layout or functionality., The product capsules on desktop still don’t match the reference shape.
+    Mobile is perfect – please do not change mobile.
+    
+    On desktop only:
+    – Make each capsule a taller rounded rectangle, not a circle.
+    – Increase the height of the capsule a bit so it looks more like the reference (a tall pill shape).
+    – Keep the same light grey background and large rounded corners, just change the proportion (taller than it is wide).
+    – Keep the grid (4 per row) and all add-to-cart star behavior exactly as they are.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-product-grid-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    position: relative;
+    padding: 40px 20px;
+  }
+
+  .ai-product-grid-container-{{ ai_gen_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .ai-product-grid-wrapper-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: {{ block.settings.grid_gap }}px;
+    position: relative;
+    padding-bottom: 100px;
+  }
+
+  .ai-product-card-{{ ai_gen_id }} {
+    background-color: {{ block.settings.card_background }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    min-height: 420px;
+    border: none;
+  }
+
+  .ai-product-card-link-{{ ai_gen_id }} {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 100%;
+  }
+
+  .ai-product-image-wrapper-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: 140px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+  }
+
+  .ai-product-image-{{ ai_gen_id }} {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-product-image-secondary-{{ ai_gen_id }} {
+    opacity: 0;
+  }
+
+  @media screen and (min-width: 750px) and (hover: hover) and (pointer: fine) {
+    .ai-product-card-{{ ai_gen_id }}:hover .ai-product-image-wrapper--has-hover-{{ ai_gen_id }} .ai-product-image-primary-{{ ai_gen_id }} {
+      opacity: 0;
+    }
+
+    .ai-product-card-{{ ai_gen_id }}:hover .ai-product-image-wrapper--has-hover-{{ ai_gen_id }} .ai-product-image-secondary-{{ ai_gen_id }} {
+      opacity: 1;
+    }
+  }
+
+  .ai-product-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 1;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+  }
+
+  .ai-product-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+  }
+
+  .ai-product-title-{{ ai_gen_id }} {
+    font-size: 10px;
+    font-weight: 500;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+  }
+
+  .ai-product-price-{{ ai_gen_id }} {
+    font-size: 9px;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 10px 0;
+  }
+
+  .ai-add-to-cart-star-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+
+  .ai-add-to-cart-star-{{ ai_gen_id }}:hover {
+    transform: scale(1.1);
+  }
+
+  .ai-add-to-cart-star-{{ ai_gen_id }}:hover .ai-star-icon-{{ ai_gen_id }} {
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .ai-star-icon-{{ ai_gen_id }} {
+    width: {{ block.settings.star_size }}px;
+    height: {{ block.settings.star_size }}px;
+    stroke: {{ block.settings.star_color }};
+    fill: none;
+    stroke-width: 1.5;
+    transition: all 0.2s ease;
+  }
+
+  .ai-add-to-cart-star-{{ ai_gen_id }}.adding .ai-star-icon-{{ ai_gen_id }} {
+    fill: {{ block.settings.star_color }};
+  }
+
+  .ai-gradient-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 150px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+    pointer-events: none;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-product-grid-wrapper-{{ ai_gen_id }} {
+      grid-template-columns: repeat(2, 1fr);
+      gap: {{ block.settings.grid_gap_mobile }}px;
+    }
+
+    .ai-product-card-{{ ai_gen_id }} {
+      padding: 25px 15px;
+      border-radius: {{ block.settings.card_border_radius_mobile }}px;
+      min-height: {{ block.settings.card_min_height_mobile }}px;
+    }
+
+    .ai-product-image-wrapper-{{ ai_gen_id }} {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+  }
+{% endstyle %}
+
+<product-grid-{{ ai_gen_id }} class="ai-product-grid-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-product-grid-container-{{ ai_gen_id }}">
+    <div class="ai-product-grid-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.collection != blank %}
+        {% for product in block.settings.collection.products limit: block.settings.products_to_show %}
+          {%- liquid
+            assign hover_image = blank
+
+            for image in product.images
+              if product.featured_image == blank or image.id != product.featured_image.id
+                assign hover_image = image
+                break
+              endif
+            endfor
+          -%}
+          <div class="ai-product-card-{{ ai_gen_id }}">
+            <a href="{{ product.url }}" class="ai-product-card-link-{{ ai_gen_id }}">
+              <div class="ai-product-image-wrapper-{{ ai_gen_id }}{% if hover_image != blank %} ai-product-image-wrapper--has-hover-{{ ai_gen_id }}{% endif %}">
+                {% if product.featured_image %}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 400 }}"
+                    alt="{{ product.featured_image.alt | escape }}"
+                    class="ai-product-image-{{ ai_gen_id }} ai-product-image-primary-{{ ai_gen_id }}"
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                  >
+                  {%- if hover_image != blank -%}
+                    <img
+                      src="{{ hover_image | image_url: width: 400 }}"
+                      alt=""
+                      aria-hidden="true"
+                      class="ai-product-image-{{ ai_gen_id }} ai-product-image-secondary-{{ ai_gen_id }}"
+                      loading="lazy"
+                      width="400"
+                      height="{{ 400 | divided_by: hover_image.aspect_ratio | round }}"
+                    >
+                  {%- endif -%}
+                {% else %}
+                  <div class="ai-product-image-placeholder-{{ ai_gen_id }}">
+                    {{ 'product-1' | placeholder_svg_tag }}
+                  </div>
+                {% endif %}
+              </div>
+              <h3 class="ai-product-title-{{ ai_gen_id }}">{{ product.title }}</h3>
+              <div class="ai-product-price-{{ ai_gen_id }}">{{ product.price | money }}</div>
+            </a>
+            <button
+              class="ai-add-to-cart-star-{{ ai_gen_id }}"
+              data-product-id="{{ product.id }}"
+              data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              aria-label="Add {{ product.title }} to cart"
+            >
+              <svg class="ai-star-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              </svg>
+            </button>
+          </div>
+        {% endfor %}
+      {% else %}
+        {% for i in (1..8) %}
+          <div class="ai-product-card-{{ ai_gen_id }}">
+            <a href="#" class="ai-product-card-link-{{ ai_gen_id }}">
+              <div class="ai-product-image-wrapper-{{ ai_gen_id }}">
+                <div class="ai-product-image-placeholder-{{ ai_gen_id }}">
+                  {{ 'product-1' | placeholder_svg_tag }}
+                </div>
+              </div>
+              <h3 class="ai-product-title-{{ ai_gen_id }}">Product Title</h3>
+              <div class="ai-product-price-{{ ai_gen_id }}">EGP 0.00</div>
+            </a>
+            <button class="ai-add-to-cart-star-{{ ai_gen_id }}" aria-label="Add to cart">
+              <svg class="ai-star-icon-{{ ai_gen_id }}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              </svg>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    {% if block.settings.show_gradient %}
+      <div class="ai-gradient-overlay-{{ ai_gen_id }}"></div>
+    {% endif %}
+  </div>
+</product-grid-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ProductGrid{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.setupAddToCart();
+      }
+
+      setupAddToCart() {
+        const buttons = this.querySelectorAll('.ai-add-to-cart-star-{{ ai_gen_id }}');
+        
+        buttons.forEach(button => {
+          button.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const variantId = button.getAttribute('data-variant-id');
+            
+            if (!variantId) return;
+            
+            button.classList.add('adding');
+            
+            try {
+              const response = await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  id: variantId,
+                  quantity: 1
+                })
+              });
+              
+              if (response.ok) {
+                setTimeout(() => {
+                  button.classList.remove('adding');
+                }, 200);
+                
+                document.dispatchEvent(new CustomEvent('cart:refresh'));
+                
+                const cartCountElements = document.querySelectorAll('.cart-count, [data-cart-count]');
+                if (cartCountElements.length > 0) {
+                  const cartResponse = await fetch('/cart.js');
+                  const cart = await cartResponse.json();
+                  cartCountElements.forEach(el => {
+                    el.textContent = cart.item_count;
+                  });
+                }
+              } else {
+                button.classList.remove('adding');
+              }
+            } catch (error) {
+              button.classList.remove('adding');
+            }
+          });
+        });
+      }
+    }
+
+    customElements.define('product-grid-{{ ai_gen_id }}', ProductGrid{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product grid capsule",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "label": "Products to show",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 60,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Desktop border radius",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius_mobile",
+      "min": 40,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "label": "Mobile border radius",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "card_min_height_mobile",
+      "min": 280,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Mobile card height",
+      "default": 340
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "price_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Price size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Star icon"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Star color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "star_size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Star size",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Grid layout"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Desktop gap",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_mobile",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "label": "Mobile gap",
+      "default": 15
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gradient",
+      "label": "Show fade gradient",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product grid capsule"
+    }
+  ]
+}
+{% endschema %}

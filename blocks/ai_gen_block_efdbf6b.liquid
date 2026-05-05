@@ -1,0 +1,532 @@
+{% doc %}
+  @prompt
+    Create a clean, minimal 3-tab product menu section with the following tabs:
+    
+    The 44th Wink (main description)
+    
+    Details
+    
+    Shipping & Returns
+    
+    MOBILE LAYOUT (like the first screenshot):
+    
+    Stack the tabs horizontally at the top.
+    
+    The selected tab should be bold and black.
+    
+    Unselected tabs should be light grey.
+    
+    Add a thin underline only under the active tab.
+    
+    The content of the selected tab should appear directly below the tab list in full width.
+    
+    All text must be centered and easy to read on mobile.
+    
+    DESKTOP LAYOUT (like the second screenshot):
+    
+    Place the tabs vertically on the left side.
+    
+    “The 44th Wink” should be bold black, showing as the active tab.
+    
+    The other tabs (Details, Shipping & Returns) should be light grey until selected.
+    
+    When a tab is selected, make it turn black and bold.
+    
+    The underline should be removed on desktop; instead use bold text to show active state.
+    
+    On the right side, show the tab content in a large readable paragraph.
+    
+    Keep the content perfectly aligned like a 2-column layout.
+    
+    STYLE REQUIREMENTS:
+    
+    No borders, no boxes — only clean minimal text.
+    
+    Luxury, modern, editorial style typography.
+    
+    Soft grey (#B3B3B3) for inactive tabs.
+    
+    Pure black for the active tab.
+    
+    Plenty of spacing between the vertical tabs on desktop.
+    
+    Smooth transition when switching between tabs.
+    
+    Let me fully edit the text inside each tab.
+    
+    CONTENT TO INSERT:
+    
+    Put placeholder text under each tab so I can edit it easily.
+    
+    Make sure this menu works perfectly for both desktop and mobile automatically.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-product-tabs-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.section_padding_mobile }}px 0;
+  }
+
+  .ai-product-tabs-container-{{ ai_gen_id }} {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-product-tabs-layout-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.content_gap_mobile }}px;
+  }
+
+  .ai-product-tabs-nav-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: {{ block.settings.tab_spacing_mobile }}px;
+    border-bottom: 1px solid {{ block.settings.divider_color }};
+  }
+
+  .ai-product-tabs-button-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    padding: {{ block.settings.tab_padding_mobile }}px 0;
+    font-size: 10px;
+    font-weight: 400;
+    color: {{ block.settings.inactive_tab_color }};
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease, font-weight 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .ai-product-tabs-button-{{ ai_gen_id }}.active {
+    color: {{ block.settings.active_tab_color }};
+    font-weight: 700;
+  }
+
+  .ai-product-tabs-button-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: {{ block.settings.active_tab_color }};
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-product-tabs-button-{{ ai_gen_id }}.active::after {
+    opacity: 1;
+  }
+
+  .ai-product-tabs-content-{{ ai_gen_id }} {
+    display: none;
+    text-align: center;
+    font-size: 9px;
+    line-height: {{ block.settings.content_line_height }};
+    color: {{ block.settings.content_color }};
+  }
+
+  .ai-product-tabs-content-{{ ai_gen_id }}.active {
+    display: block;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-product-tabs-{{ ai_gen_id }} {
+      padding: {{ block.settings.section_padding_desktop }}px 0;
+    }
+
+    .ai-product-tabs-layout-{{ ai_gen_id }} {
+      flex-direction: row;
+      gap: {{ block.settings.content_gap_desktop }}px;
+      align-items: flex-start;
+    }
+
+    .ai-product-tabs-nav-{{ ai_gen_id }} {
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: {{ block.settings.tab_spacing_desktop }}px;
+      border-bottom: none;
+      min-width: {{ block.settings.tab_column_width }}px;
+    }
+
+    .ai-product-tabs-button-{{ ai_gen_id }} {
+      text-align: left;
+      padding: {{ block.settings.tab_padding_desktop }}px 0;
+      font-size: 10px;
+    }
+
+    .ai-product-tabs-button-{{ ai_gen_id }}::after {
+      display: none;
+    }
+
+    .ai-product-tabs-content-{{ ai_gen_id }} {
+      flex: 1;
+      text-align: left;
+      font-size: 9px;
+    }
+  }
+  /* Removes extra space at the bottom of the tab */
+selector summary.details__header {
+  padding-bottom: 0 !important;
+}
+
+/* Pulls the content wrapper up to the tab */
+selector .details-content {
+  padding-top: 0 !important;
+  margin-top: 4px !important; /* You can change 4px to 0px if you want it touching */
+}
+
+/* Removes the invisible default margin above the text itself */
+selector .details-content > *:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+{% endstyle %}
+
+<product-tabs-{{ ai_gen_id }} class="ai-product-tabs-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-product-tabs-container-{{ ai_gen_id }}">
+    <div class="ai-product-tabs-layout-{{ ai_gen_id }}">
+      <nav class="ai-product-tabs-nav-{{ ai_gen_id }}" role="tablist">
+        <button
+          class="ai-product-tabs-button-{{ ai_gen_id }} active"
+          data-tab="tab1"
+          role="tab"
+          aria-selected="true"
+          aria-controls="content-tab1-{{ ai_gen_id }}"
+        >
+          {{ block.settings.tab1_title }}
+        </button>
+        <button
+          class="ai-product-tabs-button-{{ ai_gen_id }}"
+          data-tab="tab2"
+          role="tab"
+          aria-selected="false"
+          aria-controls="content-tab2-{{ ai_gen_id }}"
+        >
+          {{ block.settings.tab2_title }}
+        </button>
+        <button
+          class="ai-product-tabs-button-{{ ai_gen_id }}"
+          data-tab="tab3"
+          role="tab"
+          aria-selected="false"
+          aria-controls="content-tab3-{{ ai_gen_id }}"
+        >
+          {{ block.settings.tab3_title }}
+        </button>
+      </nav>
+
+      <div class="ai-product-tabs-panels-{{ ai_gen_id }}">
+        <div
+          id="content-tab1-{{ ai_gen_id }}"
+          class="ai-product-tabs-content-{{ ai_gen_id }} active"
+          data-tab="tab1"
+          role="tabpanel"
+        >
+          {{ block.settings.tab1_content }}
+        </div>
+        <div
+          id="content-tab2-{{ ai_gen_id }}"
+          class="ai-product-tabs-content-{{ ai_gen_id }}"
+          data-tab="tab2"
+          role="tabpanel"
+        >
+          {{ block.settings.tab2_content }}
+        </div>
+        <div
+          id="content-tab3-{{ ai_gen_id }}"
+          class="ai-product-tabs-content-{{ ai_gen_id }}"
+          data-tab="tab3"
+          role="tabpanel"
+        >
+          {{ block.settings.tab3_content }}
+        </div>
+      </div>
+    </div>
+  </div>
+</product-tabs-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ProductTabs{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.buttons = this.querySelectorAll('.ai-product-tabs-button-{{ ai_gen_id }}');
+        this.contents = this.querySelectorAll('.ai-product-tabs-content-{{ ai_gen_id }}');
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.buttons.forEach((button) => {
+          button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+            this.switchTab(targetTab);
+          });
+        });
+      }
+
+      switchTab(targetTab) {
+        this.buttons.forEach((btn) => {
+          const isActive = btn.getAttribute('data-tab') === targetTab;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', isActive);
+        });
+
+        this.contents.forEach((content) => {
+          const isActive = content.getAttribute('data-tab') === targetTab;
+          content.classList.toggle('active', isActive);
+        });
+      }
+    }
+
+    customElements.define('product-tabs-{{ ai_gen_id }}', ProductTabs{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product tabs",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Tab 1"
+    },
+    {
+      "type": "text",
+      "id": "tab1_title",
+      "label": "Title",
+      "default": "The 44th Wink"
+    },
+    {
+      "type": "richtext",
+      "id": "tab1_content",
+      "label": "Content",
+      "default": "<p>Discover the essence of luxury with our carefully crafted product. Each detail has been thoughtfully designed to bring you an exceptional experience that combines elegance with functionality.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Tab 2"
+    },
+    {
+      "type": "text",
+      "id": "tab2_title",
+      "label": "Title",
+      "default": "Details"
+    },
+    {
+      "type": "richtext",
+      "id": "tab2_content",
+      "label": "Content",
+      "default": "<p>Premium materials and expert craftsmanship come together in this exceptional piece. Made with attention to every detail, ensuring lasting quality and timeless style.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Tab 3"
+    },
+    {
+      "type": "text",
+      "id": "tab3_title",
+      "label": "Title",
+      "default": "Shipping & Returns"
+    },
+    {
+      "type": "richtext",
+      "id": "tab3_content",
+      "label": "Content",
+      "default": "<p>We offer complimentary shipping on all orders. Returns are accepted within 30 days of purchase. Please contact our customer service team for assistance with returns or exchanges.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "active_tab_color",
+      "label": "Active tab",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "inactive_tab_color",
+      "label": "Inactive tab",
+      "default": "#B3B3B3"
+    },
+    {
+      "type": "color",
+      "id": "content_color",
+      "label": "Content text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider",
+      "default": "#E6E6E6"
+    },
+    {
+      "type": "header",
+      "content": "Mobile layout"
+    },
+    {
+      "type": "range",
+      "id": "tab_font_size_mobile",
+      "label": "Tab font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "content_font_size_mobile",
+      "label": "Content font size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "tab_spacing_mobile",
+      "label": "Tab spacing",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "tab_padding_mobile",
+      "label": "Tab padding",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "content_gap_mobile",
+      "label": "Content gap",
+      "min": 15,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "section_padding_mobile",
+      "label": "Section padding",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Desktop layout"
+    },
+    {
+      "type": "range",
+      "id": "tab_font_size_desktop",
+      "label": "Tab font size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "content_font_size_desktop",
+      "label": "Content font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "tab_spacing_desktop",
+      "label": "Tab spacing",
+      "min": 15,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "tab_padding_desktop",
+      "label": "Tab padding",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "content_gap_desktop",
+      "label": "Content gap",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "tab_column_width",
+      "label": "Tab column width",
+      "min": 120,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "section_padding_desktop",
+      "label": "Section padding",
+      "min": 20,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "content_line_height",
+      "label": "Content line height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.6
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product tabs"
+    }
+  ]
+}
+{% endschema %}

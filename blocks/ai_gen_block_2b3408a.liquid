@@ -1,0 +1,327 @@
+{% doc %}
+  @prompt
+    create an add to card button
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-add-to-cart-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-add-to-cart-container-{{ ai_gen_id }} {
+    width: 100%;
+  }
+
+  .ai-add-to-cart-button-{{ ai_gen_id }} {
+    width: 100%;
+    padding: {{ block.settings.button_padding }}px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: {{ block.settings.button_border_width }}px solid {{ block.settings.button_border_color }};
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .ai-add-to-cart-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+    color: {{ block.settings.button_hover_text_color }};
+    border-color: {{ block.settings.button_hover_border_color }};
+    font-weight: 700;
+    opacity: 0.85;
+  }
+
+  .ai-add-to-cart-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .ai-add-to-cart-icon-{{ ai_gen_id }} {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .ai-add-to-cart-text-{{ ai_gen_id }} {
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-add-to-cart-container-{{ ai_gen_id }} {
+      width: {{ block.settings.desktop_width_percent }}%;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-add-to-cart-container-{{ ai_gen_id }} {
+      width: {{ block.settings.desktop_width_percent }}%;
+    }
+  }
+{% endstyle %}
+
+<add-to-cart-{{ ai_gen_id }} class="ai-add-to-cart-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-add-to-cart-container-{{ ai_gen_id }}">
+    <button
+      type="button"
+      class="ai-add-to-cart-button-{{ ai_gen_id }}"
+      data-product-id="{{ product.id }}"
+      {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+    >
+      {% if block.settings.show_icon %}
+        <svg class="ai-add-to-cart-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+      {% endif %}
+      <span class="ai-add-to-cart-text-{{ ai_gen_id }}">
+        {% if product.selected_or_first_available_variant.available %}
+          {{ block.settings.button_text }}
+        {% else %}
+          {{ block.settings.sold_out_text }}
+        {% endif %}
+      </span>
+    </button>
+  </div>
+</add-to-cart-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class AddToCart{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.button = this.querySelector('.ai-add-to-cart-button-{{ ai_gen_id }}');
+        this.originalText = this.button.querySelector('.ai-add-to-cart-text-{{ ai_gen_id }}').textContent;
+      }
+
+      connectedCallback() {
+        this.button.addEventListener('click', this.handleAddToCart.bind(this));
+      }
+
+      async handleAddToCart() {
+        if (this.button.disabled) return;
+
+        const productId = this.button.dataset.productId;
+        const variantId = {{ product.selected_or_first_available_variant.id }};
+
+        this.setLoading(true);
+
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: variantId,
+              quantity: 1
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to add to cart');
+          }
+
+          const data = await response.json();
+          
+          this.setSuccess();
+          
+          document.dispatchEvent(new CustomEvent('cart:refresh'));
+          
+          setTimeout(() => {
+            this.resetButton();
+          }, 2000);
+
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+          this.setError();
+          setTimeout(() => {
+            this.resetButton();
+          }, 2000);
+        }
+      }
+
+      setLoading(isLoading) {
+        const textElement = this.button.querySelector('.ai-add-to-cart-text-{{ ai_gen_id }}');
+        if (isLoading) {
+          this.button.disabled = true;
+          textElement.textContent = '{{ block.settings.loading_text }}';
+        }
+      }
+
+      setSuccess() {
+        const textElement = this.button.querySelector('.ai-add-to-cart-text-{{ ai_gen_id }}');
+        textElement.textContent = '{{ block.settings.success_text }}';
+        this.button.disabled = false;
+      }
+
+      setError() {
+        const textElement = this.button.querySelector('.ai-add-to-cart-text-{{ ai_gen_id }}');
+        textElement.textContent = 'Error - Try again';
+        this.button.disabled = false;
+      }
+
+      resetButton() {
+        const textElement = this.button.querySelector('.ai-add-to-cart-text-{{ ai_gen_id }}');
+        textElement.textContent = this.originalText;
+      }
+    }
+
+    customElements.define('add-to-cart-{{ ai_gen_id }}', AddToCart{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Add to cart button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Button text"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Add to cart"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_text",
+      "label": "Sold out text",
+      "default": "Sold out"
+    },
+    {
+      "type": "text",
+      "id": "loading_text",
+      "label": "Loading text",
+      "default": "Adding..."
+    },
+    {
+      "type": "text",
+      "id": "success_text",
+      "label": "Success text",
+      "default": "Added!"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Show cart icon",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_padding",
+      "label": "Padding",
+      "min": 8,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "label": "Border width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Border",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Hover background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Hover text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_border_color",
+      "label": "Hover border",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Add to cart button"
+    }
+  ]
+}
+{% endschema %}

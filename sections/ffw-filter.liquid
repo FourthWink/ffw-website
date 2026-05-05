@@ -1,0 +1,520 @@
+{% comment %}
+  =============================================
+  FORTY FOUR WINKS — Filter Panel Section
+  File: sections/ffw-filter.liquid
+  =============================================
+{% endcomment %}
+
+{%- comment -%} ── Glass Backdrop for the Blur ── {%- endcomment -%}
+<div id="ffw-filter-backdrop" class="ffw-filter-backdrop"></div>
+
+<div
+  id="ffw-filter-view"
+  class="ffw-filter-view"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Filter products"
+  data-source=""
+>
+  <section class="ffw-filter-section">
+    <div class="ffw-filter-island">
+
+      <button class="ffw-filter-close filter-close" id="ffw-filter-close-btn" aria-label="Close filter panel" type="button">
+        &times;
+      </button>
+
+      <div class="ffw-filter-container">
+
+        {%- comment -%} ── Left column: Type / Color / Size ─────────────── {%- endcomment -%}
+        <div class="ffw-filter-col ffw-filter-col-left">
+
+          {%- comment -%} TYPE {%- endcomment -%}
+          <div class="ffw-filter-row">
+            <span class="ffw-filter-label">Type</span>
+            <div class="ffw-filter-options-stack">
+              <div class="ffw-filter-options-row">
+                <button class="ffw-filter-link" data-filter-group="type" data-filter-value="tops" type="button">Tops</button>
+                <button class="ffw-filter-link" data-filter-group="type" data-filter-value="shirts" type="button">Shirts</button>
+                <button class="ffw-filter-link" data-filter-group="type" data-filter-value="trousers" type="button">Trousers</button>
+                <button class="ffw-filter-link" data-filter-group="type" data-filter-value="shorts" type="button">Shorts</button>
+              </div>
+              <div class="ffw-filter-options-row">
+                <button class="ffw-filter-link" data-filter-group="type" data-filter-value="accessories" type="button">Accessories</button>
+              </div>
+            </div>
+          </div>
+
+          {%- comment -%} COLOR {%- endcomment -%}
+          <div class="ffw-filter-row">
+            <span class="ffw-filter-label">Color</span>
+            <div class="ffw-filter-options-stack">
+              <div class="ffw-filter-options-row">
+                <button class="ffw-filter-link" data-filter-group="color" data-filter-value="black" type="button">Black</button>
+                <button class="ffw-filter-link" data-filter-group="color" data-filter-value="white" type="button">White</button>
+                <button class="ffw-filter-link" data-filter-group="color" data-filter-value="blue" type="button">Blue</button>
+                <button class="ffw-filter-link" data-filter-group="color" data-filter-value="grey" type="button">Grey</button>
+              </div>
+              <div class="ffw-filter-options-row">
+                <button class="ffw-filter-link" data-filter-group="color" data-filter-value="multicolor" type="button">Multicolor</button>
+              </div>
+            </div>
+          </div>
+
+          {%- comment -%} SIZE {%- endcomment -%}
+          <div class="ffw-filter-row">
+            <span class="ffw-filter-label">Size</span>
+            <div class="ffw-filter-options-stack">
+              <div class="ffw-filter-options-row">
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="34" type="button">34</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="36" type="button">36</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="38" type="button">38</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="40" type="button">40</button>
+              </div>
+              <div class="ffw-filter-options-row">
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="42" type="button">42</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="44" type="button">44</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="46" type="button">46</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="48" type="button">48</button>
+              </div>
+              <div class="ffw-filter-options-row">
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="s" type="button">S</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="m" type="button">M</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="l" type="button">L</button>
+                <button class="ffw-filter-link" data-filter-group="size" data-filter-value="xl" type="button">XL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {%- comment -%} ── Right column: Sort & Availability ──────── {%- endcomment -%}
+        <div class="ffw-filter-col ffw-filter-col-right">
+          <div class="ffw-filter-row">
+            <span class="ffw-filter-label">Sort</span>
+            <div class="ffw-filter-options-stack">
+              <div class="ffw-filter-options-row">
+                <button class="ffw-filter-link" data-filter-group="sort" data-filter-value="created-descending" type="button">New In</button>
+                <button class="ffw-filter-link" data-filter-group="availability" data-filter-value="1" type="button">Availability</button>
+                <button class="ffw-filter-link" data-filter-group="sort" data-filter-value="price-asc" type="button">Price Ascending</button>
+                <button class="ffw-filter-link" data-filter-group="sort" data-filter-value="price-desc" type="button">Price Descending</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ffw-filter-bottom">
+        <button class="ffw-clear-all-link" id="ffw-clear-all" type="button">Clear All</button>
+        <button class="ffw-filter-soul-divider" id="ffw-apply-filter-btn" type="button">
+          <img src="{{ 'half-soul.svg' | asset_url }}" alt="Apply">
+          <span class="ffw-filter-apply-text">Apply</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+{% stylesheet %}
+  /* ── Fade out the "Filter" button when menu opens ── */
+  .filter-trigger {
+    transition: opacity 0.3s ease;
+  }
+  body.ffw-filter-open .filter-trigger {
+    opacity: 0;
+    pointer-events: none; /* Stops it from being clickable while invisible */
+  }
+
+  /* ── Dedicated Glass Backdrop ──────────────────────────── */
+  .ffw-filter-backdrop {
+    position: fixed;
+    top: var(--header-group-height, 80px);
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - var(--header-group-height, 80px));
+    background: rgba(255, 255, 255, 0.1); /* Very subtle white tint */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 989; 
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0s 0.4s;
+  }
+
+  .ffw-filter-backdrop.ffw-show {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s ease, visibility 0s 0s;
+  }
+
+  /* ── Page Push Animation ────────────────────────────────── */
+  /* Smoothly slide the main products down when filter opens */
+  body.ffw-filter-open main, 
+  body.ffw-filter-open #MainContent,
+  body.ffw-filter-open #main-content {
+    transform: translateY(34.5vh);
+  }
+
+  main, #MainContent, #main-content {
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  /* Force the main header to stay on top of everything */
+  #header-group { position: relative; z-index: 1000 !important; }
+
+  /* ── Filter Panel ─────────────────────────────────────── */
+  .ffw-filter-view {
+    position: fixed;
+    top: var(--header-group-height, 80px);
+    left: 50%;
+    width: 100%;
+    height: 50vh;
+    max-height: calc(100vh - var(--header-group-height, 80px));
+    transform: translate(-50%, -20px);
+    background: transparent;
+    z-index: 990; 
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease, visibility 0s 0.2s;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .ffw-filter-view.ffw-show {
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease, visibility 0s 0s;
+  }
+
+  /* Island */
+  .ffw-filter-section {
+    position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    pointer-events: auto;
+    margin-top: 0;
+  }
+
+  .ffw-filter-island {
+    position: relative;
+    width: 98.5%;
+    max-width: none;
+    margin: 0;
+    height: 100%;
+    background: rgba(250, 250, 250, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 0 0 80px 80px;
+    padding: 20px 0 50px;
+    box-sizing: border-box;
+    overflow: visible;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none;
+  }
+
+  #ffw-filter-view::after, .ffw-filter-island::after { display: none !important; }
+
+  /* Close button */
+  .ffw-filter-close {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    color: #555;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 2002;
+    padding: 0;
+    line-height: 1;
+  }
+  .ffw-filter-close:hover { color: #111; font-weight: 700; }
+
+  /* Container */
+  .ffw-filter-container {
+    display: flex;
+    width: auto;
+    margin: 15px 50px 0; 
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+  }
+
+  .ffw-filter-col { display: flex; flex-direction: column; gap: 0; justify-content: flex-start; }
+  .ffw-filter-col-left  { flex: 2; align-items: flex-start; }
+  .ffw-filter-col-right { flex: 2; align-items: flex-end; padding-left: 0; padding-right: 20px; }
+  
+  .ffw-filter-row { display: flex; align-items: flex-start; width: 100%; margin-bottom: 20px; }
+  .ffw-filter-col-left  .ffw-filter-row { justify-content: flex-start; gap: 40px; }
+  .ffw-filter-col-right .ffw-filter-row { justify-content: flex-end; gap: 30px; }
+
+  /* THE GAP UNDER TYPES */
+  .ffw-filter-col-left .ffw-filter-row:nth-child(1) {
+    margin-bottom: 40px; 
+  }
+
+div#ffw-filter-view span.ffw-filter-label {
+    font-size: 9px !important; /* LOCKED */
+    color: #333;
+    width: 40px;
+    text-transform: capitalize;
+    line-height: 1;
+    margin-top: -10px;
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+
+  /* The actual clickable filter options */
+  div#ffw-filter-view button.ffw-filter-link {
+    font-size: 9px !important; /* LOCKED */
+    color: #555;
+    text-decoration: none;
+    transition: color 0.3s;
+    white-space: nowrap;
+    line-height: 1;
+    margin-top: 0px;
+    display: block;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+  div#ffw-filter-view button.ffw-filter-link:hover { color: #666; }
+  div#ffw-filter-view button.ffw-filter-link.ffw-active { color: #000; }
+
+  .ffw-filter-options-stack { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .ffw-filter-options-row { display: flex; flex-direction: row; gap: 35px; align-items: flex-start; }
+  .ffw-filter-options { display: flex; flex-direction: column; gap: 10px; }
+
+  .ffw-filter-col-left .ffw-filter-row:nth-child(2) .ffw-filter-options-row { gap: 0; }
+  .ffw-filter-col-left .ffw-filter-row:nth-child(2) .ffw-filter-options-row .ffw-filter-link:nth-child(1) { margin-right: 48px; }
+  .ffw-filter-col-left .ffw-filter-row:nth-child(2) .ffw-filter-options-row .ffw-filter-link:nth-child(2) { margin-right: 32px; }
+  .ffw-filter-col-left .ffw-filter-row:nth-child(2) .ffw-filter-options-row .ffw-filter-link:nth-child(3) { margin-right: 38px; }
+
+  .ffw-filter-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .ffw-clear-all-link {
+    position: absolute;
+    bottom: 12px;
+    left: calc(50% - 160px); 
+    font-size: 10px; 
+    color: #555;
+    text-decoration: none;
+    pointer-events: auto;
+    transition: color 0.3s;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  .ffw-clear-all-link:hover { color: #333; font-weight: 700; }
+
+  .ffw-filter-soul-divider {
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    transform: translateX(-50%);
+    background: transparent;
+    border: none;
+    padding: 0;
+    z-index: 6;
+    cursor: pointer;
+    pointer-events: auto;
+    display: flex;
+    justify-content: center;
+  }
+  .ffw-filter-soul-divider img { display: block; width: 150px; height: auto; } 
+
+  .ffw-filter-apply-text {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: bold;
+    color: #444;
+    
+  }
+
+  /* Responsive */
+  @media (max-width: 1023px) { .ffw-filter-container { margin: 15px 30px 0; } }
+  @media (max-width: 767px) {
+    .ffw-filter-view { height: 60vh; max-height: 60vh; }
+    .ffw-filter-container { flex-direction: column; gap: 15px; margin: 15px 15px 0; }
+    .ffw-filter-col-left, .ffw-filter-col-right { flex: unset; width: 100%; padding-right: 0; }
+    .ffw-filter-row { gap: 15px !important; }
+    .ffw-filter-col-right .ffw-filter-options-row { flex-wrap: wrap; }
+  }
+{% endstylesheet %}
+
+<script>
+  (function() {
+    function initFilterPanel() {
+      var panel = document.getElementById('ffw-filter-view');
+      var backdrop = document.getElementById('ffw-filter-backdrop'); 
+      if (!panel) return;
+
+      var currentSource = '';        
+      var activeFilters = { type: '', color: '', size: '', sort: '', availability: '' };
+
+      function openPanel(source) {
+        currentSource = source || '';
+        panel.dataset.source = currentSource;
+        panel.classList.add('ffw-show');
+        if (backdrop) backdrop.classList.add('ffw-show'); 
+        document.body.classList.add('ffw-filter-open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closePanel() {
+        panel.classList.remove('ffw-show');
+        if (backdrop) backdrop.classList.remove('ffw-show'); 
+        document.body.classList.remove('ffw-filter-open');
+        document.body.style.overflow = '';
+      }
+
+      function clearAll() {
+        activeFilters = { type: '', color: '', size: '', sort: '', availability: '' };
+        panel.querySelectorAll('.ffw-filter-link.ffw-active').forEach(function(el) {
+          el.classList.remove('ffw-active');
+        });
+      }
+
+      function buildCollectionUrl(source) {
+        var baseUrl = (source === 'shop') ? '/collections/all' : (source === 'newin' ? '/collections/new-in' : window.location.pathname);
+        var params = new URLSearchParams();
+        if (activeFilters.sort) params.set('sort_by', activeFilters.sort);
+        if (activeFilters.type) params.set('filter.p.product_type', activeFilters.type);
+        if (activeFilters.color) params.set('filter.p.m.custom.color', activeFilters.color);
+        if (activeFilters.size) params.set('filter.v.option.size', activeFilters.size);
+        if (activeFilters.availability === '1') params.set('filter.v.availability', '1');
+        var query = params.toString();
+        return query ? baseUrl + '?' + query : baseUrl;
+      }
+
+      /* Listen for external open triggers from Shop and New In grids */
+      document.addEventListener('ffw:filter:open', function(e) {
+        if (panel.classList.contains('ffw-show')) { 
+          closePanel(); 
+        } else { 
+          openPanel(e.detail.source); 
+        }
+      });
+
+      /* ── SUPER BULLETPROOF GLOBAL LISTENER ── */
+      document.addEventListener('click', function(e) {
+        var trigger = e.target.closest('.filter-trigger');
+        var closeBtn = e.target.closest('#ffw-filter-close-btn');
+
+        if (trigger) {
+          e.preventDefault(); e.stopPropagation();
+          var source = trigger.dataset.source || 'shop';
+          if (panel.classList.contains('ffw-show')) { closePanel(); } else { openPanel(source); }
+          return;
+        }
+        if (closeBtn) { closePanel(); return; }
+
+        /* Close if clicked on the backdrop OR outside the panel */
+        if (panel.classList.contains('ffw-show')) {
+          if (e.target === backdrop || (!panel.contains(e.target) && !e.target.closest('.ffw-filter-view'))) {
+            closePanel();
+          }
+        }
+      });
+
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePanel(); });
+
+      /* ── Filter option buttons (LIVE FILTERING) ── */
+      panel.addEventListener('click', function(e) {
+        var btn = e.target.closest('.ffw-filter-link');
+        if (!btn) return;
+        var group = btn.dataset.filterGroup;
+        var value = btn.dataset.filterValue;
+        if (!group) return;
+
+        if (activeFilters[group] === value) {
+          activeFilters[group] = '';
+          btn.classList.remove('ffw-active');
+        } else {
+          var prev = panel.querySelector('.ffw-filter-link.ffw-active[data-filter-group="' + group + '"]');
+          if (prev) prev.classList.remove('ffw-active');
+          activeFilters[group] = value;
+          btn.classList.add('ffw-active');
+        }
+
+        /* Fire the filter instantly so user sees products sort live */
+        document.dispatchEvent(new CustomEvent('ffw:filter:apply', {
+          detail: { source: currentSource, filters: activeFilters }
+        }));
+
+        /* Silently update the URL */
+        if (window.location.pathname.indexOf('/collections/') !== -1) {
+          window.history.pushState(null, '', buildCollectionUrl(currentSource));
+        }
+      });
+
+      /* ── Clear All ── */
+      var clearBtn = document.getElementById('ffw-clear-all');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+          clearAll();
+          document.dispatchEvent(new CustomEvent('ffw:filter:apply', {
+            detail: { source: currentSource, filters: activeFilters }
+          }));
+          if (window.location.pathname.indexOf('/collections/') !== -1) {
+            window.history.pushState(null, '', buildCollectionUrl(currentSource));
+          }
+        });
+      }
+
+      /* ── Apply (Now smoothly closes) ── */
+      var applyBtn = document.getElementById('ffw-apply-filter-btn');
+      if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+          closePanel();
+        });
+      }
+    }
+
+    /* Wait for the DOM so we don't try to attach to elements that don't exist yet */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFilterPanel);
+    } else {
+      initFilterPanel();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "FFW – Filter Panel",
+  "tag": "div",
+  "class": "ffw-filter-wrapper",
+  "settings": [],
+  "presets": [ { "name": "FFW – Filter Panel" } ]
+}
+{% endschema %}

@@ -1,0 +1,526 @@
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .ai-picks-grid-{{ ai_gen_id }} {
+    --picks-gap: {{ block.settings.grid_gap }}px;
+    --picks-radius: {{ block.settings.inner_corner_radius }}px;
+    position: relative;
+    width: 100%;
+    display: block;
+    margin-top: 50px;
+    padding: 0;
+  }
+
+  .ai-picks-grid-container-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--picks-gap);
+    padding: 0 0;
+    position: relative;
+  }
+
+  .ai-picks-box-{{ ai_gen_id }} {
+    position: relative;
+    height: 37vh;
+    background-color: {{ block.settings.box_background_color }};
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6% 5%;
+    text-decoration: none;
+    border-radius: 75px;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-picks-box-media-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-bottom: 4%;
+    margin-top: -6%;
+  }
+
+  .ai-picks-box-image-{{ ai_gen_id }} {
+    grid-area: 1 / 1;
+    width: auto;
+    max-width: 30%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    display: block;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-picks-box-image-secondary-{{ ai_gen_id }} {
+    opacity: 0;
+  }
+
+  /* Fixed-height bottom zone so card never shifts */
+  .ai-picks-bottom-{{ ai_gen_id }} {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 20%;
+    width: 100%;
+  }
+
+  /* Text group: anchored to bottom, slides up + fades out on hover */
+  .ai-picks-text-group-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    bottom: -25px; /* <-- CHANGED to hard pixels to force a big drop! */
+    left: 0;
+    right: 0;
+    transform: translateY(0);
+    transition: transform 0.25s ease, opacity 0.2s ease;
+  }
+
+  .ai-picks-box-{{ ai_gen_id }}:hover .ai-picks-text-group-{{ ai_gen_id }} {
+    transform: translateY(-70%);
+  }
+
+  @media screen and (min-width: 769px) and (hover: hover) and (pointer: fine) {
+    .ai-picks-box-{{ ai_gen_id }}:hover .ai-picks-box-media--has-hover-{{ ai_gen_id }} .ai-picks-box-image-primary-{{ ai_gen_id }} {
+      opacity: 0;
+    }
+
+    .ai-picks-box-{{ ai_gen_id }}:hover .ai-picks-box-media--has-hover-{{ ai_gen_id }} .ai-picks-box-image-secondary-{{ ai_gen_id }} {
+      opacity: 1;
+    }
+  }
+
+  .ai-picks-box-title-{{ ai_gen_id }} {
+    z-index: 1;
+    color: #000000;
+    font-size: 10px;
+    font-weight: 500;
+    
+    text-align: center;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .ai-picks-box-price-{{ ai_gen_id }} {
+    z-index: 1;
+    color: #444444;
+    font-size: 9px;
+    opacity: 0.7;
+    margin-top: 0.4em;
+    text-align: center;
+  }
+
+.sparkle-btn-{{ ai_gen_id }} {
+    z-index: 3;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: -25px; /* <-- MATCHES the text drop! */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  /* Show on card hover — applies to BOTH empty and filled states */
+  .ai-picks-box-{{ ai_gen_id }}:hover .sparkle-btn-{{ ai_gen_id }} {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Scale on direct button hover */
+  .sparkle-btn-{{ ai_gen_id }}:hover {
+    transform: translateX(-50%) scale(1.15);
+  }
+
+  .sparkle-btn-{{ ai_gen_id }} img {
+    width: auto;
+    height: 11px;
+    display: block;
+    transition: filter 0.2s ease;
+  }
+
+  /* Pop animation — plays on both add AND remove */
+  @keyframes sparkle-pop-{{ ai_gen_id }} {
+    0%   { transform: translateX(-50%) scale(1);    }
+    40%  { transform: translateX(-50%) scale(1.55); }
+    70%  { transform: translateX(-50%) scale(0.88); }
+    100% { transform: translateX(-50%) scale(1);    }
+  }
+
+  .sparkle-btn-{{ ai_gen_id }}.sparkle-popping {
+    animation: sparkle-pop-{{ ai_gen_id }} 0.35s ease forwards;
+  }
+
+  /* Center Floating Label */
+  .ai-picks-label-{{ ai_gen_id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    color: {{ block.settings.label_color }};
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-picks-grid-{{ ai_gen_id }} {
+      width: 100%;
+    }
+
+    .ai-picks-grid-container-{{ ai_gen_id }} {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 0 10px;
+    }
+
+    .ai-picks-box-{{ ai_gen_id }} {
+      height: 34vh;
+      border-radius: 70px;
+      padding: 5% 4%;
+    }
+
+    .ai-picks-box-media-{{ ai_gen_id }} {
+      height: 70%;
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+
+    .ai-picks-bottom-{{ ai_gen_id }} {
+      height: 30%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .ai-picks-text-group-{{ ai_gen_id }} {
+      position: static;
+      transform: none !important;
+      transition: none !important;
+      text-align: center;
+    }
+
+    .ai-picks-box-{{ ai_gen_id }}:hover .ai-picks-text-group-{{ ai_gen_id }} {
+      transform: none !important;
+    }
+
+    /* On mobile there's no hover, so sparkle is always visible */
+    .sparkle-btn-{{ ai_gen_id }} {
+      position: static;
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+      padding: 12px 20px;
+      margin-bottom: -12px;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .sparkle-btn-{{ ai_gen_id }}:hover {
+      transform: none;
+      opacity: 0.8;
+    }
+
+    .ai-picks-box-title-{{ ai_gen_id }} {
+      font-size: 10px;
+    }
+
+    .ai-picks-box-price-{{ ai_gen_id }} {
+      font-size: 9px;
+    }
+
+    .sparkle-btn-{{ ai_gen_id }} img {
+      height: 11px;
+    }
+
+    .ai-picks-label-{{ ai_gen_id }} {
+      font-size: 10px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-picks-grid-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-picks-grid-container-{{ ai_gen_id }}">
+
+    {% for i in (1..4) %}
+      {% capture prod_setting %}product_{{ i }}{% endcapture %}
+      {% capture title_setting %}title_{{ i }}{% endcapture %}
+      {% assign prod = block.settings[prod_setting] %}
+
+      {%- comment -%}
+        Gather product data for the wishlist.
+        We use the first available variant as the variant_id.
+        Price is in cents so we divide by 100 for storage.
+      {%- endcomment -%}
+      {% assign wl_variant_id  = prod.first_available_variant.id | default: prod.variants.first.id %}
+      {% assign wl_title       = prod.title | default: block.settings[title_setting] %}
+      {% assign wl_price_cents = prod.price | default: 0 %}
+      {% assign wl_price_val   = wl_price_cents | divided_by: 100.0 %}
+      {% assign wl_price_fmt   = prod.price | default: 0 | money %}
+      {% assign wl_image       = prod.featured_image | image_url: width: 400 %}
+      {% assign wl_url         = prod.url | default: '#' %}
+      {% assign hover_image    = blank %}
+
+      {% if prod != blank %}
+        {% for image in prod.images %}
+          {% if prod.featured_image == blank or image.id != prod.featured_image.id %}
+            {% assign hover_image = image %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      <div class="ai-picks-box-{{ ai_gen_id }}">
+        <a href="{{ wl_url }}" style="position: absolute; inset: 0; z-index: 1;"></a>
+
+        {% if prod.featured_image %}
+          <div class="ai-picks-box-media-{{ ai_gen_id }}{% if hover_image != blank %} ai-picks-box-media--has-hover-{{ ai_gen_id }}{% endif %}">
+            <img
+              src="{{ prod.featured_image | image_url: width: 800 }}"
+              alt="{{ prod.title | escape }}"
+              class="ai-picks-box-image-{{ ai_gen_id }} ai-picks-box-image-primary-{{ ai_gen_id }}"
+              loading="lazy"
+              width="800"
+              height="800"
+            >
+            {%- if hover_image != blank -%}
+              <img
+                src="{{ hover_image | image_url: width: 800 }}"
+                alt=""
+                aria-hidden="true"
+                class="ai-picks-box-image-{{ ai_gen_id }} ai-picks-box-image-secondary-{{ ai_gen_id }}"
+                loading="lazy"
+                width="800"
+                height="{{ 800 | divided_by: hover_image.aspect_ratio | round }}"
+              >
+            {%- endif -%}
+          </div>
+        {% endif %}
+
+        <div class="ai-picks-bottom-{{ ai_gen_id }}">
+
+          <!-- Text slides up on hover -->
+          <div class="ai-picks-text-group-{{ ai_gen_id }}">
+            <h3 class="ai-picks-box-title-{{ ai_gen_id }}">{{ wl_title }}</h3>
+            <div class="ai-picks-box-price-{{ ai_gen_id }}">
+              {{ prod.price | default: 10000 | money }}
+            </div>
+          </div>
+          <!--
+            Sparkle button — all product data lives here as data-* attributes.
+            header.liquid's ffwinksToggleWishlist() reads them directly.
+            data-svg-empty  = outline sparkle (not wishlisted)
+            data-svg-filled = filled sparkle (wishlisted)
+          -->
+          <button
+  class="sparkle-btn-{{ ai_gen_id }}"
+  data-ffwinks-sparkle
+  data-variant-id="{{ wl_variant_id }}"
+  data-title="{{ wl_title | escape }}"
+  data-price="{{ wl_price_val }}"
+  data-price-formatted="{{ wl_price_fmt | escape }}"
+  data-currency="{{ cart.currency.iso_code | default: 'GBP' }}"
+  data-image="{{ wl_image }}"
+  data-url="{{ wl_url }}"
+{% assign size_names = prod.metafields.shopify.size.value | map: 'label' | join: ', ' %}
+{% assign color_names = prod.metafields.shopify.color-pattern.value | map: 'label' | join: ', ' %}
+data-available-sizes="{{ size_names }}"
+data-available-colors="{{ color_names }}"
+  data-svg-empty="{{ 'sparkle.svg' | asset_url }}"
+  data-svg-filled="{{ 'sparkle-icon.svg' | asset_url }}">
+            <img src="{{ 'sparkle.svg' | asset_url }}" alt="Wishlist">
+          </button>
+
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="ai-picks-label-{{ ai_gen_id }}">
+      {{ block.settings.center_label }}
+    </div>
+  </div>
+</div>
+
+<script>
+  /* Sync sparkle visual states as soon as this block renders.
+     We wait for DOMContentLoaded in case header.liquid hasn't run yet,
+     then re-sync once header's IIFE has definitely finished. */
+  (function () {
+    function sync() {
+      if (typeof window.ffwinksSyncSparkles === 'function') {
+        window.ffwinksSyncSparkles();
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', sync);
+    } else {
+      sync();
+    }
+    /* Also try after a short delay to catch late-loading header scripts */
+    setTimeout(sync, 300);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product picks grid",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Grid layout"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Gap between boxes",
+      "min": 8,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Box style"
+    },
+    {
+      "type": "header",
+      "content": "Center label"
+    },
+    {
+      "type": "text",
+      "id": "center_label",
+      "label": "Label text",
+      "default": "44's Picks"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "label_font_size",
+      "label": "Label font size",
+      "min": 9,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "box_background_color",
+      "label": "Background color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Title font size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Product 1"
+    },
+    {
+      "type": "product",
+      "id": "product_1",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "Fallback title",
+      "default": "Product 1"
+    },
+    {
+      "type": "header",
+      "content": "Product 2"
+    },
+    {
+      "type": "product",
+      "id": "product_2",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "Fallback title",
+      "default": "Product 2"
+    },
+    {
+      "type": "header",
+      "content": "Product 3"
+    },
+    {
+      "type": "product",
+      "id": "product_3",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "Fallback title",
+      "default": "Product 3"
+    },
+    {
+      "type": "header",
+      "content": "Product 4"
+    },
+    {
+      "type": "product",
+      "id": "product_4",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "title_4",
+      "label": "Fallback title",
+      "default": "Product 4"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product picks grid"
+    }
+  ]
+}
+{% endschema %}

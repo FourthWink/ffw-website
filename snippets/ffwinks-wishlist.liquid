@@ -1,0 +1,49 @@
+{% comment %}
+  FFWinks — Wishlist Fullscreen Overlay
+  Full-viewport panel that lists saved wishlist items.
+
+  Item rows are injected at runtime by renderWishlistOverlay() in ffwinks-js.liquid.
+  The "Add all to cart" button moves all items to the cart overlay in one fetch call.
+  "Share my wishlist" copies a shareable URL to the clipboard.
+
+  Triggered by:
+    a[href*="/wishlist"], a[aria-label*="wishlist"],
+    [data-wishlist-nav], .header-actions__action--wishlist,
+    a:has(img[alt*="sparkle"]), a:has(img[src*="sparkle"])
+
+  CSS: search in header.liquid for "► SECTION: ffwinks-cart.liquid  &  ffwinks-wishlist.liquid"
+{% endcomment %}
+
+<div id="ffwinks-wishlist-overlay" class="ffwinks-fullscreen" aria-hidden="true" role="dialog" aria-label="Wishlist">
+
+  <div class="ffwinks-fullscreen__wishlist-header">
+    <button class="ffwinks-share-btn" id="ffwinks-wishlist-share">Share my wishlist</button>
+  </div>
+
+  <div class="ffwinks-soul-list" id="ffwinks-wishlist-list">
+    <div id="ffwinks-wishlist-empty" class="ffwinks-soul-addall-wrapper" style="pointer-events: none;">
+  <div class="ffwinks-img-btn-wrap">
+    <img src="{{ 'addall.svg' | asset_url }}" alt="" class="ffwinks-action-img ffwinks-action-img--invert">
+    <span class="ffwinks-img-label">Wishlist is empty</span>
+  </div>
+</div>
+  </div>
+
+  <div class="ffwinks-soul-subtotal-wrapper">
+    <div class="ffwinks-soul-subtotal-row">
+      <span class="ffwinks-soul-subtotal-label">Subtotal</span>
+      <span class="ffwinks-soul-subtotal-price" id="ffwinks-wishlist-subtotal">—</span>
+    </div>
+    <p class="ffwinks-soul-subtotal-info">Shipping and taxes calculated at checkout</p>
+  </div>
+
+  <div class="ffwinks-soul-addall-wrapper">
+    <button class="ffwinks-soul-action-bottom" id="ffwinks-add-all-btn">
+      <div class="ffwinks-img-btn-wrap">
+        <img src="{{ 'addall.svg' | asset_url }}" alt="" class="ffwinks-action-img ffwinks-action-img--invert">
+        <span class="ffwinks-img-label">Add all to cart</span>
+      </div>
+    </button>
+  </div>
+
+</div>

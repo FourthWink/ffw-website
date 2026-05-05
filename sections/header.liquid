@@ -1,0 +1,2827 @@
+{% comment %}
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  header.liquid — Fourth Wink                                     ║
+  ║                                                                  ║
+  ║  This file contains only the core header logic and styles.       ║
+  ║  The FFWinks custom panels live in dedicated snippet files:      ║
+  ║                                                                  ║
+  ║   snippets/ffwinks-search.liquid   — search island               ║
+  ║   snippets/ffwinks-account.liquid  — sign-in / register island   ║
+  ║   snippets/ffwinks-wishlist.liquid — wishlist fullscreen panel   ║
+  ║   snippets/ffwinks-cart.liquid     — cart fullscreen panel       ║
+  ║   snippets/ffwinks-js.liquid       — all JavaScript              ║
+  ║                                                                  ║
+  ║  CSS ({% stylesheet %}) must stay here — Shopify only processes  ║
+  ║  stylesheet blocks inside section files, not snippets.           ║
+  ║                                                                  ║
+  ║  Each snippet's CSS is kept in a clearly labelled section below  ║
+  ║  so you can jump straight to it when editing that file.          ║
+  ║                                                                  ║
+  ║  CSS SECTIONS (search "► SECTION" to jump):                      ║
+  ║   ► SECTION: GLOBAL TOKENS & RESET                               ║
+  ║   ► SECTION: header.liquid                                       ║
+  ║   ► SECTION: ffwinks-search.liquid                               ║
+  ║   ► SECTION: ffwinks-account.liquid                              ║
+  ║   ► SECTION: ffwinks-cart.liquid  &  ffwinks-wishlist.liquid     ║
+  ║   ► SECTION: SHARED ACTIONS / BADGE / SPARKLE                    ║
+  ║   ► SECTION: MOBILE & TABLET MEDIA QUERIES                       ║
+  ║   ► SECTION: EXTREME SCREENS & PORTRAIT LOCK                     ║
+  ║   ► SECTION: CHECKOUT TRANSITION                                 ║
+  ╚══════════════════════════════════════════════════════════════════╝
+{% endcomment %}
+
+{% liquid
+  assign order = 'logo,menu,localization,search,mobile_search,actions'
+
+  if shop.customer_accounts_enabled
+    assign order = 'mobile_search,logo,menu,localization,search,actions'
+  endif
+
+  assign rows = 'top,bottom' | split: ','
+  assign search_style = 'none'
+
+  if section.settings.show_search
+    assign search_style = 'modal'
+  endif
+
+  if section.settings.enable_transparent_header_home and template.name == 'index'
+    assign transparent = 'always'
+    assign transparent_color_scheme = section.settings.home_color_scheme
+  elsif section.settings.enable_transparent_header_product and template.name == 'product'
+    assign transparent = 'always'
+    assign transparent_color_scheme = section.settings.product_color_scheme
+  elsif section.settings.enable_transparent_header_collection and template.name == 'collection'
+    assign transparent = 'always'
+    assign transparent_color_scheme = section.settings.collection_color_scheme
+  endif
+
+  if section.settings.enable_sticky_header == 'always'
+    assign sticky = 'always'
+  elsif section.settings.enable_sticky_header == 'scroll-up'
+    assign sticky = 'scroll-up'
+  endif
+
+  if transparent and sticky
+    assign transparent = 'not-sticky'
+  endif
+
+  if transparent
+    if transparent_color_scheme == 'inverse'
+      assign transparent_color_scheme = 'color-' | append: section.settings.color_scheme_transparent
+    else
+      assign transparent_color_scheme = 'color-' | append: section.settings.color_scheme_top
+    endif
+  endif
+%}
+
+{% capture logo %}
+  {% content_for 'block', type: '_header-logo', id: 'header-logo-main' %}
+{% endcapture %}
+
+{% capture menu %}
+  {% content_for 'block', type: '_header-menu', id: 'header-menu-desktop' %}
+{% endcapture %}
+
+{% capture mobile_menu %}
+  {% content_for 'block', type: '_header-menu', id: 'header-menu-mobile', variant: 'mobile' %}
+{% endcapture %}
+
+{% capture navigation_bar %}
+  {% content_for 'block', type: '_header-menu', id: 'header-menu-nav', variant: 'navigation_bar', transparent: transparent %}
+{% endcapture %}
+
+{% capture actions %}
+  {% render 'header-actions' %}
+{% endcapture %}
+
+{% liquid
+  if shop.customer_accounts_enabled
+    assign search_class = ''
+  endif
+
+  if section.settings.localization_position == 'left'
+    if section.settings.search_position == 'left'
+      if shop.customer_accounts_enabled
+        assign order = 'mobile_search,logo,search,localization,menu,actions'
+      else
+        assign order = 'logo,search,localization,menu,mobile_search,actions'
+      endif
+    else
+      if shop.customer_accounts_enabled
+        assign order = 'mobile_search,logo,localization,menu,search,actions'
+      else
+        assign order = 'logo,localization,menu,search,mobile_search,actions'
+      endif
+    endif
+  else
+    if section.settings.search_position == 'left'
+      if shop.customer_accounts_enabled
+        assign order = 'mobile_search,logo,search,menu,localization,actions'
+      else
+        assign order = 'logo,search,menu,localization,mobile_search,actions'
+      endif
+    endif
+  endif
+%}
+
+{% capture search %}
+  {% render 'search', style: search_style, class: search_class %}
+{% endcapture %}
+
+{% liquid
+  assign skip_mobile_search = false
+  if shop.customer_accounts_enabled == false and section.settings.search_position == 'left' and search_style != 'none'
+    assign skip_mobile_search = true
+  endif
+
+  if section.settings.search_row == 'bottom' or search_style != 'none' and skip_mobile_search == false
+    capture mobile_search
+      render 'search', class: 'desktop:hidden', style: search_style
+    endcapture
+  endif
+
+  assign show_language = section.settings.show_language
+  if localization.available_languages.size <= 1
+    assign show_language = false
+  endif
+
+  assign show_country = section.settings.show_country
+  if localization.available_countries.size <= 1
+    assign show_country = false
+  endif
+
+  assign bottom_row_blocks = ''
+
+  if section.settings.menu_row == 'bottom'
+    assign bottom_row_blocks = bottom_row_blocks | append: 'menu,'
+  endif
+
+  if section.settings.search_style != 'none'
+    if section.settings.search_row == 'bottom'
+      assign bottom_row_blocks = bottom_row_blocks | append: 'search,'
+    endif
+  endif
+
+  if section.settings.show_country or section.settings.show_language
+    if section.settings.localization_row == 'bottom'
+      assign bottom_row_blocks = bottom_row_blocks | append: 'localization,'
+    endif
+  endif
+
+  assign bottom_row_blocks = bottom_row_blocks | split: ',' | compact
+
+  if section.settings.section_height == 'compact'
+    assign header_height_class = ' header--compact'
+  endif
+
+  if bottom_row_blocks.size > 0 and section.settings.color_scheme_top.settings.background.rgb == section.settings.color_scheme_bottom.settings.background.rgb and section.settings.divider_width == 0
+    assign collapse_header_paddings_class = 'header--collapse-row-paddings'
+  endif
+
+  assign class = 'header'
+
+  if transparent_color_scheme
+    assign class = class | append: ' ' | append: transparent_color_scheme
+  endif
+
+  if section.settings.color_scheme_top.settings.background.alpha != 1
+    assign class = class | append: ' ' | append: 'header--inherit-color-scheme-on-menu-open'
+  endif
+
+  if header_height_class
+    assign class = class | append: ' ' | append: header_height_class
+  endif
+
+  if collapse_header_paddings_class
+    assign class = class | append: ' ' | append: collapse_header_paddings_class
+  endif
+%}
+
+{% capture localization_markup %}
+  {% liquid
+    assign localization_font = '--menu-localization-font: var(--font-[localization_font]--family); ' | replace: '[localization_font]', section.settings.localization_font
+    assign localization_font_size = '--menu-localization-font-size: [localization_font_size]; ' | replace: '[localization_font_size]', section.settings.localization_font_size
+    assign color_shadow = '--color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-10-25));'
+    assign form_style = localization_font | append: localization_font_size | append: color_shadow
+  %}
+  {% if show_language and show_country == false %}
+    <div class="dropdown-localization mobile:hidden">
+      {% render 'localization-form',
+        show_country: show_country,
+        show_language: show_language,
+        localization_style: 'dropdown',
+        form_style: form_style,
+        block_id: section.id
+      %}
+    </div>
+  {% elsif show_country %}
+    <dropdown-localization-component class="dropdown-localization mobile:hidden">
+      <button
+        type="button"
+        class="button dropdown-localization__button localization-selector link link--text"
+        aria-expanded="false"
+        aria-controls="dropdown-localization-results"
+        ref="button"
+        on:click="/toggleSelector"
+        style="{{ localization_font }} {{ localization_font_size }}"
+      >
+        {% if show_country %}
+          {% if section.settings.country_selector_style == true %}
+            {% liquid
+              assign background_brightness = section.settings.color_scheme.settings.background | color_brightness
+              if background_brightness < 64
+                assign shadow_size = 4
+              else
+                assign shadow_size = 2
+              endif
+            %}
+            <span
+              class="icon-flag"
+              style="
+                background-image: url({{- localization.country | image_url: width: 32 }});
+                --size-shadow: {{ shadow_size }}px;
+                --color-shadow: rgb(var(--color-foreground-rgb) / var(--opacity-30-60));
+              "
+            ></span>
+          {% endif %}
+          <span class="currency-code" data-testid="localization-currency-code">
+            {{- localization.country.currency.iso_code -}}
+          </span>
+        {% endif %}
+        <span class="visually-hidden" data-testid="localization-visually-hidden">
+          {{- 'accessibility.localization_region_and_language' | t -}}
+        </span>
+        {%- if show_country and show_language -%}<span>/</span>{%- endif -%}
+        {%- if show_language -%}
+          <span>{{ localization.language.iso_code | upcase }}</span>
+        {%- endif -%}
+        <span class="svg-wrapper icon-caret">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+      </button>
+      <div
+        class="localization-wrapper {{ section.settings.localization_position }}-bound color-{{ settings.popover_color_scheme }}"
+        hidden
+        ref="panel"
+      >
+        {% render 'localization-form',
+          show_country: show_country,
+          show_language: show_language,
+          localization_style: 'dropdown',
+          form_style: form_style,
+          block_id: section.id
+        %}
+      </div>
+    </dropdown-localization-component>
+  {% endif %}
+{% endcapture %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    {% if settings.logo %}
+      "logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},
+    {% endif %}
+    "url": {{ request.origin | append: page.url | json }}
+  }
+</script>
+
+<header-component
+  id="header-component"
+  class="{{ class }}"
+  data-theme-color="rgb({{ section.settings.color_scheme_top.settings.background.rgb }})"
+  {% if transparent %}transparent="{{ transparent }}"{% endif %}
+  {% if sticky %}sticky="{{ sticky }}"{% endif %}
+  data-skip-node-update
+  data-scroll-direction="none"
+>
+  {%- if request.page_type == 'index' -%}
+    <h1 class="visually-hidden">{{ shop.name }}</h1>
+  {%- endif -%}
+
+  {% for row in rows %}
+    {% liquid
+      assign scheme = 'color_scheme_' | append: row
+      assign class = 'header__row header__row--[row] color-[row_scheme] section section--full-width-margin section--[section-width]' | replace: '[row]', row | replace: '[row_scheme]', section.settings[scheme] | replace: '[section-width]', section.settings.section_width
+
+      case row
+        when 'top'
+          assign first = mobile_menu
+          if bottom_row_blocks.size > 0 and section.settings.divider_size == 'page-width'
+            assign class = class | append: ' divider--page-width'
+          endif
+          if bottom_row_blocks.size > 0
+            assign border_bottom_setting_id = 'divider_width'
+          else
+            assign border_bottom_setting_id = 'border_width'
+          endif
+        when 'bottom'
+          assign first = ''
+          assign class = class | append: ' mobile:hidden'
+          assign border_bottom_setting_id = 'border_width'
+      endcase
+
+      assign style = '--border-bottom-width: [width]px; ' | replace: '[width]', section.settings[border_bottom_setting_id]
+      if row == 'top'
+        assign style = style | append: '--border-bottom-width-mobile: [width]px; ' | replace: '[width]', section.settings.border_width
+      endif
+    %}
+
+    {% capture content %}
+      {% render 'header-row',
+        row: row,
+        order: order,
+        settings: section.settings,
+        first: first,
+        logo: logo,
+        menu: menu,
+        actions: actions,
+        localization: localization_markup,
+        search: search,
+        mobile_search: mobile_search
+      %}
+    {% endcapture %}
+
+    {% assign content = content | strip %}
+    {% if content != blank %}
+      <div
+        class="{{ class | strip }}"
+        ref="headerRowTop"
+        {%- if style != blank -%}style="{{ style | strip }}"{%- endif -%}
+      >
+        <div class="header__columns spacing-style">{{ content }}</div>
+      </div>
+    {% endif %}
+  {% endfor %}
+
+  {% if navigation_bar != blank %}
+    <div class="header__row header__row--mobile desktop:hidden color-{{ section.settings.color_scheme_bottom }}">
+      {{ navigation_bar }}
+    </div>
+  {% endif %}
+
+</header-component>
+
+{% comment %}
+  ─────────────────────────────────────────────────────────────
+  FFWinks overlay panels — each lives in its own snippet file.
+  Render order matters: overlays must be in the DOM before the
+  JS snippet runs so getElementById() finds them immediately.
+  ─────────────────────────────────────────────────────────────
+{% endcomment %}
+<div id="ffw-portrait-lock">
+  <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+  </svg>
+  <p>Please rotate your device to portrait mode.</p>
+</div>
+
+<div id="ffw-checkout-transition">
+  <img src="{{ 'lips.svg' | asset_url }}" alt="Loading Checkout..." class="ffw-lips-transition-icon">
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const transitionScreen = document.getElementById('ffw-checkout-transition');
+    
+    // Intercept clicks on any checkout links or checkout form buttons
+    document.addEventListener('click', (e) => {
+      const checkoutLink = e.target.closest('a[href*="/checkout"]');
+      const checkoutBtn = e.target.closest('button[name="checkout"], input[name="checkout"]');
+      
+      if (checkoutLink || checkoutBtn) {
+        e.preventDefault();
+        
+        // 1. Show the lips transition screen
+        transitionScreen.classList.add('is-active');
+        
+        // 2. Wait exactly 2 seconds, then execute the redirect
+        setTimeout(() => {
+          if (checkoutLink) {
+            window.location.href = checkoutLink.href;
+          } else if (checkoutBtn) {
+            // For standard forms, simulate a form submission to the checkout endpoint
+            window.location.href = '/checkout'; 
+          }
+        }, 2000);
+      }
+    });
+  });
+</script>
+
+<div id="ffwinks-global-overlay"></div>
+{% render 'ffwinks-search' %}
+{% render 'ffwinks-account' %}
+{% render 'ffwinks-wishlist' %}
+{% render 'ffwinks-cart' %}
+{% render 'ffwinks-mobile-menu' %}
+{% render 'ffwinks-js' %}
+{% stylesheet %}
+
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │ ► SECTION: GLOBAL TOKENS & RESET                               │
+   │   CSS custom properties shared across all ffwinks files.       │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+:root {
+  --ffwinks-master-spacing: clamp(16px, 4vw, 44px);
+  --ffwinks-mobile-gap: clamp(12px, 3vw, 24px); /* NEW RESPONSIVE GAP ADDED HERE */
+  
+  --ffwinks-header-h-mobile:  clamp(36px, 5.5svh, 44px);
+  --ffwinks-header-h-tablet:  clamp(44px, 6svh,   52px);
+  --ffwinks-header-h-desktop: clamp(52px, 6.5svh, 64px);
+
+  /* Scroll Padding matches dynamic header height + fixed offset buffer */
+  --ffwinks-scroll-desktop: clamp(78px, calc(6.5svh + 26px), 90px);
+  --ffwinks-scroll-tablet:  clamp(68px, calc(6svh + 24px),   76px);
+  --ffwinks-scroll-mobile:  clamp(56px, calc(5.5svh + 20px), 64px);
+
+  --ffwinks-island-h-mobile:  clamp(280px, 55svh, 460px);
+  --ffwinks-island-h-tablet:  clamp(320px, 60svh, 520px);
+  --ffwinks-island-h-desktop: clamp(360px, 62svh, 580px);
+  --ffwinks-action-img-w: 150px;
+  --ffwinks-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ffwinks-dur: 0.35s;
+
+  /* ── Cart / Wishlist row tokens ── */
+  --soul-img-h:          240px;
+  --soul-img-w: calc(49.7vw - var(--soul-remove-ml) - var(--soul-remove-w) - var(--soul-remove-mr));
+  --soul-img-aspect:     unset;
+  --soul-row-min-h:      var(--soul-img-h);
+  --soul-row-max-w:      100%;
+  --soul-remove-ml:      var(--ffwinks-master-spacing); /* Aligns perfectly with header */
+  --soul-remove-mr:      14px;
+  --soul-remove-w:       14px;
+  --soul-details-pl:     36px;
+  --soul-grid-label-w:   68px;
+  --soul-grid-col-gap:   52px;
+  --soul-grid-row-gap:   11px;
+  --soul-grid-row3-mt:   24px;
+  --soul-action-btn-mt:  18px;
+  --soul-list-pt: calc(50vh - var(--header-overlay-offset, 60px) - var(--soul-img-h) - (var(--soul-list-gap) / 2) - 2.5px);
+  --soul-list-pb:        15vh;
+  --soul-list-gap:       12px;
+  --soul-subtotal-pt-cart:     100px;
+  --soul-subtotal-pt-wishlist: 56px;
+  --soul-subtotal-gap:   120px;
+  --soul-img-radius:      20px;
+  --soul-img-radius-pill: 70px;
+  --soul-font-base:      11px;
+  --soul-font-label:     10px;
+  --soul-font-remove:    20px;
+  --soul-font-qty:       15px;
+  --soul-font-action:    9px;
+  --soul-font-subtotal:  10px;
+  --soul-qty-gap:        16px;
+  --soul-qty-btn-w:      26px;
+  --soul-qty-btn-h:      34px;
+  --soul-qty-num-w:      14px;
+  --soul-opts-gap:       16px;
+  --soul-wl-header-pt:   64px;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--ffwinks-scroll-desktop) !important; 
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  --header-height: 10px !important;
+  --header-group-height: var(--header-height);
+  --transparent-header-offset-boolean: 0;
+  overflow-x: hidden;
+}
+body.ffwinks-open,
+body.ffwinks-body-lock { overflow: hidden !important; }
+body.ffwinks-open .header-section,
+body.ffwinks-body-lock .header-section { z-index: 600 !important; }
+
+.header, .header *,
+#header-component, #header-component *,
+#ffwinks-search-bar, #ffwinks-search-bar *,
+#ffwinks-wishlist-overlay, #ffwinks-wishlist-overlay *,
+#ffwinks-cart-overlay, #ffwinks-cart-overlay * {
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │ ► SECTION: header.liquid                                       │
+   │   Header shell, columns, nav menu, sticky & transparent        │
+   │   header variants, global overlay, logo.                       │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+/* 1. MAKE NAVBAR COMPLETELY INVISIBLE */
+#header-component,
+.header,
+.header__row,
+.header-section {
+  background: transparent !important;
+  background-color: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* 2. FORCE NAVBAR LINKS TO ALWAYS BE VISIBLE (BLACK) */
+header-component .list-menu__item,
+header-component .header__menu-item {
+  color: #000000 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 3. HOVER STATE: LINKS GET BOLDER */
+header-component .list-menu__item:hover,
+header-component .header__menu-item:hover {
+  font-weight: bold !important; 
+  color: #000000 !important; 
+  background-color: transparent !important;
+}
+
+/* 4. FIX ICONS: NO FADING, CLEAN THICKNESS ON HOVER */
+.header-actions__action,
+.header__icon {
+  color: #000000 !important;
+  opacity: 1 !important; 
+}
+
+/* 4. FIX ICONS: NO FADING, CLEAN THICKNESS ON HOVER */
+.header-actions__action svg,
+.header__icon svg {
+  color: #000000 !important;
+  stroke: #000000 !important; 
+  opacity: 1 !important;
+  transition: stroke-width 0.2s ease !important;
+  pointer-events: none !important;
+}
+
+/* ----------------------------------------------------
+   Prevent icon cropping when stroke expands on hover 
+---------------------------------------------------- */
+.search-action .svg-wrapper,
+.search-action svg,
+.account-popover .svg-wrapper,
+.account-popover svg,
+.account-drawer .svg-wrapper,
+.account-drawer svg,
+.action__wishlist .svg-wrapper,
+.action__wishlist svg,
+.action__cart .svg-wrapper,
+.action__cart svg,
+.header-actions__cart-icon .svg-wrapper,
+.header-actions__cart-icon svg,
+.header-actions__action .svg-wrapper,
+.header-actions__action svg,
+.header__icon svg {
+  overflow: visible !important;
+}
+
+.header-actions__action:hover svg,
+.header__icon:hover svg {
+  filter: none !important;
+  stroke: #000000 !important;
+  stroke-width: 0.4px !important;
+  transition: stroke-width 0.2s ease !important;
+}
+
+
+/* Matched the account icon to the rest of the header icons */
+a[href*="account"] svg,
+a[href*="login"] svg,
+.header__icon--account svg {
+  stroke: #000000 !important; /* <--- ADD THIS */
+  stroke-width: 0 !important;
+  transition: stroke-width 0.2s ease !important;
+  pointer-events: none !important;
+}
+
+a[href*="account"]:hover svg,
+a[href*="login"]:hover svg,
+.header__icon--account:hover svg {
+  stroke-width: 0.4px !important;
+  transition: stroke-width 0.2s ease !important;
+  pointer-events: none !important;
+}
+.header-actions__cart-icon.header-actions__cart-icon--has-cart svg,
+.header-actions__action svg,
+.header__icon svg,
+cart-icon svg {
+  mask: none !important;
+  -webkit-mask: none !important;
+  clip-path: none !important;
+}
+
+/* 5. PROTECT & RE-SHAPE CART & WISHLIST BUBBLES */
+cart-count, 
+.cart-count-bubble, 
+.ffwinks-badge,
+[class*="cart-count"],
+#header-group a span.cart-count-bubble,
+#header-group a span.ffwinks-badge,
+#header-group a:hover span.cart-count-bubble,
+#header-group a:hover span.ffwinks-badge,
+.header-actions__action span[class*="cart-count"],
+.header-actions__action:hover span[class*="cart-count"] {
+  position: absolute !important;
+  top: -4px !important;     
+  right: -4px !important;   
+  left: auto !important;
+  bottom: auto !important;
+  
+  width: 12px !important;   
+  height: 12px !important;  
+  min-width: unset !important;
+  padding: 0 !important;    
+  border-radius: 50% !important; 
+  
+  background-color: #222 !important;
+  color: #ffffff !important;
+  font-size: 7px !important; 
+  font-weight: 700 !important;
+  display: flex !important; 
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  z-index: 2 !important;
+}
+
+/* 6. ABSOLUTE OVERRIDE: ALLOW NATIVE JS TO HIDE EMPTY BUBBLES */
+cart-count[style*="none"], 
+.cart-count-bubble[style*="none"], 
+.ffwinks-badge[style*="none"],
+[class*="cart-count"][style*="none"],
+#header-group a span.cart-count-bubble[style*="none"],
+#header-group a span.ffwinks-badge[style*="none"],
+#header-group a:hover span.cart-count-bubble[style*="none"],
+#header-group a:hover span.ffwinks-badge[style*="none"],
+.header-actions__action span[class*="cart-count"][style*="none"],
+.header-actions__action:hover span[class*="cart-count"][style*="none"],
+.ffwinks-badge:empty,
+.cart-count-bubble:empty {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 7. CLONE GLOBAL FOG INSIDE CART AND WISHLIST PANELS */
+.ffwinks-fullscreen::before,
+.ffwinks-fullscreen::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.ffwinks-fullscreen::before {
+  top: 0;
+  height: 100px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 10%, rgba(255, 255, 255, 1) 20%,
+    rgba(255, 255, 255, 1) 30%, rgba(255, 255, 255, 1) 40%, rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 1) 55%, rgba(255, 255, 255, 0.98) 60%, rgba(255, 255, 255, 0.92) 65%,
+    rgba(255, 255, 255, 0.82) 70%, rgba(255, 255, 255, 0.68) 75%, rgba(255, 255, 255, 0.50) 80%,
+    rgba(255, 255, 255, 0.32) 85%, rgba(255, 255, 255, 0.16) 90%, rgba(255, 255, 255, 0.06) 95%,
+    rgba(255, 255, 255, 0.02) 98%, rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.ffwinks-fullscreen::after {
+  bottom: 0;
+  height: 60px;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 5%, rgba(255, 255, 255, 1) 10%,
+    rgba(255, 255, 255, 0.98) 15%, rgba(255, 255, 255, 0.95) 20%, rgba(255, 255, 255, 0.90) 25%,
+    rgba(255, 255, 255, 0.84) 30%, rgba(255, 255, 255, 0.76) 35%, rgba(255, 255, 255, 0.68) 40%,
+    rgba(255, 255, 255, 0.59) 45%, rgba(255, 255, 255, 0.50) 50%, rgba(255, 255, 255, 0.41) 55%,
+    rgba(255, 255, 255, 0.32) 60%, rgba(255, 255, 255, 0.24) 65%, rgba(255, 255, 255, 0.17) 70%,
+    rgba(255, 255, 255, 0.11) 75%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.03) 85%,
+    rgba(255, 255, 255, 0.01) 90%, rgba(255, 255, 255, 0) 100%
+  );
+}
+
+@media screen and (max-width: 768px) {
+  .ffwinks-fullscreen::after { height: 15px !important; }
+  .ffwinks-fullscreen::before { height: 40px !important; }
+}
+.header {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  --header-padding: var(--padding-sm);
+  --font-paragraph--line-height: 1;
+  position: relative;
+  z-index: 600 !important;
+  overflow: visible !important;
+}
+header-component  { overflow: visible !important; }
+.header__row      { overflow: visible !important; }
+.header.header--compact { --header-padding: var(--padding-2xs); }
+.header:has(#Details-menu-drawer-container[open]) { contain: style; }
+
+.header__row {
+  position: relative;
+  background-color: var(--header-bg-color, var(--color-background));
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.header__row.section--page-width,
+.header__row.section--full-width-margin {
+  padding-inline: 0 !important;
+  margin-inline: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+.header__row--top:not(.divider--page-width),
+.header__row--top.divider--page-width .header__columns,
+.header__row--bottom {
+  border-bottom: var(--border-bottom-width) solid var(--color-border);
+}
+@media screen and (max-width: 749px) {
+  .header__row--top:not(.divider--page-width),
+  .header__row--top.divider--page-width .header__columns {
+    border-bottom-width: var(--border-bottom-width-mobile);
+  }
+}
+.header__row.divider--page-width:not(.section--page-width) .header__columns {
+  @media screen and (min-width: 750px) {
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+    margin-inline-start: var(--page-margin);
+    margin-inline-end: var(--page-margin);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .header__row--top {
+    height: var(--ffwinks-header-h-desktop);
+    max-height: var(--ffwinks-header-h-desktop);
+    min-height: var(--ffwinks-header-h-desktop);
+    overflow: visible !important;
+  }
+  .header__row .spacing-style,
+  .header__columns {
+    height: var(--ffwinks-header-h-desktop);
+  }
+}
+
+.header__columns {
+  --header-left: 1fr;
+  --header-center: auto;
+  --header-right: 1fr;
+  --header-template-columns: var(--header-left) var(--header-center) var(--header-right);
+  --header-mobile-bookend: 44px;
+  --padding-block-start: var(--header-padding);
+  --padding-block-end: var(--header-padding);
+  display: grid;
+  grid-template-areas: 'left center right';
+  grid-gap: var(--gap-xl);
+  grid-template-columns: var(--header-template-columns);
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+  padding-left: var(--ffwinks-master-spacing) !important;
+  padding-right: var(--ffwinks-master-spacing) !important;
+  margin-inline: 0 !important;
+}
+.header__row .spacing-style {
+  padding-left: var(--ffwinks-master-spacing) !important;
+  padding-right: var(--ffwinks-master-spacing) !important;
+  margin-inline: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+.header__columns:has(.header__column--center header-menu) {
+  --header-center: auto;
+  --header-left: minmax(max-content, 1fr);
+  --header-right: minmax(max-content, 1fr);
+}
+.header__columns:where(:not(:has(.header__column--center))) {
+  @media screen and (min-width: 750px) {
+    --header-template-columns: var(--header-left) var(--header-right);
+    grid-template-areas: 'left right';
+  }
+  &:has(.header__column--right header-menu) {
+    --header-right: auto;
+    --header-left: minmax(max-content, 1fr);
+  }
+  &:has(.header__column--left header-menu) {
+    --header-left: auto;
+    --header-right: minmax(max-content, 1fr);
+  }
+}
+.header__columns:not(:has(.header__column)) { grid-template-columns: 1fr; }
+
+.header__column                { display: flex; align-items: center; }
+.header__column--left,
+.header__column--center        { gap: 5rem; grid-area: left; }
+.header__column--center        { justify-content: center; grid-area: center; }
+.header__column--center header-menu:only-child .overflow-menu::part(list) { justify-content: center; }
+.header__column--right         { gap: var(--gap-xl); justify-content: flex-end; grid-area: right; }
+.header__column--right .overflow-menu::part(list) { justify-content: flex-end; }
+.header__column--left          { padding-inline-start: 12px !important; }
+.header__column--right         { padding-inline-end: 12px !important; }
+
+.header__columns .menu-list__link {
+  font-size: 11px;
+  
+  color: #444;
+  text-transform: capitalize;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.header__columns .menu-list__link:hover { font-weight: 700; }
+
+#header-group:has(#header-component[sticky]) { display: contents; }
+.header-section:has(> #header-component[sticky='always']),
+.header-section:has(> #header-component[sticky='scroll-up'][data-sticky-state='active']) {
+  position: sticky;
+  top: -1px;
+  z-index: 600 !important;
+  width: 100%;
+}
+.header[data-sticky-state]                                  { transition: opacity var(--animation-speed) var(--animation-easing); opacity: 1; }
+.header[data-sticky-state='active']                         { view-transition-name: sticky-header; }
+.header[data-sticky-state='idle'],
+.header[data-sticky-state='active'][data-animating]         { opacity: 0; }
+
+.header[transparent] {
+  --language-button-background-color: transparent;
+  --language-button-border-color: transparent;
+  --header-bg-color: transparent;
+  --header-logo-display: none;
+  --header-logo-inverse-display: block;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  width: 100%;
+  background-color: transparent;
+  z-index: var(--layer-overlay);
+}
+.header[transparent][transparent='not-sticky'][data-sticky-state='active'],
+.header[transparent]:has(.mega-menu__list:hover),
+.header[transparent]:has(.menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'], [data-animating])),
+.header[transparent]:has(.menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover, [aria-expanded='true'], [data-animating])) {
+  --header-logo-display: unset;
+  --header-logo-inverse-display: unset;
+  --header-bg-color: unset;
+  --color-foreground: inherit;
+  --color-foreground-rgb: inherit;
+  --color-background: inherit;
+  --color-background-rgb: inherit;
+  --color-border: inherit;
+  --color-border-rgb: inherit;
+}
+.header[transparent][transparent='not-sticky'][data-sticky-state='active'] .header__row,
+.header[transparent]:has(.mega-menu__list:hover) .header__row,
+.header[transparent]:has(.menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'], [data-animating])) .header__row,
+.header[transparent]:has(.menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover, [aria-expanded='true'], [data-animating])) .header__row {
+  transition: color var(--animation-values-fast), border-color var(--animation-values-fast), background-color var(--animation-values-fast);
+}
+.header[transparent] .header__row {
+  transition: color var(--animation-values-slow), border-color var(--animation-values-slow), background-color var(--animation-values-slow);
+}
+:is(.header[transparent]:not([data-sticky-state='active']), .header[transparent='always'][data-sticky-state='active'])
+  .header__row:not(:has(.mega-menu__list:hover, .menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'], [data-animating]), .menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover, [aria-expanded='true'], [data-animating]))) {
+  --color-foreground: inherit;
+  --color-foreground-rgb: inherit;
+  --color-border: inherit;
+  --color-border-rgb: inherit;
+  --color-primary-button-background: inherit;
+  --color-primary-button-text: inherit;
+}
+.header--inherit-color-scheme-on-menu-open:has(.mega-menu__list:hover) .header__row,
+.header--inherit-color-scheme-on-menu-open:has(.menu-list__link[aria-haspopup]:is(:hover, [aria-expanded='true'], [data-animating])) .header__row,
+.header--inherit-color-scheme-on-menu-open:has(.menu-list__list-item[slot='overflow'] .menu-list__link:is(:hover, [aria-expanded='true'], [data-animating])) .header__row {
+  --color-foreground: inherit;
+  --color-foreground-rgb: inherit;
+  --color-background: inherit;
+  --color-background-rgb: inherit;
+  --color-border: inherit;
+  --color-border-rgb: inherit;
+}
+.header-section:has(.header[transparent]) + .shopify-section { margin-top: var(--header-height); }
+
+@media (hover: hover) {
+  .header__column:has(header-menu:hover),
+  .header__column:has(.header-actions__action:hover),
+  .header__column:has(.dropdown-localization__button:hover),
+  .header__column:has(.header__icon--menu:hover) {
+    header-menu:not(:hover),
+    .header-actions__action:not(:hover),
+    .dropdown-localization__button:not(:hover),
+    .header__icon--menu:not(:hover) {
+      opacity: var(--opacity-subdued-text);
+      transition: opacity var(--animation-speed) var(--animation-easing);
+    }
+  }
+}
+header-menu, .header-actions__action, .dropdown-localization__button, .header__icon--menu {
+  transition: opacity var(--animation-speed) var(--animation-easing);
+}
+
+.menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__link[aria-haspopup],
+.menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__link,
+.menu-list__list-item:where(:not([slot='overflow'])) > button.menu-list__link {
+  margin-block: calc(-2 * var(--header-padding));
+  padding-block: calc(2 * var(--header-padding));
+  margin-inline: calc(-1 * var(--gap-xl) / 2);
+  padding-inline: calc(var(--gap-xl) / 2);
+}
+.header:not(.header--compact) .header__row--bottom { --header-padding: var(--padding-xs); }
+.header--collapse-row-paddings .header__row--top    .header__columns { --padding-block-end:   0px; }
+.header--collapse-row-paddings .header__row--bottom .header__columns { --padding-block-start: 0px; }
+
+.header-menu .menu-list__submenu { content-visibility: auto; contain-intrinsic-size: 0px 500px; }
+.header-menu details[open] .menu-list__submenu,
+.header-menu .menu-list__submenu[data-active] { content-visibility: visible; }
+
+/* Global overlay (rendered in header.liquid) */
+#ffwinks-global-overlay {
+  position: fixed;
+  top: var(--ffwinks-header-h-desktop);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 590;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+#ffwinks-global-overlay.is-active { opacity: 1; pointer-events: auto; }
+
+/* Disable global overlay when FFW filter panel is open */
+body.ffw-filter-open #ffwinks-global-overlay {
+  display: none !important;
+}
+
+/* Logo */
+.header-logo img, header-logo img,
+.header-logo svg, header-logo svg,
+.header-logo a img, header-logo a img {
+  width: auto !important;
+  height: auto !important;
+  max-height: 30px !important;
+  max-width: 150px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │ ► SECTION: ffwinks-search.liquid                               │
+   │   Fade-in search island panel.                                 │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+#ffwinks-search-bar {
+  position: fixed;
+  top: 0 !important;
+  left: 0;
+  width: 100%;
+  height: 100vh !important;
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #ffffff 50%,
+    rgba(255,255,255,0) 100%
+  ) !important;
+  z-index: 595 !important;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  transition: opacity var(--ffwinks-dur) ease, visibility 0s var(--ffwinks-dur);
+  opacity: 0;
+  visibility: hidden;
+  overflow: visible;
+}
+#ffwinks-search-bar.is-open {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--ffwinks-dur) ease, visibility 0s 0s;
+}
+
+/* Content sits directly below the header */
+#ffwinks-search-bar .ffwinks-container {
+  top: calc(var(--ffwinks-header-h-desktop) + 40px) !important;
+}
+
+/* Kill the inner island's own background — parent handles it */
+#ffwinks-search-bar .ffwinks-island {
+  background: transparent !important;
+}
+.ffwinks-island-section {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  pointer-events: auto;
+}
+.ffwinks-island {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,1)  45%,
+    rgba(255,255,255,.85) 70%,
+    rgba(255,255,255,0)  100%
+  );
+  box-sizing: border-box;
+  overflow: visible;
+  pointer-events: auto;
+}
+.ffwinks-container {
+  position: absolute;
+  top: 8%;
+  left: 0 !important;
+  padding-left: var(--ffwinks-master-spacing) !important;
+  padding-right: var(--ffwinks-master-spacing) !important;
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 4svh, 60px);
+  align-items: flex-start;
+  z-index: 600;
+  box-sizing: border-box;
+}
+
+.ffwinks-main-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 10px;
+  color: #333;
+  padding: 12px 0;
+  background: transparent;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  
+  font-weight: 400;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+.ffwinks-main-input::placeholder { color: #aaa; font-size: inherit;  font-weight: 300; }
+.ffwinks-main-input::-webkit-search-cancel-button,
+.ffwinks-main-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+
+.ffwinks-input-row, .account-split { width: 100%; }
+.ffwinks-input-row form { width: 100%; }
+
+.ffwinks-suggestions-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.ffwinks-suggestions-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: #222;
+  
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.ffwinks-suggestions-list { display: flex; flex-direction: row; gap: 25px; flex-wrap: wrap; }
+.ffwinks-suggestion-link {
+  font-size: 9px;
+  font-weight: 500;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s;
+  
+  text-transform: capitalize;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+}
+.ffwinks-suggestion-link:hover { color: #000; }
+
+.ffwinks-bottom-label {
+  font-size: 10px;
+  font-weight: 400;
+  color: #666;
+  white-space: nowrap;
+  z-index: 4;
+  cursor: default;
+  transition: all 0.3s ease;
+  
+  text-decoration: none;
+  display: block;
+  text-align: center;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+button.ffwinks-submit-btn { background: none; border: none; cursor: pointer; }
+.ffwinks-bottom-label:hover,
+button.ffwinks-submit-btn:hover { color: #000; }
+
+/* ── Search star ── */
+.ffwinks-search-star-wrap {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 596;
+  pointer-events: none;
+}
+.ffwinks-search-star {
+  width: 150px;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  filter: invert(1);
+  mix-blend-mode: normal;
+}
+.ffwinks-search-star-wrap button.ffwinks-submit-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 597;
+  pointer-events: auto;
+  text-align: center;
+  white-space: nowrap;
+  color: #666;
+  font-size: 10px;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+.ffwinks-search-star-wrap button.ffwinks-submit-btn:hover {
+  color: #000;
+}
+@media screen and (max-width: 750px) {
+  .ffwinks-search-star-wrap {
+    width: 150px;
+    height: auto;
+  }
+}
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │ ► SECTION: ffwinks-cart.liquid  &  ffwinks-wishlist.liquid     │
+   │   Fullscreen overlay panels — shared row/grid/qty structure,   │
+   │   then per-overlay overrides for subtotal, checkout, addall.   │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+/* — Shared fullscreen shell — */
+.ffwinks-fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 500;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity var(--ffwinks-dur) ease, visibility 0s var(--ffwinks-dur);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-top: var(--header-overlay-offset, 60px);
+}
+.ffwinks-fullscreen::-webkit-scrollbar { display: none; }
+.ffwinks-fullscreen.ffwinks-fullscreen--open {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity var(--ffwinks-dur) ease, visibility 0s 0s;
+}
+
+/* — ffwinks-mobile-menu.liquid — */
+#ffwinks-mobile-menu {
+  z-index: 590;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  height: 100dvh;
+  justify-content: space-between;
+  overflow-x: hidden;
+  overflow-y: auto;
+  --ffwinks-menu-cross-x: 50%;
+  --ffwinks-menu-cross-y: 50%;
+  --ffwinks-menu-label-x: clamp(42px, 12vw, 56px);
+  --ffwinks-menu-label-top-offset: clamp(126px, 15.5svh, 146px);
+  --ffwinks-menu-label-bottom-offset: clamp(162px, 19svh, 184px);
+  --ffwinks-menu-link-color: rgba(88, 88, 88, 0.84);
+  --ffwinks-menu-fog-core: rgba(224, 155, 105, 0.11);
+  --ffwinks-menu-fog-soft: rgba(238, 205, 182, 0.055);
+  background:
+    radial-gradient(circle at 50% 48%, rgba(238, 200, 178, 0.08) 0, rgba(255, 255, 255, 0) 18rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.975) 100%);
+  padding:
+    clamp(14px, 3.8svh, 26px)
+    clamp(18px, 5vw, 34px)
+    calc(clamp(24px, 5svh, 46px) + env(safe-area-inset-bottom, 0px));
+}
+
+#ffwinks-mobile-menu::before,
+#ffwinks-mobile-menu::after {
+  display: none;
+}
+
+.ffwinks-mobile-menu__backdrop,
+.ffwinks-mobile-menu__inner {
+  position: relative;
+  width: 100%;
+}
+
+.ffwinks-mobile-menu__backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ffwinks-mobile-menu__inner {
+  z-index: 1;
+  display: flex;
+  min-height: calc(100% - clamp(10px, 2svh, 18px));
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.ffwinks-mobile-menu__ambient,
+.ffwinks-mobile-menu__glow,
+.ffwinks-mobile-menu__image-strip {
+  position: absolute;
+  left: var(--ffwinks-menu-cross-x);
+  top: var(--ffwinks-menu-cross-y);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ffwinks-mobile-menu__ambient {
+  width: clamp(190px, 58vw, 270px);
+  height: clamp(190px, 58vw, 270px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--ffwinks-menu-fog-core) 0%, var(--ffwinks-menu-fog-soft) 34%, rgba(255, 255, 255, 0) 74%);
+  filter: blur(28px);
+}
+
+.ffwinks-mobile-menu__glow--vertical {
+  width: clamp(42px, 11vw, 54px);
+  height: min(74svh, 620px);
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(235, 185, 150, 0.025) 16%,
+      rgba(220, 146, 95, 0.08) 36%,
+      rgba(220, 146, 95, 0.08) 64%,
+      rgba(235, 185, 150, 0.025) 84%,
+      rgba(255, 255, 255, 0) 100%);
+  filter: blur(32px);
+}
+
+.ffwinks-mobile-menu__glow--horizontal {
+  width: min(104vw, 700px);
+  height: clamp(42px, 11vw, 54px);
+  background:
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(235, 185, 150, 0.025) 12%,
+      rgba(220, 146, 95, 0.07) 34%,
+      rgba(220, 146, 95, 0.085) 50%,
+      rgba(220, 146, 95, 0.07) 66%,
+      rgba(235, 185, 150, 0.025) 88%,
+      rgba(255, 255, 255, 0) 100%);
+  filter: blur(28px);
+}
+
+.ffwinks-mobile-menu__image-strip {
+  opacity: 0.28;
+  background-image:
+    var(--ffwinks-mobile-menu-image, linear-gradient(135deg, rgba(244, 177, 125, 0.4) 0%, rgba(249, 222, 203, 0.08) 100%)),
+    linear-gradient(135deg, rgba(244, 177, 125, 0.4) 0%, rgba(249, 222, 203, 0.08) 100%);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  mix-blend-mode: multiply;
+  filter: blur(26px) saturate(0.88) brightness(1.08);
+}
+
+.ffwinks-mobile-menu__image-strip--vertical {
+  width: clamp(26px, 6.8vw, 34px);
+  height: min(76svh, 620px);
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 10%, black 24%, black 76%, rgba(0, 0, 0, 0.08) 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 10%, black 24%, black 76%, rgba(0, 0, 0, 0.08) 90%, transparent 100%);
+}
+
+.ffwinks-mobile-menu__image-strip--horizontal {
+  width: min(102vw, 680px);
+  height: clamp(26px, 6.8vw, 34px);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.08) 9%, black 22%, black 78%, rgba(0, 0, 0, 0.08) 91%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.08) 9%, black 22%, black 78%, rgba(0, 0, 0, 0.08) 91%, transparent 100%);
+}
+
+/* 1. The Grid Layout (Fully Transparent) */
+.ffwinks-mobile-menu__layout {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  
+  /* The container is now completely invisible */
+  background: transparent !important; 
+  
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* 2. The Completely Transparent Squares */
+.ffwinks-mobile-menu__link {
+  background-color: transparent !important; 
+  padding-left: 50px;
+  display: flex !important;
+  align-items: center !important; /* Centers vertically */
+  justify-content: center !important; /* Centers horizontally */
+  text-align: center !important;
+  
+  /* Force the links to fill the whole square */
+  width: 100% !important; 
+  height: 100% !important; 
+  white-space: nowrap !important;
+  /* Typography Updates */
+  color: #ffffff !important; 
+  font-size: 10px !important; 
+  font-weight: normal !important; 
+}
+/* 3. The Translucent Cross (Built with Borders) & Positioning Reset */
+.ffwinks-mobile-menu__link.pos-tl {
+  /* Draws the top and left part of the cross */
+  border-right: 2px solid rgba(255, 255, 255, 0.2) !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+  position: relative !important; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
+}
+
+.ffwinks-mobile-menu__link.pos-tr {
+  /* Draws the right side of the cross arm */
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+  position: relative !important; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
+}
+
+.ffwinks-mobile-menu__link.pos-bl {
+  /* Draws the bottom side of the cross leg */
+  border-right: 2px solid rgba(255, 255, 255, 0.2) !important;
+  position: relative !important; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
+}
+
+.ffwinks-mobile-menu__link.pos-br {
+  position: relative !important; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important;
+}
+
+/* 3. Center the Star Graphic */
+.ffwinks-mobile-menu__ambient,
+.menu-center-star {
+  position: absolute;
+  left: var(--ffwinks-menu-cross-x);
+  top: var(--ffwinks-menu-cross-y);
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-center-star img,
+.menu-center-star svg {
+  width: 150px;
+  height: auto;
+  display: block;
+  mix-blend-mode: normal;
+  filter: invert(1);
+  opacity: 1;
+}
+
+.ffwinks-mobile-menu__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.ffwinks-mobile-menu__account {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: rgba(68, 68, 68, 0.9);
+  text-decoration: none;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.ffwinks-mobile-menu__account:hover {
+  color: #111;
+  transform: translateY(-1px);
+}
+
+.ffwinks-mobile-menu__account .svg-wrapper,
+.ffwinks-mobile-menu__account svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Close button inside mobile menu overlay */
+.ffwinks-mobile-menu__close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin: 50px auto 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(68, 68, 68, 0.9);
+  transition: color 0.2s ease, transform 0.2s ease;
+  padding: 0;
+}
+.ffwinks-mobile-menu__close-btn .svg-wrapper,
+.ffwinks-mobile-menu__close-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+@media screen and (min-width: 750px) {
+  #ffwinks-mobile-menu {
+    display: none;
+  }
+}
+
+/* — Wishlist-only: fixed header with share button — */
+.ffwinks-fullscreen__wishlist-header {
+  position: fixed;
+  top: var(--header-overlay-offset, 60px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--soul-wl-header-pt) var(--ffwinks-master-spacing) 6px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.ffwinks-share-btn {
+  pointer-events: auto;
+  font-size: var(--soul-font-label);
+  color: #666;
+  text-transform: capitalize;
+  cursor: pointer;
+  text-decoration: underline;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  min-height: 30px;
+  transition: color 0.2s, font-weight 0.1s;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+.ffwinks-share-btn:hover { color: #000; }
+
+/* — Item list wrapper — */
+.ffwinks-soul-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--soul-list-pt) var(--ffwinks-master-spacing) var(--soul-list-pb) 0;
+  box-sizing: border-box;
+  gap: var(--soul-list-gap);
+  flex-shrink: 0;
+}
+.ffwinks-empty-msg {
+  font-size: 9px;
+  color: #ccc;
+  margin: 60px 0;
+  font-weight: 300;
+  text-align: center;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+
+/* — Item row — */
+.ffwinks-soul-row {
+  display: flex;
+  width: 100%;
+  max-width: var(--soul-row-max-w);
+  align-items: center;
+  position: relative;
+  min-height: var(--soul-row-min-h);
+  padding: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* — Remove button — */
+.ffwinks-soul-remove {
+  font-size: 16px;
+  color: #666;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: var(--soul-remove-ml);
+  margin-right: var(--soul-remove-mr);
+  margin-top: 12px; /* <-- Tweak this number to align perfectly with your image curve! */
+  flex: 0 0 var(--soul-remove-w);
+  width: var(--soul-remove-w);
+  line-height: 1;
+  font-weight: 400;
+  min-height: var(--soul-remove-w);
+  display: flex;
+  align-items: flex-start; /* Pulls the 'X' text to the top of its own box */
+  justify-content: right;
+  align-self: flex-start; /* Pulls the entire button to the top of the product row */
+  transition: color 0.2s, font-weight 0.1s;
+}
+.ffwinks-soul-remove:hover { color: #000; }
+
+/* — Image box — locked height, percentage width shrinks with overlay — */
+/* — Image box — locked height, percentage width shrinks with overlay — */
+.ffwinks-soul-img-box {
+  flex: 0 0 var(--soul-img-w);
+  width: var(--soul-img-w);
+  min-width: var(--soul-img-w);
+  max-width: var(--soul-img-w);
+  height: var(--soul-img-h);
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-radius: var(--soul-img-radius-pill);
+  overflow: hidden;
+  /* Optimization: Forces GPU acceleration to keep curved edges smooth during image hover effects */
+  transform: translateZ(0); 
+}
+
+.ffwinks-soul-img-box img {
+  width: auto;
+  height: 60%;
+  object-fit: contain; /* Optimization: Ensures varying product image ratios never distort */
+  object-position: center;
+  pointer-events: none;
+  transition: none;
+  will-change: auto;
+}
+
+.ffwinks-soul-row > .ffwinks-soul-img-box,
+#ffwinks-cart-overlay .ffwinks-soul-row > .ffwinks-soul-img-box,
+#ffwinks-wishlist-overlay .ffwinks-soul-row > .ffwinks-soul-img-box,
+.ffwinks-soul-row > .ffwinks-soul-img-box:hover,
+#ffwinks-cart-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:hover,
+#ffwinks-wishlist-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:hover,
+.ffwinks-soul-row > .ffwinks-soul-img-box:focus-visible,
+#ffwinks-cart-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:focus-visible,
+#ffwinks-wishlist-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:focus-visible,
+.ffwinks-soul-row > .ffwinks-soul-img-box:active,
+#ffwinks-cart-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:active,
+#ffwinks-wishlist-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:active {
+  flex: 0 0 var(--soul-img-w) !important;
+  width: var(--soul-img-w) !important;
+  min-width: var(--soul-img-w) !important;
+  max-width: var(--soul-img-w) !important;
+  height: var(--soul-img-h) !important;
+  background-color: #f4f4f4 !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.ffwinks-soul-img-box,
+.ffwinks-soul-img-box:hover,
+.ffwinks-soul-img-box:focus-visible,
+.ffwinks-soul-img-box:active {
+  color: inherit !important;
+  opacity: 1 !important;
+  transform: none !important;
+  text-decoration: none !important;
+  filter: none !important;
+  background-color: #f4f4f4 !important;
+}
+
+.ffwinks-soul-img-box img,
+.ffwinks-soul-img-box:hover img,
+.ffwinks-soul-img-box:focus-visible img,
+.ffwinks-soul-img-box:active img {
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.ffwinks-soul-row:hover .ffwinks-soul-img-box,
+.ffwinks-soul-row:focus-within .ffwinks-soul-img-box,
+.ffwinks-soul-row:hover .ffwinks-soul-img-box img,
+.ffwinks-soul-row:focus-within .ffwinks-soul-img-box img {
+  background-color: #f4f4f4 !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+/* — Details box — */
+.ffwinks-soul-details-box {
+  flex: 1 1 0%;
+  display: flex;
+  justify-content: flex-start;
+  padding-left: var(--soul-details-pl);
+  box-sizing: border-box;
+}
+
+/* — Details grid — */
+.ffwinks-soul-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: var(--soul-grid-label-w) 1fr;
+  column-gap: var(--soul-grid-col-gap);
+  row-gap: var(--soul-grid-row-gap);
+  font-size: var(--soul-font-base);
+  color: #333;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  align-content: start;
+  align-items: center;
+}
+.ffwinks-soul-label {
+  font-weight: 400;
+  color: #999;
+  text-align: left;
+}
+.ffwinks-soul-value {
+  font-weight: 700;
+  color: #222;
+  text-align: left;
+}
+
+/* — Text options (size/colour chips) — */
+.ffwinks-text-options-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--soul-opts-gap);
+  margin-top: -2px;
+}
+.ffwinks-text-option {
+  font-size: var(--soul-font-label);
+  font-weight: 300;
+  color: #999;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  text-transform: capitalize;
+}
+.ffwinks-text-option:hover { color: #333; }
+.ffwinks-text-option.is-active { color: #000; font-weight: 600; }
+
+/* — Quantity controls — */
+.ffwinks-soul-qty {
+  display: flex;
+  gap: var(--soul-qty-gap);
+  align-items: center;
+  font-weight: bold;
+  color: #333;
+  user-select: none;
+}
+.ffwinks-soul-qty__btn {
+  background: none;
+  border: none;
+  font-size: var(--soul-font-qty);
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  font-weight: 400;
+  min-width: var(--soul-qty-btn-w);
+  min-height: var(--soul-qty-btn-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, font-weight 0.1s ease;
+}
+.ffwinks-soul-qty__btn:hover { color: #000; }
+.ffwinks-soul-qty__num {
+  font-size: var(--soul-font-label);
+  color: #333;
+  min-width: var(--soul-qty-num-w);
+  text-align: center;
+}
+
+/* Size/colour row spacing */
+.ffwinks-soul-grid > :nth-child(3),
+.ffwinks-soul-grid > :nth-child(4) {
+  margin-top: var(--soul-grid-row3-mt);
+}
+
+/* — Action button (add to cart / move to cart) — */
+.ffwinks-soul-action-btn {
+  grid-column: 1 / -1;
+  justify-self: end;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: var(--soul-font-action);
+  color: #666;
+  background: none;
+  border: none;
+  margin-top: var(--soul-action-btn-mt);
+  padding: 4px 0;
+  min-height: var(--soul-qty-btn-w);
+  transition: color 0.2s, font-weight 0.1s;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+.ffwinks-soul-action-btn:hover { color: #000; }
+
+/* — Subtotal bar (fixed bottom) — */
+.ffwinks-soul-subtotal-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  text-align: right;
+  width: 100%;
+  padding-right: var(--ffwinks-master-spacing);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* Cart-specific subtotal overrides */
+#ffwinks-cart-overlay .ffwinks-soul-subtotal-wrapper {
+  padding-top: var(--soul-subtotal-pt-cart);
+  padding-bottom: 20px;
+  background: linear-gradient(to top, rgba(255,255,255,1) 35%, rgba(255,255,255,0) 100%);
+}
+#ffwinks-cart-overlay .ffwinks-soul-subtotal-row,
+#ffwinks-cart-overlay .ffwinks-soul-subtotal-info { pointer-events: auto; }
+
+/* Wishlist-specific subtotal overrides */
+#ffwinks-wishlist-overlay .ffwinks-soul-subtotal-wrapper {
+  padding-top: var(--soul-subtotal-pt-wishlist);
+  padding-bottom: 0;
+  background: linear-gradient(to top, rgba(255,255,255,0.95) 10%, rgba(255,255,255,0) 100%);
+}
+#ffwinks-wishlist-overlay .ffwinks-soul-subtotal-row,
+#ffwinks-wishlist-overlay .ffwinks-soul-subtotal-info { display: none !important; }
+
+/* — Subtotal row — */
+.ffwinks-soul-subtotal-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--soul-subtotal-gap);
+  margin-bottom: 8px;
+}
+.ffwinks-soul-subtotal-label {
+  font-size: var(--soul-font-subtotal);
+  color: #333;
+  font-weight: bold;
+  text-transform: capitalize;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+.ffwinks-soul-subtotal-price {
+  font-size: var(--soul-font-subtotal);
+  color: #333;
+  font-weight: normal;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+.ffwinks-soul-subtotal-info {
+  font-size: 9px;
+  color: #bbb;
+  margin: 0;
+  font-style: normal;
+  text-align: right;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+
+.ffwinks-soul-checkout-wrapper,
+.ffwinks-soul-addall-wrapper {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 10001;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 2. Empty State — Overrides the grid and forces dead-center */
+#ffwinks-cart-empty,
+#ffwinks-wishlist-empty {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important; 
+  will-change: transform;
+}
+.ffwinks-soul-action-bottom {
+  background: transparent;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  display: block;
+  pointer-events: auto;
+  text-decoration: none;
+}
+.ffwinks-img-btn-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+.ffwinks-action-img {
+  width: var(--ffwinks-action-img-w);
+  height: auto;
+  display: block;
+}
+.ffwinks-action-img--invert { filter: invert(1); }
+.ffwinks-img-label {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  font-weight: 400;
+  color: #666;
+  white-space: nowrap;
+  
+  pointer-events: none;
+  transition: color 0.3s ease;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+}
+.ffwinks-soul-action-bottom:hover .ffwinks-img-label { color: #000; }
+.ffwinks-checkout-link-wrap { pointer-events: auto; }
+
+/* Hard lock overlay CTA labels — no color transition (avoids pulse if hover target jitters) */
+#ffwinks-cart-overlay .ffwinks-img-label,
+#ffwinks-wishlist-overlay .ffwinks-img-label {
+  color: #666 !important;
+  font-weight: 400 !important;
+  transition: none !important;
+}
+#ffwinks-cart-overlay .ffwinks-soul-action-bottom:hover .ffwinks-img-label,
+#ffwinks-cart-overlay .ffwinks-soul-action-bottom:focus-visible .ffwinks-img-label,
+#ffwinks-wishlist-overlay .ffwinks-soul-action-bottom:hover .ffwinks-img-label,
+#ffwinks-wishlist-overlay .ffwinks-soul-action-bottom:focus-visible .ffwinks-img-label {
+  color: #000 !important;
+  transition: none !important;
+}
+
+/* Custom-liquid cart drawer floating checkout (same classes as soul pill) */
+.cart-overlay__floating-btn .ffwinks-img-label {
+  transition: none !important;
+}
+.cart-overlay__floating-btn:hover .ffwinks-img-label,
+.cart-overlay__floating-btn:focus-visible .ffwinks-img-label {
+  color: #000 !important;
+  font-weight: 400 !important;
+  transition: none !important;
+}
+
+
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │ ► SECTION: SHARED ACTIONS / BADGE / SPARKLE                    │
+   │   Header action icon wrapper, badge counter, wishlist sparkle. │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+/* Sparkle states */
+.product-sparkle-icon,
+.shop-product-icon,
+.newin-product-icon,
+[data-ffwinks-sparkle] {
+  cursor: pointer;
+  transition: filter 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+}
+.product-sparkle-icon.ffwinks-sparkle--active,
+.shop-product-icon.ffwinks-sparkle--active,
+.newin-product-icon.ffwinks-sparkle--active { filter: brightness(0); opacity: 1 !important; }
+@keyframes ffwinks-sparkle-pop {
+  0%   { filter: brightness(0) blur(0px);  }
+  40%  { filter: brightness(0) blur(1px);  }
+  100% { filter: brightness(0) blur(0px);  }
+}
+.product-sparkle-icon.ffwinks-sparkle--pop,
+.shop-product-icon.ffwinks-sparkle--pop,
+.newin-product-icon.ffwinks-sparkle--pop { animation: ffwinks-sparkle-pop 0.3s ease forwards; }
+
+/* Header action icon wrapper */
+.header-actions__action { overflow: visible !important; }
+header-actions { overflow: visible !important; }
+.header-actions__action span[style*="position:relative"] {
+  line-height: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  position: relative !important;
+}
+.header-actions__action span[style*="position:relative"] svg,
+.header-actions__action span[style*="position:relative"] img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │ ► SECTION: MOBILE & TABLET MEDIA QUERIES                        │
+   │   Breakpoint overrides for all files above.                   │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+@media screen and (max-width: 749px) {
+
+  html {
+    scroll-padding-top: var(--ffwinks-scroll-mobile) !important;
+  }
+
+  /* header.liquid — mobile header row */
+  .header__row--top {
+    height: var(--ffwinks-header-h-mobile) !important;
+    max-height: var(--ffwinks-header-h-mobile) !important;
+    min-height: var(--ffwinks-header-h-mobile) !important;
+    overflow: visible !important;
+  }
+  .header__row .spacing-style,
+  .header__columns {
+    --padding-block-start: 0px !important;
+    --padding-block-end: 0px !important;
+    padding-block: 0 !important;
+    height: var(--ffwinks-header-h-mobile) !important;
+  }
+  .header__columns {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: var(--ffwinks-mobile-gap) !important; 
+    justify-content: space-between !important;
+  }
+  .header__column {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    height: var(--ffwinks-header-h-mobile) !important;
+    padding: 0 !important;
+    gap: 8px !important; 
+  }
+.header__column--left   { flex: 0 0 120px !important; justify-content: flex-start !important; padding-inline-start: 0 !important; order: 1 !important; gap: 0 !important; }
+.header__column--center { flex: 1 1 auto !important; justify-content: center !important; order: 2 !important; min-width: 0 !important; }
+.header__column--right  { flex: 0 0 120px !important; justify-content: flex-end !important; padding-inline-end: 0 !important; order: 3 !important; gap: 0 !important; }
+  .header__icon--menu {
+    width: var(--ffwinks-header-h-mobile) !important;
+    height: var(--ffwinks-header-h-mobile) !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    flex-shrink: 0 !important; padding: 0 !important; margin: 0 !important;
+  }
+
+  #Details-menu-drawer-container > .menu-drawer,
+  #Details-menu-drawer-container > .menu-drawer__backdrop {
+    display: none !important;
+  }
+
+  #ffwinks-mobile-menu {
+    padding-inline: clamp(18px, 6vw, 30px);
+    --ffwinks-menu-label-x: clamp(34px, 10vw, 46px);
+    --ffwinks-menu-label-top-offset: clamp(110px, 14svh, 126px);
+    --ffwinks-menu-label-bottom-offset: clamp(146px, 17svh, 162px);
+  }
+
+  .ffwinks-mobile-menu__layout {
+    min-height: clamp(486px, 69svh, 620px);
+  }
+
+  .ffwinks-mobile-menu__link {
+    max-width: 68px;
+  }
+
+  .ffwinks-mobile-menu__ambient {
+    width: clamp(196px, 58vw, 264px);
+    height: clamp(196px, 58vw, 264px);
+  }
+
+  .ffwinks-mobile-menu__glow--vertical {
+    width: clamp(36px, 9vw, 44px);
+  }
+
+  .ffwinks-mobile-menu__glow--horizontal {
+    height: clamp(36px, 9vw, 44px);
+  }
+
+  .desktop\:hidden {
+    width: 36px !important;
+    height: var(--ffwinks-header-h-mobile) !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    flex-shrink: 0 !important; padding: 0 !important; margin: 0 !important;
+  }
+  /* header.liquid — mobile logo */
+ .header-logo, header-logo {
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    height: var(--ffwinks-header-h-mobile) !important;
+    width: 100% !important; max-width: 100% !important;
+    margin-inline: 0 !important;
+  }
+  .header-logo img, header-logo img, .header-logo svg, header-logo svg,
+  .header-logo a img, header-logo a img {
+    max-height: 22px !important; max-width: 140px !important;
+    width: auto !important; height: auto !important;
+    object-fit: contain !important; display: block !important;
+  }
+  /* header.liquid — mobile actions */
+  header-actions {
+    display: flex !important; flex-direction: row !important; align-items: center !important;
+    height: var(--ffwinks-header-h-mobile) !important;
+    gap: 0 !important; padding: 0 !important; margin: 0 !important; flex-shrink: 0 !important;
+  }
+  header-actions .header-actions__action {
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    width: 38px !important; height: var(--ffwinks-header-h-mobile) !important;
+    flex: 0 0 38px !important; padding: 0 !important; margin: 0 !important;
+  }
+  .header-actions__action, .header__icon--menu {
+    margin-bottom: 0.5svh; /* ADDED svh bottom margin */
+  }
+  /* header.liquid — hide desktop-only elements on mobile */
+  .header__column--left header-menu,
+  .header__column--center header-menu,
+  .header__column--right header-menu { display: none !important; }
+  /* Show native mobile search icon */
+  search-button.desktop\:hidden { 
+    display: flex !important; 
+  }
+
+  /* Hide the desktop/ffwinks search icon on mobile */
+  search-button:not(.desktop\:hidden),
+  header-actions .header-actions__action[href*="/search"],
+  header-actions .header-actions__action--search,
+  .action__search { 
+    display: none !important; 
+    width: 0 !important; 
+    height: 0 !important;
+    pointer-events: none !important;
+  }
+  .dropdown-localization, dropdown-localization-component { display: none !important; }
+  .mobile\:hidden { display: none !important; }
+  .header__row--mobile { display: none !important; }
+  /* header.liquid — hide account action on mobile */
+  header-actions .header-actions__action[href*="account"],
+  header-actions .header-actions__action[href*="login"],
+  header-actions .header-actions__action[href*="customer"],
+  header-actions .header-actions__action[href*="sign"],
+  header-actions .header-actions__action[href*="profile"],
+  .header-actions__action--account,
+  .header-actions__action--login,
+  .header-actions__action--user,
+  [class*="account"].header-actions__action,
+  [class*="login"].header-actions__action,
+  [class*="user"].header-actions__action,
+  a[href*="account"]:is(.header-actions__action, [class*="header"]),
+  a[href*="login"]:is(.header-actions__action, [class*="header"]),
+  header-actions .header-actions__action:has(svg[class*="user"]),
+  header-actions .header-actions__action:has(svg[class*="account"]),
+  header-actions .header-actions__action:has(svg[aria-label*="account" i]),
+  header-actions .header-actions__action:has(svg[aria-label*="login" i]),
+  header-actions .header-actions__action:has([aria-label*="account" i]),
+  header-actions .header-actions__action:has([aria-label*="login" i]),
+  header-actions .header-actions__action:has([title*="account" i]),
+  header-actions .header-actions__action:has([title*="login" i]) {
+    display: none !important; width: 0 !important; height: 0 !important;
+    pointer-events: none !important;
+  }
+
+  header-actions .action__wishlist,
+  header-actions .header-actions__action[href*="/wishlist"] {
+    display: flex !important;
+    width: 38px !important;
+    height: var(--ffwinks-header-h-mobile) !important;
+    pointer-events: auto !important;
+  }
+
+  /* ffwinks-cart.liquid & ffwinks-wishlist.liquid — mobile soul tokens */
+  :root {
+    --soul-img-h:                39vh;
+    --soul-img-w:                calc(48.4vw - var(--soul-remove-ml) - var(--soul-remove-w) - var(--soul-remove-mr));
+    --soul-img-aspect:           unset;
+    --soul-row-min-h:            var(--soul-img-h);
+    --soul-row-max-w:            100%;
+    --soul-remove-ml:            var(--ffwinks-master-spacing);
+    --soul-remove-mr:            10px;
+    --soul-remove-w:             14px;
+    --soul-details-pl:           30px;
+    --soul-grid-label-w:         48px;
+    --soul-grid-col-gap:         14px;
+    --soul-grid-row-gap:         7px;
+    --soul-grid-row3-mt:         13px;
+    --soul-action-btn-mt:        10px;
+    --soul-list-pt:              calc(50dvh - var(--header-overlay-offset, 60px) - var(--soul-img-h) - (var(--soul-list-gap) / 2) - 2.5px);
+    --soul-list-pb:              6.2svh;
+    --soul-list-gap:             14px;
+    --soul-subtotal-pt-cart:     48px;
+    --soul-subtotal-pt-wishlist: 27px;
+    --soul-subtotal-gap:         38px;
+    --soul-img-radius:           70px;
+    --soul-img-radius-pill:      70px;
+    --soul-font-base:            11px;
+    --soul-font-label:           9px;
+    --soul-font-remove:          18px;
+    --soul-font-qty:             14.5px;
+    --soul-font-action:          8px;
+    --soul-font-subtotal:        9px;
+    --soul-qty-gap:              10px;
+    --soul-qty-btn-w:            21px;
+    --soul-qty-btn-h:            29px;
+    --soul-qty-num-w:            11px;
+    --soul-opts-gap:             10px;
+    --soul-wl-header-pt:         20px;
+  }
+  /* Pushes product text down to clear the wishlist share button */
+  .ffwinks-soul-details-box {
+    padding-top: 40px !important; 
+  }
+  /* OVERLAY HEIGHT FIXES FOR MOBILE */
+  #ffwinks-global-overlay { top: 0; height: 100dvh; }
+  #ffwinks-search-bar .ffwinks-container {
+    top: calc(var(--ffwinks-header-h-mobile) + 40px) !important;
+  }
+}
+/* Hide "Contact" link in the left header column on Desktop only */
+@media screen and (min-width: 750px) {
+  .header__column--left header-menu li:has(a[href*="contact"]),
+  .header__column--left header-menu a[href*="contact"] {
+    display: none !important;
+  }
+}
+@media screen and (min-width: 480px) and (max-width: 749px) {
+  /* header.liquid — mid-mobile logo & action tweaks */
+  .header-logo img, header-logo img { max-height: 24px !important; max-width: 150px !important; }
+  header-actions .header-actions__action { width: 40px !important; flex: 0 0 40px !important; }
+  .ffwinks-mobile-menu__link { font-size: 9px; }
+}
+
+@media screen and (min-width: 750px) and (max-width: 1023px) {
+
+  html {
+    scroll-padding-top: var(--ffwinks-scroll-tablet) !important;
+  }
+
+  /* header.liquid — tablet header row */
+  .header__row--top {
+    height: var(--ffwinks-header-h-tablet) !important;
+    max-height: var(--ffwinks-header-h-tablet) !important;
+    min-height: var(--ffwinks-header-h-tablet) !important;
+  }
+  .header__row .spacing-style,
+  .header__columns {
+    height: var(--ffwinks-header-h-tablet) !important;
+    gap: var(--gap-md, 0.75rem);
+  }
+  header-menu { min-width: 0; overflow: hidden; }
+  .header__columns .menu-list__link { font-size: 10px;  }
+  .header-logo img, header-logo img { max-height: 28px !important; }
+
+  
+  /* OVERLAY HEIGHT FIXES FOR TABLET */
+  #ffwinks-global-overlay { top: var(--ffwinks-header-h-tablet); }
+  #ffwinks-search-bar .ffwinks-container { top: calc(var(--ffwinks-header-h-tablet) + 40px) !important; }
+}
+
+/* Final typography + hover pass */
+:root {
+  --menu-localization-font-size: 10px;
+  --soul-font-base: 9px;
+  --soul-font-label: 9px;
+  --soul-font-remove: 10px;
+  --soul-font-qty: 10px;
+  --soul-font-action: 10px;
+  --soul-font-subtotal: 10px;
+}
+
+.header__columns .menu-list__link,
+header-component .list-menu__item,
+header-component .header__menu-item {
+  font-size: 10px !important;
+}
+
+.ffwinks-main-input {
+  font-size: 10px;
+}
+
+.ffwinks-suggestions-label,
+.ffwinks-suggestion-link,
+.ffwinks-empty-msg {
+  font-size: 9px;
+}
+
+.ffwinks-bottom-label,
+.ffwinks-mobile-menu__link {
+  font-size: 10px;
+}
+
+.ffwinks-mobile-menu__link {
+  font-size: 9px !important;
+}
+
+.ffwinks-soul-grid {
+  font-size: 9px;
+}
+
+.ffwinks-soul-label {
+  font-size: 9px;
+}
+
+.ffwinks-soul-value {
+  font-size: 10px;
+}
+
+.ffwinks-soul-qty__num,
+.ffwinks-soul-subtotal-info {
+  font-size: 9px;
+}
+
+.ffwinks-soul-subtotal-label,
+.ffwinks-soul-subtotal-price,
+.ffwinks-share-btn {
+  font-size: 10px;
+}
+
+/* Dream Picks parity: unified pill/button interaction style */
+:root {
+  --ffw-pill-color-default: #666;
+  --ffw-pill-color-hover: #000;
+  --ffw-pill-font-size: 10px;
+  --ffw-pill-font-weight: 400;
+  --ffw-pill-transition: color 0.3s ease, opacity 0.25s ease;
+}
+
+.ffwinks-text-option,
+.ffwinks-soul-action-btn,
+.ffwinks-soul-qty__btn,
+.ffwinks-img-label,
+.floating-atc-text,
+.ffwinks-mobile-atc-btn {
+  color: var(--ffw-pill-color-default) !important;
+  font-size: var(--ffw-pill-font-size) !important;
+  font-weight: var(--ffw-pill-font-weight) !important;
+  transition: var(--ffw-pill-transition) !important;
+}
+
+.ffwinks-text-option,
+.ffwinks-soul-action-btn,
+.ffwinks-soul-qty__btn,
+.ffwinks-mobile-atc-btn {
+  background: transparent !important;
+  border: none !important;
+}
+
+.ffwinks-text-option.is-active {
+  color: var(--ffw-pill-color-hover) !important;
+  font-weight: 400 !important;
+}
+
+.ffwinks-text-option:is(:hover, :focus-visible, :active),
+.ffwinks-soul-action-btn:is(:hover, :focus-visible, :active),
+.ffwinks-soul-qty__btn:is(:hover, :focus-visible, :active),
+.ffwinks-soul-action-bottom:is(:hover, :focus-visible, :active) .ffwinks-img-label,
+.floating-atc-btn:is(:hover, :focus-visible, :active) .floating-atc-text,
+.ffwinks-mobile-atc-btn:is(:hover, :focus-visible, :active) {
+  color: var(--ffw-pill-color-hover) !important;
+}
+
+.header__columns .menu-list__link:hover,
+header-component .list-menu__item:hover,
+header-component .header__menu-item:hover,
+.ffwinks-suggestion-link:hover,
+.ffwinks-bottom-label:hover,
+.ffwinks-share-btn:hover,
+.ffwinks-text-option:hover,
+.ffwinks-soul-action-btn:hover {
+  color: #000 !important;
+}
+
+.ffwinks-mobile-menu__link:hover {
+  color: #ffffff !important;
+}
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │ ► SECTION: EXTREME SCREENS & PORTRAIT LOCK                       │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+/* 1. Shrink the stars on extreme narrow or short screens */
+@media screen and (max-height: 600px), screen and (max-width: 325px) {
+  .center-star-bg, .center-star-bg img, .center-star-bg svg,
+  .ffwinks-search-star-wrap, .ffwinks-search-star,
+  #ffwinks-cart-empty, #ffwinks-cart-empty img,
+  #ffwinks-wishlist-empty, #ffwinks-wishlist-empty img,
+  .ffwinks-action-img {
+    width: 150px !important;
+    height: auto !important;
+  }
+  .ffwinks-search-star-wrap button.ffwinks-submit-btn {
+    font-size: 8px !important; /* shrink text slightly */
+  }
+  .ffwinks-mobile-menu__ambient {
+    width: 140px !important; /* shrink the menu fog */
+    height: 140px !important;
+  }
+}
+
+/* 2. The Portrait Lock Overlay Shell */
+#ffw-portrait-lock {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  background: #ffffff;
+  z-index: 2147483647; /* Maximum possible z-index to cover the entire site */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+#ffw-portrait-lock p {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+/* 3. Animating the little phone icon */
+#ffw-portrait-lock svg {
+  animation: rotate-phone 2s infinite ease-in-out;
+  margin-bottom: 20px;
+}
+@keyframes rotate-phone {
+  0% { transform: rotate(-90deg); }
+  50% { transform: rotate(0deg); }
+  100% { transform: rotate(-90deg); }
+}
+
+/* 4. Trigger the overlay ONLY on mobile devices turned sideways */
+@media screen and (max-width: 950px) and (max-height: 500px) and (orientation: landscape) {
+  #ffw-portrait-lock {
+    display: flex !important;
+  }
+  body {
+    overflow: hidden !important;
+  }
+}
+/* 5. Huge Desktop Adjustments */
+@media screen and (min-width: 1800px),
+       screen and (min-width: 1400px) and (min-height: 820px) {
+  :root {
+    /* Increase this clamp to make cards taller without breaking the aspect ratio */
+    --soul-img-h: clamp(350px, 40vh, 800px); 
+  }
+}
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │ ► SECTION: CHECKOUT TRANSITION                                  │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+#ffw-checkout-transition {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  background-color: #ffffff;
+  z-index: 2147483647;
+
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition: opacity 0.2s ease, visibility 0s 0.2s;
+}
+
+#ffw-checkout-transition.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.2s ease, visibility 0s 0s;
+}
+
+/* Base positioning (Desktop/Tablet) */
+.ffw-lips-transition-icon {
+  width: 260px;
+  height: auto;
+  position: absolute;
+  /* Adjust these values to place it exactly where you want on larger screens */
+  top: 160px;
+  left: 300px;
+  
+  transform: rotate(-22deg);
+  transform-origin: center center;
+  opacity: 0;
+  animation: none;
+}
+
+/* Mobile positioning override */
+@media screen and (max-width: 749px) {
+  .ffw-lips-transition-icon {
+    /* Adjust these values to place it exactly where you want on mobile */
+    top: 25%;
+    left: 50px;
+    
+    /* Optional: Shrink the lips a bit for mobile so they fit better */
+    width: 180px; 
+  }
+}
+
+/* Trigger the animation */
+#ffw-checkout-transition.is-active .ffw-lips-transition-icon {
+  animation: ffw-lips-fade-once 0.9s ease-in-out 1 forwards;
+}
+
+/* Cleaned up keyframes: only animates opacity and scale now */
+@keyframes ffw-lips-fade-once {
+  0% {
+    opacity: 0;
+    transform: rotate(-22deg) scale(0.96);
+  }
+  35% {
+    opacity: 1;
+    transform: rotate(-22deg) scale(1);
+  }
+  65% {
+    opacity: 1;
+    transform: rotate(-22deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-22deg) scale(0.96);
+  }
+}
+<script>
+(function () {
+
+  // ============================================================
+  // WAIT FOR DOM
+  // ============================================================
+  function ready(fn) {
+    if (document.readyState !== 'loading') { fn(); }
+    else { document.addEventListener('DOMContentLoaded', fn); }
+  }
+
+  ready(function () {
+
+    var transitionScreen = document.getElementById('ffw-checkout-transition');
+
+
+    // ============================================================
+    // HELPER: is this click targeting checkout?
+    // ============================================================
+    function isCheckoutTarget(el) {
+      return !!(
+        el.closest('.ffwinks-checkout-link-wrap')  ||
+        el.closest('.ffwinks-soul-action-bottom')  ||
+        el.closest('a[href*="checkout"]')          ||
+        el.closest('button[name="checkout"]')      ||
+        el.closest('input[name="checkout"]')
+      );
+    }
+
+    // ============================================================
+    // HELPER: is this click targeting the cart icon (NOT checkout)?
+    // ============================================================
+    function isCartIconTarget(el) {
+      return !!(
+        el.closest('.action__cart')                           ||
+        el.closest('[data-ffwinks-cart]')                     ||
+        el.closest('a[href="/cart"]:not([href*="checkout"])')
+      );
+    }
+
+
+    // ============================================================
+    // CHECKOUT TRANSITION
+    // Visual-only lips animation, then redirect to checkout.
+    // ============================================================
+    function executeTransition(e, targetUrl) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      // 1. Show lips animation
+      if (transitionScreen) {
+        transitionScreen.classList.remove('is-active');
+        void transitionScreen.offsetWidth; // force repaint
+        transitionScreen.classList.add('is-active');
+      }
+
+      // 2. Navigate after animation
+      setTimeout(function () {
+        window.location.href = targetUrl;
+      }, 2000);
+    }
+
+
+    // ============================================================
+    // CLICK LISTENER — checkout targets only
+    // isCartIconTarget guard stops cart-icon clicks from
+    // accidentally hitting the checkout path
+    // ============================================================
+    document.addEventListener('click', function (e) {
+      if (isCartIconTarget(e.target)) return;
+      if (!isCheckoutTarget(e.target)) return;
+
+      var url = '/checkout';
+      var parentLink = e.target.closest('a');
+      if (parentLink && parentLink.href) url = parentLink.href;
+
+      executeTransition(e, url);
+
+    }, true);
+
+
+    // ============================================================
+    // FORM SUBMIT LISTENER
+    // ============================================================
+    document.addEventListener('submit', function (e) {
+      var form = e.target;
+      if (!form || !form.action) return;
+
+      // — Add to cart: silent fetch, then open overlay via custom event
+      if (form.action.includes('/cart/add')) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        var submitBtn     = form.querySelector('[type="submit"]');
+        var originalHTML  = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) submitBtn.innerHTML = 'Adding...';
+
+        fetch(window.Shopify.routes.root + 'cart/add.js', {
+          method: 'POST',
+          body: new FormData(form)
+        })
+        .then(function (r) { return r.json(); })
+        .then(function () {
+          if (submitBtn) submitBtn.innerHTML = originalHTML;
+          // Fire custom event — keeps this 100% separate from checkout path
+          document.dispatchEvent(new CustomEvent('ffwinks:open-cart'));
+        })
+        .catch(function (err) {
+          console.error('FFWinks — cart/add error:', err);
+          if (submitBtn) submitBtn.innerHTML = originalHTML;
+        });
+
+        return;
+      }
+
+      // — Checkout form submission
+      if (form.action.includes('/cart') || form.action.includes('/checkout')) {
+        executeTransition(e, '/checkout');
+      }
+
+    }, true);
+
+
+    // ============================================================
+    // OPEN CART OVERLAY
+    // Triggered by 'ffwinks:open-cart' custom event only —
+    // completely isolated from the checkout click path so a
+    // programmatic cart open can never trigger the checkout transition
+    // ============================================================
+    document.addEventListener('ffwinks:open-cart', function () {
+      var cartOverlay = document.getElementById('ffwinks-cart-overlay');
+      if (cartOverlay) {
+        cartOverlay.classList.add('ffwinks-fullscreen--open');
+        document.body.classList.add('ffwinks-open');
+        return;
+      }
+      // Fallback: direct link click
+      var headerCartLink = document.querySelector('.action__cart, a[href="/cart"]');
+      if (headerCartLink) headerCartLink.click();
+    });
+
+  }); // end ready()
+
+})();
+</script>
+
+
+/* ==========================================================
+   FORCE GPU RENDERING FOR HOME PAGE STICKY STAR
+   (Prevents scroll jitter when wishlist DOM gets heavy)
+========================================================== */
+.center-star-bg {
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+  will-change: transform, position !important;
+}
+
+.center-star-bg img, 
+.center-star-bg svg {
+  -webkit-transform: translateZ(0) !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+}
+/* ==========================================================
+   ULTIMATE SCROLL PERFORMANCE LOCK 
+   (Stops the browser from calculating hidden products on scroll)
+========================================================== */
+.ffwinks-fullscreen:not(.ffwinks-fullscreen--open),
+#ffwinks-search-bar:not(.is-open) {
+  content-visibility: hidden;
+}
+/* Mobile close button inside the Cart Overlay */
+.ffwinks-cart__close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 50px;
+  right: 16px;
+  z-index: 10002;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, opacity 0.2s, transform 0.2s ease;
+  padding: 0;
+  
+  /* Typography for the letter "x" */
+  color: #000;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
+  padding-bottom: 2px; /* Slight nudge to visually center the lowercase x */
+}
+
+
+@media screen and (min-width: 750px) {
+  .ffwinks-cart__close-btn.mobile-only {
+    display: none !important;
+  }
+}
+{% endstylesheet %}
+
+{% unless request.design_mode %}
+  <script type="module">
+    import { hydrate } from '@theme/section-hydration';
+    const url = new URL(window.location.href);
+    url.searchParams.delete('page');
+    hydrate('{{ section.id }}', url);
+  </script>
+{% endunless %}
+{% schema %}
+{
+  "name": "t:names.header",
+  "tag": "header",
+  "class": "header-section",
+  "settings": [
+    { "type": "header", "content": "t:content.logo" },
+    { "type": "select", "id": "logo_position", "label": "t:settings.position",
+      "options": [{ "value": "left", "label": "t:options.left" }, { "value": "center", "label": "t:options.center" }, { "value": "right", "label": "t:options.right" }],
+      "default": "center" },
+    { "type": "header", "content": "t:content.menu" },
+    { "type": "select", "id": "menu_position", "label": "t:settings.position",
+      "options": [{ "value": "left", "label": "t:options.left" }, { "value": "center", "label": "t:options.center" }, { "value": "right", "label": "t:options.right" }],
+      "default": "left" },
+    { "type": "select", "id": "menu_row", "label": "t:settings.row",
+      "options": [{ "value": "top", "label": "t:options.top" }, { "value": "bottom", "label": "t:options.bottom" }],
+      "default": "top" },
+    { "type": "header", "content": "t:content.customer_account" },
+    { "type": "paragraph", "content": "t:content.manage_customer_accounts" },
+    { "type": "header", "content": "t:content.search" },
+    { "type": "checkbox", "id": "show_search", "label": "t:settings.search_icon", "default": true },
+    { "type": "select", "id": "search_position", "label": "t:settings.search_position",
+      "options": [{ "value": "left", "label": "t:options.left" }, { "value": "right", "label": "t:options.right" }],
+      "default": "right", "visible_if": "{{ section.settings.show_search }}" },
+    { "type": "select", "id": "search_row", "label": "t:settings.search_row",
+      "options": [{ "value": "top", "label": "t:options.top" }, { "value": "bottom", "label": "t:options.bottom" }],
+      "default": "top", "visible_if": "{{ section.settings.show_search }}" },
+    { "type": "header", "content": "t:content.localization" },
+    { "type": "checkbox", "id": "show_country", "label": "t:settings.country_region", "info": "t:info.manage_countries_regions", "default": true },
+    { "type": "checkbox", "id": "country_selector_style", "label": "t:settings.flag", "default": true, "visible_if": "{{ section.settings.show_country }}" },
+    { "type": "checkbox", "id": "show_language", "label": "t:settings.language_selector", "info": "t:info.manage_languages", "default": true },
+    { "type": "select", "id": "localization_font", "label": "t:settings.font",
+      "options": [{ "value": "heading", "label": "t:options.heading" }, { "value": "subheading", "label": "t:options.subheading" }, { "value": "body", "label": "t:options.body" }, { "value": "accent", "label": "t:options.accent" }],
+      "default": "heading", "visible_if": "{{ section.settings.show_country or section.settings.show_language }}" },
+    { "type": "select", "id": "localization_font_size", "label": "t:settings.size",
+      "options": [{ "value": "0.625rem", "label": "10px" }, { "value": "0.75rem", "label": "12px" }, { "value": "0.875rem", "label": "14px" }, { "value": "1rem", "label": "16px" }, { "value": "1.125rem", "label": "18px" }],
+      "default": "1rem" },
+    { "type": "select", "id": "localization_position", "label": "t:settings.position",
+      "options": [{ "value": "left", "label": "t:options.left" }, { "value": "right", "label": "t:options.right" }],
+      "default": "right", "visible_if": "{{ section.settings.show_country or section.settings.show_language }}" },
+    { "type": "select", "id": "localization_row", "label": "t:settings.row",
+      "options": [{ "value": "top", "label": "t:options.top" }, { "value": "bottom", "label": "t:options.bottom" }],
+      "default": "top", "visible_if": "{{ section.settings.show_country or section.settings.show_language }}" },
+    { "type": "header", "content": "t:content.appearance" },
+    { "type": "select", "id": "section_width", "label": "t:settings.width",
+      "options": [{ "value": "page-width", "label": "t:options.page" }, { "value": "full-width", "label": "t:options.full" }],
+      "default": "full-width" },
+    { "type": "select", "id": "section_height", "label": "t:settings.height",
+      "options": [{ "value": "compact", "label": "t:options.compact" }, { "value": "standard", "label": "t:options.standard" }],
+      "default": "standard" },
+    { "type": "select", "id": "enable_sticky_header", "label": "t:settings.sticky_header",
+      "options": [{ "value": "always", "label": "t:options.always" }, { "value": "scroll-up", "label": "t:options.on_scroll_up" }, { "value": "never", "label": "t:options.never" }],
+      "default": "always" },
+    { "type": "range", "id": "divider_width", "label": "t:settings.divider_thickness", "min": 0, "max": 5, "step": 0.5, "unit": "px", "default": 0,
+      "visible_if": "{{ section.settings.menu_row == 'bottom' or section.settings.localization_row == 'bottom' or section.settings.search_row == 'bottom' }}" },
+    { "type": "select", "id": "divider_size", "label": "t:settings.divider_width",
+      "options": [{ "value": "page-width", "label": "t:options.page" }, { "value": "full-width", "label": "t:options.full" }],
+      "visible_if": "{{ section.settings.divider_width > 0 and section.settings.menu_row == 'bottom' or section.settings.localization_row == 'bottom' or section.settings.search_row == 'bottom' }}" },
+    { "type": "range", "id": "border_width", "label": "t:settings.border_width", "min": 0, "max": 5, "step": 0.5, "unit": "px", "default": 0 },
+    { "type": "header", "content": "t:content.colors" },
+    { "type": "color_scheme", "id": "color_scheme_top", "label": "t:settings.default", "default": "primary" },
+    { "type": "color_scheme", "id": "color_scheme_bottom", "label": "t:settings.bottom_row", "default": "primary",
+      "visible_if": "{{ section.settings.menu_row == 'bottom' or section.settings.localization_row == 'bottom' or section.settings.search_row == 'bottom' }}" },
+    { "type": "color_scheme", "id": "color_scheme_transparent", "label": "t:settings.inverse", "default": "primary",
+      "visible_if": "{{ section.settings.enable_transparent_header_home or section.settings.enable_transparent_header_product or section.settings.enable_transparent_header_collection }}" },
+    { "type": "header", "content": "t:content.home_page" },
+    { "type": "checkbox", "id": "enable_transparent_header_home", "label": "t:settings.transparent_background", "default": false },
+    { "type": "select", "id": "home_color_scheme", "label": "t:settings.color_scheme",
+      "options": [{ "value": "default", "label": "t:options.default" }, { "value": "inverse", "label": "t:options.inverse" }],
+      "default": "default", "visible_if": "{{ section.settings.enable_transparent_header_home }}" },
+    { "type": "header", "content": "t:content.product_page" },
+    { "type": "checkbox", "id": "enable_transparent_header_product", "label": "t:settings.transparent_background", "default": false },
+    { "type": "select", "id": "product_color_scheme", "label": "t:settings.color_scheme",
+      "options": [{ "value": "default", "label": "t:options.default" }, { "value": "inverse", "label": "t:options.inverse" }],
+      "default": "default", "visible_if": "{{ section.settings.enable_transparent_header_product }}" },
+    { "type": "header", "content": "t:content.collection_page" },
+    { "type": "checkbox", "id": "enable_transparent_header_collection", "label": "t:settings.transparent_background", "default": false },
+    { "type": "select", "id": "collection_color_scheme", "label": "t:settings.color_scheme",
+      "options": [{ "value": "default", "label": "t:options.default" }, { "value": "inverse", "label": "t:options.inverse" }],
+      "default": "default", "visible_if": "{{ section.settings.enable_transparent_header_collection }}" }
+  ],
+  "presets": []
+}
+{% endschema %}
+<style>
+  /* Force-hide the slow, ugly native Shopify cart drawers and popups */
+  cart-drawer, cart-notification, #cart-notification { 
+    display: none !important; 
+  }
+</style>
+
+<script>
+  // Listen for ANY "Add to Cart" form submission on the entire website
+  document.addEventListener('submit', function(e) {
+    const form = e.target;
+    
+    // Check if the form is an Add to Cart form
+    if (form.action && form.action.includes('/cart/add')) {
+      e.preventDefault(); // Stop the page from reloading
+      e.stopImmediatePropagation(); // KILLS the slow native theme JavaScript!
+      
+      const submitBtn = form.querySelector('[type="submit"]');
+      const originalText = submitBtn ? submitBtn.innerHTML : '';
+      
+      // Optional: change button text to a quick loading state
+      if (submitBtn) submitBtn.innerHTML = 'Adding...';
+
+      // Silently and quickly add the item to the cart in the background
+      fetch(window.Shopify.routes.root + 'cart/add.js', {
+        method: 'POST',
+        body: new FormData(form)
+      })
+      .then(response => response.json())
+      .then(() => {
+        if (submitBtn) submitBtn.innerHTML = originalText;
+        
+        // Instantly trigger our custom FFWinks cart from the header!
+        const headerCartLink = document.querySelector('a[href*="/cart"]');
+        if (headerCartLink) {
+          headerCartLink.click(); 
+        }
+      })
+      .catch(err => {
+        console.error('Error adding to cart:', err);
+        if (submitBtn) submitBtn.innerHTML = originalText;
+      });
+    }
+  }, true); // The "true" ensures our code runs BEFORE the native Shopify theme code!
+</script>

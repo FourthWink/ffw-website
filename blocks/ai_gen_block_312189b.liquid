@@ -1,0 +1,470 @@
+{% doc %}
+  @prompt
+    Redesign the variant picker so that each option and its values appear on one clean horizontal line. For example: ‘Size’ on the left, and all size values beside it on the same line; then ‘Color’ on the left, and all color values beside it on the same line. Remove all boxes, borders, and background shapes. Make the layout minimal, thin, and elegant with wide spacing between values. Selected value should be solid black, and unselected values should be light grey.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-variant-picker-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-variant-picker__option-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: {{ block.settings.spacing_between_values }}px;
+    margin-bottom: {{ block.settings.spacing_between_options }}px;
+  }
+
+  .ai-variant-picker__option-{{ ai_gen_id }}:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-variant-picker__label-{{ ai_gen_id }} {
+    min-width: {{ block.settings.label_width }}px;
+    font-size: 10px;
+    color: {{ block.settings.label_color }};
+    font-weight: {{ block.settings.label_font_weight }};
+    flex-shrink: 0;
+  }
+@media screen and (max-width: 768px) {
+  .ai-variant-picker__label-{{ ai_gen_id }} {
+    padding-left: 18px;
+  }
+}
+  .ai-variant-picker__values-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: {{ block.settings.spacing_between_values }}px;
+    flex-wrap: wrap;
+  }
+
+  .ai-variant-picker__value-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 10px;
+    color: {{ block.settings.unselected_color }};
+    transition: color 0.2s ease;
+    font-weight: {{ block.settings.value_font_weight }};
+  }
+
+  .ai-variant-picker__value-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.hover_color }};
+  }
+
+  .ai-variant-picker__value-{{ ai_gen_id }}.selected {
+    color: {{ block.settings.selected_color }};
+    font-weight: {{ block.settings.selected_font_weight }};
+  }
+
+  .ai-variant-picker__value-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-variant-picker__label-{{ ai_gen_id }} {
+      min-width: {{ block.settings.label_width_mobile }}px;
+      font-size: 10px;
+    }
+
+    .ai-variant-picker__value-{{ ai_gen_id }} {
+      font-size: 10px;
+    }
+
+    .ai-variant-picker__option-{{ ai_gen_id }} {
+      gap: {{ block.settings.spacing_between_values_mobile }}px;
+      margin-bottom: {{ block.settings.spacing_between_options_mobile }}px;
+    }
+
+    .ai-variant-picker__values-{{ ai_gen_id }} {
+      gap: {{ block.settings.spacing_between_values_mobile }}px;
+    }
+  }
+{% endstyle %}
+
+<variant-picker-{{ ai_gen_id }}
+  class="ai-variant-picker-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+  data-product-url="{{ product.url }}"
+>
+  {% unless product.has_only_default_variant %}
+    {% for option in product.options_with_values %}
+      <div class="ai-variant-picker__option-{{ ai_gen_id }}">
+        <div class="ai-variant-picker__label-{{ ai_gen_id }}">
+          {{ option.name }}
+        </div>
+        <div class="ai-variant-picker__values-{{ ai_gen_id }}">
+          {% for value in option.values %}
+            {% assign option_index = forloop.index0 %}
+            {% assign is_selected = false %}
+            {% if option.selected_value == value %}
+              {% assign is_selected = true %}
+            {% endif %}
+
+            <button
+              type="button"
+              class="ai-variant-picker__value-{{ ai_gen_id }} {% if is_selected %}selected{% endif %}"
+              data-option-position="{{ option.position }}"
+              data-option-value="{{ value | escape }}"
+            >
+              {{ value }}
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  {% endunless %}
+
+  <select name="id" style="display: none;">
+    {% for variant in product.variants %}
+      <option
+        value="{{ variant.id }}"
+        {% if variant == product.selected_or_first_available_variant %}selected{% endif %}
+        {% unless variant.available %}disabled{% endunless %}
+      >
+        {{ variant.title }}
+      </option>
+    {% endfor %}
+  </select>
+</variant-picker-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VariantPicker{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.product = null;
+        this.currentVariant = null;
+      }
+
+      connectedCallback() {
+        this.fetchProductData();
+        this.setupEventListeners();
+      }
+
+      async fetchProductData() {
+        const productUrl = this.dataset.productUrl;
+        if (!productUrl) return;
+
+        try {
+          const response = await fetch(`${productUrl}.js`);
+          this.product = await response.json();
+          this.currentVariant = this.product.variants.find(v => v.id === parseInt(this.querySelector('select[name="id"]').value));
+          this.updateAvailability();
+        } catch (error) {
+          console.error('Error fetching product data:', error);
+        }
+      }
+
+      setupEventListeners() {
+        const buttons = this.querySelectorAll('.ai-variant-picker__value-{{ ai_gen_id }}');
+        buttons.forEach(button => {
+          button.addEventListener('click', (e) => this.handleOptionClick(e));
+        });
+      }
+
+      handleOptionClick(event) {
+        const button = event.currentTarget;
+        const position = parseInt(button.dataset.optionPosition);
+        const value = button.dataset.optionValue;
+
+        const optionContainer = button.closest('.ai-variant-picker__option-{{ ai_gen_id }}');
+        optionContainer.querySelectorAll('.ai-variant-picker__value-{{ ai_gen_id }}').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+        button.classList.add('selected');
+
+        this.updateVariant();
+      }
+
+      updateVariant() {
+        if (!this.product) return;
+
+        const selectedOptions = [];
+        const optionContainers = this.querySelectorAll('.ai-variant-picker__option-{{ ai_gen_id }}');
+
+        optionContainers.forEach(container => {
+          const selectedButton = container.querySelector('.ai-variant-picker__value-{{ ai_gen_id }}.selected');
+          if (selectedButton) {
+            selectedOptions.push(selectedButton.dataset.optionValue);
+          }
+        });
+
+        const matchingVariant = this.product.variants.find(variant => {
+          return variant.options.every((option, index) => option === selectedOptions[index]);
+        });
+
+        if (matchingVariant) {
+          this.currentVariant = matchingVariant;
+          const select = this.querySelector('select[name="id"]');
+          select.value = matchingVariant.id;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+
+          this.updateAvailability();
+          this.updateURL(matchingVariant.id);
+        }
+      }
+
+      updateAvailability() {
+        if (!this.product || !this.currentVariant) return;
+
+        const optionContainers = this.querySelectorAll('.ai-variant-picker__option-{{ ai_gen_id }}');
+
+        optionContainers.forEach((container, optionIndex) => {
+          const buttons = container.querySelectorAll('.ai-variant-picker__value-{{ ai_gen_id }}');
+
+          buttons.forEach(button => {
+            const testOptions = [...this.currentVariant.options];
+            testOptions[optionIndex] = button.dataset.optionValue;
+
+            const testVariant = this.product.variants.find(variant => {
+              return variant.options.every((option, index) => option === testOptions[index]);
+            });
+
+            if (testVariant && !testVariant.available) {
+              button.disabled = true;
+            } else {
+              button.disabled = false;
+            }
+          });
+        });
+      }
+
+      updateURL(variantId) {
+        if (!variantId) return;
+        const url = new URL(window.location.href);
+        url.searchParams.set('variant', variantId);
+        window.history.replaceState({}, '', url);
+      }
+    }
+
+    customElements.define('variant-picker-{{ ai_gen_id }}', VariantPicker{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Minimal variant picker",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "label_width",
+      "label": "Label width (desktop)",
+      "min": 40,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "label_width_mobile",
+      "label": "Label width (mobile)",
+      "min": 40,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "spacing_between_values",
+      "label": "Spacing between values (desktop)",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "spacing_between_values_mobile",
+      "label": "Spacing between values (mobile)",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "spacing_between_options",
+      "label": "Spacing between options (desktop)",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "spacing_between_options_mobile",
+      "label": "Spacing between options (mobile)",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Label style"
+    },
+    {
+      "type": "range",
+      "id": "label_font_size",
+      "label": "Font size (desktop)",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "label_font_size_mobile",
+      "label": "Font size (mobile)",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "label_font_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Value style"
+    },
+    {
+      "type": "range",
+      "id": "value_font_size",
+      "label": "Font size (desktop)",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "value_font_size_mobile",
+      "label": "Font size (mobile)",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "value_font_weight",
+      "label": "Font weight (unselected)",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "selected_font_weight",
+      "label": "Font weight (selected)",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "selected_color",
+      "label": "Selected value",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "unselected_color",
+      "label": "Unselected value",
+      "default": "#CCCCCC"
+    },
+    {
+      "type": "color",
+      "id": "hover_color",
+      "label": "Hover color",
+      "default": "#666666"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minimal variant picker"
+    }
+  ]
+}
+{% endschema %}

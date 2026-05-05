@@ -1,0 +1,610 @@
+<!doctype html>
+<html
+  {% if request.design_mode %}
+    class="shopify-design-mode"
+  {% endif %}
+  lang="{{ request.locale.iso_code }}"
+>
+  <head>
+  <link rel="icon" type="image/x-icon" href="https://cdn.shopify.com/s/files/1/0974/3538/5929/files/favicon.ico?v=1777279990">
+  <link rel="icon" type="image/png" sizes="96x96" href="https://cdn.shopify.com/s/files/1/0974/3538/5929/files/favicon-96x96.png?v=1777279989">
+  <link rel="icon" type="image/svg+xml" href="https://cdn.shopify.com/s/files/1/0974/3538/5929/files/favicon.svg?v=1777279989">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.shopify.com/s/files/1/0974/3538/5929/files/apple-touch-icon.png?v=1777279989">
+  <link rel="manifest" href="https://cdn.shopify.com/s/files/1/0974/3538/5929/files/site.webmanifest?v=1777279989">
+    
+    {% if settings.transition_to_main_product or settings.page_transition_enabled %}
+      <link
+        rel="expect"
+        href="#MainContent"
+        blocking="render"
+        id="view-transition-render-blocker"
+      >
+    {% endif %}
+
+    {%- render 'meta-tags' -%}
+    {%- render 'stylesheets' -%}
+    {%- render 'fonts' -%}
+    {%- render 'scripts' -%}
+    {%- render 'theme-styles-variables' -%}
+    {%- render 'color-schemes' -%}
+
+    {% if request.design_mode %}
+      {%- render 'theme-editor' -%}
+    {% endif %}
+
+    {{ content_for_header }}
+
+<style>
+  :root {
+    --ffw-hover-default-color: #666666;
+    --ffw-hover-active-color: #000000;
+    --ffw-hover-transition: color 0.3s ease, opacity 0.25s ease;
+  }
+
+  /* Global kerning reset */
+  :where(
+    h1, h2, h3, h4, h5, h6,
+    p, span, a, button, input, textarea, select, option,
+    label, small, strong, em, b, i, li, figcaption, summary,
+    .button, .text-block, .custom-typography
+  ) {
+    letter-spacing: 0 !important;
+  }
+
+  /* Global interaction baseline for text controls (icons excluded) */
+  :where(a, button, [role='button'], .button, input[type='submit'], input[type='button'], summary):not(:has(svg, img, .svg-wrapper, [class*='icon'])),
+  :where(a, button, [role='button'], .button, input[type='submit'], input[type='button'], summary):not(:has(svg, img, .svg-wrapper, [class*='icon']))
+    :where(span, strong, em, small, b, i, u, label, p, div):not(.visually-hidden) {
+    color: var(--ffw-hover-default-color);
+    transition: var(--ffw-hover-transition);
+  }
+
+  /* Global hover/focus/active color-only effect (no movement) */
+  :where(a, button, [role='button'], .button, input[type='submit'], input[type='button'], summary):not(:has(svg, img, .svg-wrapper, [class*='icon'])):is(:hover, :focus-visible, :active),
+  :where(a, button, [role='button'], .button, input[type='submit'], input[type='button'], summary):not(:has(svg, img, .svg-wrapper, [class*='icon'])):is(:hover, :focus-visible, :active)
+    :where(span, strong, em, small, b, i, u, label, p, div):not(.visually-hidden) {
+    color: var(--ffw-hover-active-color);
+  }
+
+  /* ==========================================================
+     NAVBAR OVERRIDES
+  ========================================================== */
+  header-component .list-menu__item,
+  header-component .list-menu__item span,
+  header-component .header__menu-item,
+  header-component .header__menu-item span,
+  #header-group a,
+  #header-group a span {
+    color: #000000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Only apply hover effects on devices with a real mouse/trackpad */
+  @media (hover: hover) and (pointer: fine) {
+    header-component .list-menu__item:hover,
+    header-component .list-menu__item:hover span,
+    header-component .header__menu-item:hover,
+    header-component .header__menu-item:hover span,
+    #header-group a:hover,
+    #header-group a:hover span {
+      color: #000000 !important;
+      opacity: 1 !important;
+      background-color: transparent !important;
+    }
+  }
+
+  /* ==========================================================
+     TOUCH DEVICE OPTIMIZATIONS & FORCED VISIBILITY
+  ========================================================== */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ffw-static-text, .center-star-bg, .wishlist-btn {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  @media (hover: none) {
+    /* Force the wishlist or quick-add buttons to always show on mobile/tablet */
+    [class*="ai-picks-grid-container-"] .wishlist-btn,
+    [class*="ai-picks-grid-container-"] .quick-add {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+      display: block !important;
+    }
+  }
+
+  /* ==========================================================
+     GLOBAL FOGS
+  ========================================================== */
+  .ffw-global-top-blur {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 1) 55%,
+      rgba(255, 255, 255, 0.98) 60%,
+      rgba(255, 255, 255, 0.92) 65%,
+      rgba(255, 255, 255, 0.82) 70%,
+      rgba(255, 255, 255, 0.68) 75%,
+      rgba(255, 255, 255, 0.50) 80%,
+      rgba(255, 255, 255, 0.32) 85%,
+      rgba(255, 255, 255, 0.16) 90%,
+      rgba(255, 255, 255, 0.06) 95%,
+      rgba(255, 255, 255, 0.02) 98%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    z-index: 585;
+    pointer-events: none;
+  }
+/* Mobile Blur Heights */
+  @media screen and (max-width: 768px) {
+    .ffw-global-top-blur {
+      height: 55px !important; /* Change this number to make it shorter/taller on mobile */
+    }
+    .ffw-global-bottom-blur {
+      height: 35px !important;
+    }
+  }
+  .ffw-global-bottom-blur {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 55px;
+    background: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 1) 10%,
+      rgba(255, 255, 255, 0.98) 15%,
+      rgba(255, 255, 255, 0.95) 20%,
+      rgba(255, 255, 255, 0.90) 25%,
+      rgba(255, 255, 255, 0.84) 30%,
+      rgba(255, 255, 255, 0.76) 35%,
+      rgba(255, 255, 255, 0.68) 40%,
+      rgba(255, 255, 255, 0.59) 45%,
+      rgba(255, 255, 255, 0.50) 50%,
+      rgba(255, 255, 255, 0.32) 60%,
+      rgba(255, 255, 255, 0.17) 70%,
+      rgba(255, 255, 255, 0.06) 80%,
+      rgba(255, 255, 255, 0.01) 90%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    z-index: 585;
+    pointer-events: none;
+  }
+
+  /* ==========================================================
+     GLOBAL SCROLLBAR & OVERLAYS
+  ========================================================== */
+  html, body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    position: relative !important;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
+
+  html:not([scroll-lock]) { overflow-y: auto !important; }
+  body:not(.ffwinks-open):not(.ffwinks-body-lock):not(.vi-video-active) { overflow-y: auto !important; }
+  body.ffwinks-open:not(:has(#ffwinks-search-bar.is-open, #ffwinks-account-bar.is-open)) { overflow-y: auto !important; }
+  body.ffwinks-body-lock:not(:has(.ffwinks-fullscreen.ffwinks-fullscreen--open[aria-hidden='false'])) { overflow-y: auto !important; }
+  body.vi-video-active:not(:has(.vi-intro-window.show)) { overflow-y: auto !important; }
+  html[scroll-lock]:not(:has(details[scroll-lock][open])) { overflow-y: auto !important; }
+  body:not(:has(#ffwinks-search-bar.is-open, #ffwinks-account-bar.is-open)) #ffwinks-global-overlay { opacity: 0 !important; pointer-events: none !important; }
+  #ffwinks-search-bar[aria-hidden='true'], #ffwinks-account-bar[aria-hidden='true'] { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+  .ffwinks-fullscreen[aria-hidden='true'] { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+  body:not(.ffw-filter-open) #ffw-filter-view, body:not(.ffw-filter-open) #ffw-filter-backdrop { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+
+/* ==========================================================
+     HIDE STAR AND TEXT ON SPECIFIC PAGES
+  ========================================================== */
+  body:has(main[data-template="page.about"]) .center-star-bg,
+  body:has(main[data-template="page.contact"]) .center-star-bg,
+  body:has(main[data-template="ffw-shop"]) .center-star-bg,
+  body:has(main[data-template="ffw-newin"]) .center-star-bg,
+  body:has(main[data-template="search"]) .center-star-bg,
+  body:has(main[data-template="product"]) .center-star-bg,
+  body:has(main[data-template="page.about"]) .ffw-static-text,
+  body:has(main[data-template="page.contact"]) .ffw-static-text,
+  body:has(main[data-template="ffw-shop"]) .ffw-static-text,
+  body:has(main[data-template="ffw-newin"]) .ffw-static-text,
+  body:has(main[data-template="search"]) .ffw-static-text,
+  body:has(main[data-template="product"]) .ffw-static-text {
+    display: none !important;
+  }
+/* ==========================================================
+     HIDE STAR AND TEXT: CART & WISHLIST (SEAMLESS FADE)
+  ========================================================== */
+  
+  /* 1. Base State: Fade back in smoothly when closing */
+  .center-star-bg,
+  .ffw-static-text {
+    transition: opacity 0.35s ease, visibility 0s 0s !important; 
+  }
+
+  /* 2. Hidden State: Hyper-optimized class lookup instead of body:has() */
+  body.ffwinks-open .center-star-bg,
+  body.ffwinks-body-lock .center-star-bg,
+  body.ffwinks-open .ffw-static-text,
+  body.ffwinks-body-lock .ffw-static-text {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.35s ease, visibility 0s 0.35s !important; 
+  }
+    /* ==========================================================
+     HIDE STAR AND TEXT ON SPECIFIC PAGES
+  ========================================================== */
+  body:has(main[data-template="page.about"]) .center-star-bg,
+  body:has(main[data-template="ffw-shop"]) .center-star-bg,
+  body:has(main[data-template="ffw-newin"]) .center-star-bg,
+  body:has(main[data-template="search"]) .center-star-bg,
+  body:has(main[data-template="product"]) .center-star-bg,
+  html.ffw-policy-page .center-star-bg,
+  body.ffw-policy-page .center-star-bg,
+  body:has(main[data-template="page.about"]) .ffw-static-text,
+  body:has(main[data-template="ffw-shop"]) .ffw-static-text,
+  body:has(main[data-template="ffw-newin"]) .ffw-static-text,
+  body:has(main[data-template="search"]) .ffw-static-text,
+  body:has(main[data-template="product"]) .ffw-static-text,
+  html.ffw-policy-page .ffw-static-text,
+  body.ffw-policy-page .ffw-static-text {
+    display: none !important;
+  }
+  /* ==========================================================
+     STAR & TEXT CSS (COMPLETELY UNCLICKABLE)
+  ========================================================== */
+  .center-star-bg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 500 !important;
+    pointer-events: none !important; 
+    width: var(--star-w, 150px);
+    mix-blend-mode: difference;
+  }
+  .center-star-bg img,
+  .center-star-bg svg,
+  .center-star-bg * {
+    width: 150px;
+    height: auto;
+    display: block;
+    pointer-events: none !important; 
+  }
+  .center-star-bg svg {
+    fill: #ffffff !important;
+    stroke: none !important;
+  }
+
+  .ffw-static-text {
+    position: absolute !important;
+    top: 50% !important; 
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    color: black !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* ==========================================================
+     CART CHECKOUT BLEED FIX 
+  ========================================================== */
+  #ffwinks-cart-overlay[aria-hidden='true'] .ffwinks-soul-checkout-wrapper,
+  #ffwinks-cart-overlay[aria-hidden='true'] a[href="/checkout"],
+  #ffwinks-cart-overlay[aria-hidden='true'] a[href*="/checkout"] {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* ==========================================================
+     CART BUBBLE CSS
+  ========================================================== */
+  cart-count, .cart-count, .cart-count-bubble, [class*="CartCount"], [class*="cart_count"] {
+    position: absolute !important; top: -8px !important; right: -8px !important; left: auto !important; bottom: auto !important; min-width: 14px !important; width: auto !important; height: 14px !important; padding: 0 3px !important; background: #222 !important; color: #fff !important; font-family: 'Montserrat', Arial, sans-serif !important; font-size: 7px !important; font-weight: 700 !important; letter-spacing: 0 !important; line-height: 14px !important; text-align: center !important; border-radius: 7px !important; box-sizing: border-box !important; pointer-events: none !important; z-index: 1 !important; clip-path: none !important; transform: none !important; margin: 0 !important;
+  }
+  .header-actions__action:has(cart-count),
+  .header-actions__action:has(.cart-count),
+  .header-actions__action:has(.cart-count-bubble) {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  /* Homepage: keep native scrolling, no snap logic */
+  body:has(main[data-template="index"]) #MainContent {
+    position: relative !important;
+    height: auto !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+  }
+  /* Hides all floating buttons when ANY Fourth Wink overlay is open */
+  body.ffwinks-body-lock .floating-atc,
+  body.ffwinks-body-lock #ffwinks-mobile-atc,
+  body.ffwinks-body-lock #ffwinks-product-sparkle,
+  body.ffwinks-open .floating-atc,
+  body.ffwinks-open #ffwinks-mobile-atc,
+  body.ffwinks-open #ffwinks-product-sparkle,
+  body:has(#ffwinks-search-bar.is-open) .floating-atc,
+  body:has(#ffwinks-search-bar.is-open) #ffwinks-mobile-atc,
+  body:has(#ffwinks-search-bar.is-open) #ffwinks-product-sparkle {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+  }
+
+  /* Push center star behind search overlay when search is open */
+  body:has(#ffwinks-search-bar.is-open) .center-star-bg {
+    z-index: -1 !important;
+  }
+  /* ==========================================================
+   PREORDER BADGE OVERRIDE
+========================================================== */
+.product-card[data-available-colors] .product-badges__badge {
+  /* too broad — use tag approach below */
+}
+/* Rename Sale → Preorder for products tagged 'preorder' */
+body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badges__badge::before {
+  content: "Preorder";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  padding: inherit;
+}
+body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badges__badge {
+  color: transparent;
+  position: relative;
+}
+</style>
+
+<script>
+  (function () {
+    if (window.location.pathname.indexOf('/policies/') === 0) {
+      document.documentElement.classList.add('ffw-policy-page');
+      document.body && document.body.classList.add('ffw-policy-page');
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.add('ffw-policy-page');
+      }, { once: true });
+    }
+  })();
+</script>
+  </head>
+
+  <body class="page-width-{{ settings.page_width }}">
+    <script>
+      (function setVH() {
+        function update() {
+          var vh = (window.innerHeight * 0.01) + 'px';
+          document.documentElement.style.setProperty('--vh', vh);
+          document.body && document.body.style.setProperty('--vh', vh);
+        }
+        update();
+        window.addEventListener('resize', update);
+      })();
+    </script>
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+
+    <div class="center-star-bg">
+      <img src="{{ 'soul.svg' | asset_url }}" alt="Dream a bit">
+    </div>
+
+    <div id="header-group">
+      {% sections 'header-group' %}
+    </div>
+
+    <div class="ffw-global-top-blur"></div>
+    <div class="ffw-global-bottom-blur"></div>
+    
+    <div class="ffw-static-text">
+      <span style="font-weight: normal; font-size: 10px;">SS26</span><br>
+      <span style="font-weight: bold; font-size: 10px;">Call before you</span><br>
+      <span style="font-weight: bold; font-size: 10px;">wake up.</span>
+    </div>
+
+    <main
+      id="MainContent"
+      class="content-for-layout"
+      role="main"
+      data-page-transition-enabled="{{ settings.page_transition_enabled }}"
+      data-product-transition="{{ settings.transition_to_main_product }}"
+      data-template="{{ template }}"
+    >
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+    {% render 'search-modal' %}
+
+    {% if settings.quick_add or settings.mobile_quick_add %}
+      {% render 'quick-add-modal' %}
+    {% endif %}
+
+    <script>
+      (function setHeaderHeighCustomProperties() {
+        var header = document.querySelector('header-component');
+        var headerGroup = document.querySelector('#header-group');
+        if (!header || !headerGroup) return;
+        var headerHeight = header.offsetHeight;
+        var headerGroupHeight = 0;
+        var children = headerGroup.children;
+        for (var i = 0; i < children.length; i++) {
+          var element = children[i];
+          if (element === header || !(element instanceof HTMLElement)) continue;
+          headerGroupHeight += element.offsetHeight;
+        }
+        document.body.style.setProperty('--header-height', headerHeight + 'px');
+        document.body.style.setProperty('--header-group-height', headerGroupHeight + 'px');
+      })();
+
+      window.addEventListener('DOMContentLoaded', function() {
+        if (navigator.platform.toUpperCase().indexOf('MAC') >= 0) {
+          document.body.classList.add('is-mac');
+        }
+
+        var overlay = document.getElementById('intro-overlay');
+        var eye = document.getElementById('eye');
+        var text = document.getElementById('intro-text');
+
+        function getCookie(name) {
+          var found = document.cookie.split('; ').filter(function(row) {
+            return row.startsWith(name + '=');
+          });
+          return found.length ? found[0].split('=')[1] : undefined;
+        }
+        function setCookie(name, value, days) {
+          var expires = new Date(Date.now() + days * 864e5).toUTCString();
+          document.cookie = name + '=' + value + '; expires=' + expires + '; path=/';
+        }
+
+        if (getCookie('intro_seen')) {
+          if (overlay) overlay.style.display = 'none';
+        } else if (eye) {
+          // =========================================================
+          // INTRO OVERLAY REQUIRES CLICK ON THE EYE TO ENTER
+          // =========================================================
+          eye.addEventListener('click', function() {
+            if(text) text.style.opacity = '0';
+            if(eye) eye.style.transform = 'scale(2)';
+            setTimeout(function() {
+              if (overlay) overlay.style.opacity = '0';
+              setTimeout(function() { if (overlay) overlay.style.display = 'none'; }, 800);
+            }, 1000);
+            setCookie('intro_seen', '1', 120);
+          });
+        }
+      });
+
+      // ==========================================================
+      // STAR ANCHOR ENGINE (Continuous rAF Logic)
+      // ==========================================================
+      window.addEventListener('DOMContentLoaded', function() {
+        var star = document.querySelector('.center-star-bg');
+        if (!star) return;
+
+        function init() {
+          // Find the actual visible grid container to prevent locking onto hidden mobile clones
+          var grids = document.querySelectorAll("[class*='ai-picks-grid-container']");
+          var target = null;
+          
+          for (var i = 0; i < grids.length; i++) {
+            if (grids[i].getBoundingClientRect().height > 50) { 
+              target = grids[i];
+              break;
+            }
+          }
+
+          // If lazy-loaded sections haven't popped in yet, try again
+          if (!target) {
+            setTimeout(init, 300);
+            return;
+          }
+
+          function applyState() {
+            var rect = target.getBoundingClientRect();
+            var targetMidInViewport = rect.top + rect.height / 2;
+            var viewportMid = window.innerHeight / 2;
+
+            if (targetMidInViewport <= viewportMid) {
+              // Grid center is at or above viewport center — pin star to grid
+              star.style.top = targetMidInViewport + 'px';
+            } else {
+              // Grid center is below viewport center — star follows viewport center
+              star.style.top = '50%';
+            }
+          }
+
+          // Always fixed, always running via requestAnimationFrame
+          star.style.position = 'fixed';
+          star.style.left = '50%';
+          star.style.transform = 'translate(-50%, -50%)';
+
+          function loop() {
+            applyState();
+            requestAnimationFrame(loop);
+          }
+
+          loop();
+        }
+
+        init();
+      });
+
+      function clearStaleScrollLocks() {
+        var searchBar      = document.getElementById('ffwinks-search-bar');
+        var accountBar     = document.getElementById('ffwinks-account-bar');
+        var globalOverlay  = document.getElementById('ffwinks-global-overlay');
+        var wishlistOverlay = document.getElementById('ffwinks-wishlist-overlay');
+        var cartOverlay    = document.getElementById('ffwinks-cart-overlay');
+        var filterView     = document.getElementById('ffw-filter-view');
+        var filterBackdrop = document.getElementById('ffw-filter-backdrop');
+        var visibleVideoIntro = Array.from(document.querySelectorAll('.vi-intro-window.show')).some(function(el) {
+          return el instanceof HTMLElement && el.style.display !== 'none';
+        });
+        
+        if (searchBar)    { searchBar.classList.remove('is-open'); searchBar.setAttribute('aria-hidden', 'true'); }
+        if (accountBar)   { accountBar.classList.remove('is-open'); accountBar.setAttribute('aria-hidden', 'true'); }
+        if (globalOverlay){ globalOverlay.classList.remove('is-active'); }
+        [wishlistOverlay, cartOverlay].forEach(function(ov) {
+          if (!ov) return;
+          ov.classList.remove('ffwinks-fullscreen--open');
+          ov.setAttribute('aria-hidden', 'true');
+        });
+        if (filterView)     { filterView.classList.remove('ffw-show'); }
+        if (filterBackdrop) { filterBackdrop.classList.remove('ffw-show'); }
+        document.body.classList.remove('ffwinks-open', 'ffwinks-body-lock', 'ffw-filter-open');
+        if (!visibleVideoIntro) { document.body.classList.remove('vi-video-active'); }
+        var hasLockedDetails = document.querySelector('details[scroll-lock][open]');
+        if (!hasLockedDetails) { document.documentElement.removeAttribute('scroll-lock'); }
+
+        var isHomepage = document.querySelector('main[data-template="index"]');
+        if (!isHomepage) {
+          document.documentElement.style.overflow = '';
+          document.documentElement.style.overflowY = '';
+          document.body.style.overflow = '';
+          document.body.style.overflowY = '';
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', clearStaleScrollLocks);
+      window.addEventListener('pageshow', clearStaleScrollLocks);
+      window.addEventListener('load', clearStaleScrollLocks);
+
+      (function hideStarOnSpecificPages() {
+        var path = window.location.pathname;
+        if (
+          path.indexOf('/collections/shop') !== -1 ||
+          path.indexOf('/collections/new-in') !== -1 ||
+          path.indexOf('ffw-shop') !== -1 ||
+          path.indexOf('ffw-newin') !== -1
+        ) {
+          var star = document.querySelector('.center-star-bg');
+          var text = document.querySelector('.ffw-static-text');
+          if (star) star.style.display = 'none';
+          if (text) text.style.display = 'none';
+        }
+      })();
+    </script>
+    {% render 'intro-overlay' %}
+    {% section 'ffw-filter' %}
+  </body>
+</html>

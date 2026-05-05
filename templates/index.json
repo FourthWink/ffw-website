@@ -1,0 +1,162 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero_zYy9rz": {
+      "type": "hero",
+      "custom_css": [
+        "main-#Hero-template--20875991482601__hero_zYy9rzimg {display: block; height: 100vh; width: 100%; object-fit: cover;}"
+      ],
+      "name": "Main picture",
+      "settings": {
+        "media_type_1": "image",
+        "image_1": "shopify://shop_images/Shot_2_Insta_webs_b0a80aed-67dd-419d-a7db-aed5b72009d8.jpg",
+        "media_type_2": "image",
+        "stack_media_on_mobile": false,
+        "custom_mobile_media": false,
+        "media_type_1_mobile": "image",
+        "media_type_2_mobile": "image",
+        "link": "",
+        "open_in_new_tab": false,
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "center",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 16,
+        "section_width": "page-width",
+        "section_height": "full-screen",
+        "section_height_custom": 50,
+        "color_scheme": "scheme-1",
+        "blurred_reflection": false,
+        "reflection_opacity": 100,
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "blocks_RpBb9C": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_2aaeb7a_hUQGdb": {
+          "type": "ai_gen_block_2aaeb7a",
+          "name": "Block separator",
+          "settings": {
+            "background_color": "#ffffff",
+            "full_width": true,
+            "hide_on_mobile": true,
+            "padding_vertical": 12,
+            "padding_horizontal": 20
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_7f81031_iR3GDc": {
+          "type": "ai_gen_block_7f81031",
+          "settings": {
+            "grid_gap": 10,
+            "center_label": "Dream Picks",
+            "label_color": "#000000",
+            "label_font_size": 9,
+            "box_background_color": "#f4f4f4",
+            "title_color": "#ffffff",
+            "title_font_size": 10,
+            "product_1": "peek-a-boo",
+            "title_1": "{{ closest.product.metafields.shopify.size | metafield_text: field: 'label' }}{{ closest.product.metafields.shopify[\"color-pattern\"] | metafield_text: field: 'label' }}",
+            "product_2": "product-name-copy-copy-copy",
+            "title_2": "",
+            "product_3": "magical-shoe",
+            "title_3": "",
+            "product_4": "product-name",
+            "title_4": ""
+          },
+          "blocks": {}
+        },
+        "custom_liquid_zCQiFH": {
+          "type": "custom-liquid",
+          "name": "t:names.custom_liquid",
+          "settings": {
+            "custom_liquid": "<style>\n  @media (max-width: 749px) {\n    [data-block-id=\"sections--20875991613673__17690349093da47b93__ai_gen_block_2aaeb7a_BxnrEL\"] {\n      display: none !important;\n    }\n  }\n</style>"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_2aaeb7a_hUQGdb",
+        "ai_gen_block_7f81031_iR3GDc",
+        "custom_liquid_zCQiFH"
+      ],
+      "custom_css": [],
+      "name": "Product Grid",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "1777316343ab5afc95": {
+      "type": "_blocks",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    }
+  },
+  "order": [
+    "hero_zYy9rz",
+    "blocks_RpBb9C",
+    "1777316343ab5afc95"
+  ]
+}

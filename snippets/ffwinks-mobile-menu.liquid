@@ -1,0 +1,89 @@
+{% liquid
+  assign main_menu = linklists['main-menu']
+  assign menu_image = blank
+
+  for link in main_menu.links
+    if link.type == 'collection_link' and link.object.featured_image
+      assign menu_image = link.object.featured_image | image_url: width: 1600
+      break
+    elsif link.type == 'product_link' and link.object.featured_media.preview_image
+      assign menu_image = link.object.featured_media.preview_image | image_url: width: 1600
+      break
+    elsif link.object.featured_image
+      assign menu_image = link.object.featured_image | image_url: width: 1600
+      break
+    endif
+  endfor
+
+  if menu_image == blank and template.name == 'product' and product.featured_media.preview_image
+    assign menu_image = product.featured_media.preview_image | image_url: width: 1600
+  elsif menu_image == blank and template.name == 'collection' and collection.featured_image
+    assign menu_image = collection.featured_image | image_url: width: 1600
+  endif
+%}
+
+<div
+  id="ffwinks-mobile-menu"
+  class="ffwinks-fullscreen"
+  aria-hidden="true"
+  role="navigation"
+  aria-label="Mobile menu"
+  {% if menu_image != blank %}
+    style="--ffwinks-mobile-menu-image: url('{{ menu_image }}');"
+  {% endif %}
+>
+  <div class="ffwinks-mobile-menu__backdrop" aria-hidden="true">
+    <div class="ffwinks-mobile-menu__glow ffwinks-mobile-menu__glow--vertical"></div>
+    <div class="ffwinks-mobile-menu__glow ffwinks-mobile-menu__glow--horizontal"></div>
+    <div class="ffwinks-mobile-menu__image-strip ffwinks-mobile-menu__image-strip--vertical"></div>
+    <div class="ffwinks-mobile-menu__image-strip ffwinks-mobile-menu__image-strip--horizontal"></div>
+    <div class="ffwinks-mobile-menu__ambient"></div>
+    <div class="menu-center-star" aria-hidden="true">
+      <img src="{{ 'soul.svg' | asset_url }}" alt="">
+    </div>
+  </div>
+
+  <div class="ffwinks-mobile-menu__inner">
+    <button
+      class="ffwinks-mobile-menu__close-btn"
+      type="button"
+      aria-label="Close menu"
+      onclick="document.getElementById('ffwinks-mobile-menu').classList.remove('ffwinks-fullscreen--open'); document.querySelector('#Details-menu-drawer-container')?.removeAttribute('open'); document.querySelector('#Details-menu-drawer-container')?.classList.remove('menu-open'); document.body.classList.remove('ffwinks-open', 'overflow-hidden');"
+    >
+      x
+    </button> 
+    <div class="ffwinks-mobile-menu__layout">
+      {% if main_menu.links.size > 0 %}
+        <a href="{{ main_menu.links[0].url }}" class="ffwinks-mobile-menu__link pos-tl">
+          {{ main_menu.links[0].title }}
+        </a>
+      {% endif %}
+
+      {% if main_menu.links.size > 1 %}
+        <a href="{{ main_menu.links[1].url }}" class="ffwinks-mobile-menu__link pos-tr">
+          {{ main_menu.links[1].title }}
+        </a>
+      {% endif %}
+
+      {% if main_menu.links.size > 2 %}
+        <a href="{{ main_menu.links[2].url }}" class="ffwinks-mobile-menu__link pos-bl">
+          {{ main_menu.links[2].title }}
+        </a>
+      {% endif %}
+
+      {% if main_menu.links.size > 3 %}
+        <a href="{{ main_menu.links[3].url }}" class="ffwinks-mobile-menu__link pos-br">
+          {{ main_menu.links[3].title }}
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="ffwinks-mobile-menu__footer">
+     <a href="{{ routes.account_url }}" class="ffwinks-mobile-menu__account" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='{{ routes.account_url }}';">
+  <span class="svg-wrapper">
+    {{- 'user-icon.svg' | inline_asset_content -}}
+  </span>
+</a>
+    </div>
+  </div>
+</div>

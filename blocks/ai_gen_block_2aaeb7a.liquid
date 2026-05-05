@@ -1,0 +1,88 @@
+{% doc %}
+  @prompt
+    just a white block separator with horizontal and vertical padding, optimized for all screen sizes including 1920x1080, with option to hide on mobile
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-separator-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    background-color: {{ block.settings.background_color }};
+    padding-top: {{ block.settings.padding_vertical }}px;
+    padding-bottom: {{ block.settings.padding_vertical }}px;
+    padding-left: {{ block.settings.padding_horizontal }}px;
+    padding-right: {{ block.settings.padding_horizontal }}px;
+    box-sizing: border-box;
+  }
+
+  {% if block.settings.full_width %}
+  .ai-separator-{{ ai_gen_id }} {
+    max-width: 100%;
+  }
+  {% endif %}
+
+  {% if block.settings.hide_on_mobile %}
+  @media screen and (max-width: 749px) {
+    .ai-separator-{{ ai_gen_id }} {
+      display: none;
+    }
+  }
+  {% endif %}
+{% endstyle %}
+
+<div class="ai-separator-{{ ai_gen_id }}" {{ block.shopify_attributes }}></div>
+
+{% schema %}
+{
+  "name": "Block separator",
+  "tag": null,
+  "settings": [
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width (beyond 1920px)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Vertical padding (top & bottom)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Horizontal padding (left & right)",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Block separator"
+    }
+  ]
+}
+{% endschema %}

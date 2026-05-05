@@ -1,0 +1,538 @@
+{% comment %}
+  =============================================
+  FORTY FOUR WINKS — Shop Section
+  File: sections/ffw-shop.liquid
+  =============================================
+{% endcomment %}
+
+{%- liquid
+  assign collection = collections[section.settings.collection]
+  assign products_to_show = section.settings.products_to_show | default: 16
+-%}
+
+<div id="ffw-shop-section" class="ffw-shop-section">
+
+  {%- comment -%} Section heading {%- endcomment -%}
+  {%- if section.settings.heading != blank -%}
+    <div class="ffw-shop-heading">{{ section.settings.heading | escape }}</div>
+  {%- endif -%}
+
+ <div class="ffw-filter-trigger filter-trigger" id="ffw-shop-filter-trigger" role="button" tabindex="0" aria-label="Open filters">
+  Filter
+</div>
+
+  {%- comment -%} Product grid {%- endcomment -%}
+  <div class="ffw-shop-grid" id="ffw-shop-grid" data-section-id="{{ section.id }}">
+    {%- if collection != blank and collection.products.size > 0 -%}
+      {%- for product in collection.products limit: products_to_show -%}
+        {%- liquid
+          assign primary_image = product.featured_image | default: product.featured_media.preview_image
+          assign hover_image = blank
+
+          for image in product.images
+            if primary_image == blank or image.id != primary_image.id
+              assign hover_image = image
+              break
+            endif
+          endfor
+        -%}
+        <a
+          class="ffw-shop-product"
+          href="{{ product.url }}"
+          aria-label="{{ product.title | escape }}"
+          data-product-id="{{ product.id }}"
+          data-product-type="{{ product.type | handle }}"
+          data-product-tags="{% for tag in product.tags %}{{ tag | handleize }}{% unless forloop.last %},{% endunless %}{% endfor %}"
+          data-product-price="{{ product.price }}"
+          data-product-available="{{ product.available }}"
+        >
+          <div class="ffw-shop-product-image{% if hover_image != blank %} ffw-shop-product-image--has-hover{% endif %}">
+            {%- if primary_image -%}
+              <div class="ffw-shop-product-image-stack">
+                <img
+                  src="{{ primary_image | image_url: width: 600 }}"
+                  alt="{{ primary_image.alt | escape | default: product.title }}"
+                  loading="lazy"
+                  width="600"
+                  height="{{ 600 | divided_by: primary_image.aspect_ratio | round }}"
+                  class="ffw-shop-product-image-primary"
+                >
+                {%- if hover_image != blank -%}
+                  <img
+                    src="{{ hover_image | image_url: width: 600 }}"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    width="600"
+                    height="{{ 600 | divided_by: hover_image.aspect_ratio | round }}"
+                    class="ffw-shop-product-image-secondary"
+                  >
+                {%- endif -%}
+              </div>
+            {%- else -%}
+              <img src="{{ 'product.svg' | asset_url }}" alt="{{ product.title | escape }}">
+            {%- endif -%}
+          </div>
+
+          <div class="ffw-shop-product-info">
+            
+            <div class="ffw-shop-text-group">
+              <p class="ffw-shop-product-name">{{ product.title }}</p>
+              <p class="ffw-shop-product-price">
+                {%- if product.compare_at_price > product.price -%}
+                  <span class="ffw-price-compare">{{ product.compare_at_price | money }}</span>
+                {%- endif -%}
+                {{ product.price | money }}
+              </p>
+            </div>
+
+            {%- comment -%} Wishlist / sparkle icon {%- endcomment -%}
+            <button
+              class="ffw-shop-product-icon ffw-wishlist-btn shop-product-icon"
+              data-ffwinks-sparkle
+              aria-label="Add {{ product.title | escape }} to wishlist"
+              data-variant-id="{{ product.first_available_variant.id | default: product.variants.first.id | default: product.id }}"
+              data-title="{{ product.title | escape }}"
+              data-price="{{ product.price | divided_by: 100.0 }}"
+              data-price-formatted="{{ product.price | money }}"
+              data-image="{{ product.featured_media | image_url: width: 300 }}"
+              data-url="{{ product.url }}"
+              data-svg-empty="{{ 'sparkle.svg' | asset_url }}"
+              data-svg-filled="{{ 'sparkle-icon.svg' | asset_url }}"
+              type="button"
+            >
+              <img src="{{ 'sparkle.svg' | asset_url }}" alt="Wishlist">
+            </button>
+          </div>
+        </a>
+      {%- endfor -%}
+
+    {%- elsif collection == blank -%}
+      {%- comment -%} Editor placeholder {%- endcomment -%}
+      {%- for i in (1..products_to_show) -%}
+        <div class="ffw-shop-product ffw-placeholder">
+          <div class="ffw-shop-product-image">
+            {{ 'product-' | append: forloop.index | placeholder_svg_tag: 'placeholder-svg' }}
+          </div>
+          <div class="ffw-shop-product-info">
+            <div class="ffw-shop-text-group">
+              <p class="ffw-shop-product-name">Product Name</p>
+              <p class="ffw-shop-product-price">£100</p>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <p class="ffw-empty-msg">{{ 'collections.general.no_matches' | t }}</p>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} View all link {%- endcomment -%}
+  {%- if section.settings.show_view_all and collection != blank -%}
+    <div class="ffw-shop-viewall">
+      <a href="{{ collection.url }}" class="ffw-viewall-link">{{ section.settings.view_all_label | default: 'View All' }}</a>
+    </div>
+  {%- endif -%}
+</div>
+
+{%- comment -%} ── Styles ──────────────────────────────────────────────── {%- endcomment -%}
+{% stylesheet %}
+  /* ── Shop Section ─────────────────────────────────────── */
+  .ffw-shop-section {
+    width: 100%;
+    min-height: 100vh;
+    background-color: transparent;
+    padding: 40px 60px;
+    box-sizing: border-box;
+  }
+
+  .ffw-shop-heading {
+    font-size: 10px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* Filter trigger */
+  .ffw-filter-trigger {
+    font-size: 10px;
+    font-weight: bold;
+    color: #666;
+    display: table;
+    margin: 0 auto 60px;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+  .ffw-filter-trigger:hover { opacity: 0.85; }
+
+  /* Grid */
+  .ffw-shop-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto 100px;
+  }
+
+  /* Product card — pill shape */
+  .ffw-shop-product {
+    background-color: #f8f8f8;
+    border-radius: 100px;
+    padding: 60px 20px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    aspect-ratio: 0.7;
+    box-sizing: border-box;
+    transition: opacity 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    justify-content: space-between;
+  }
+  .ffw-shop-product:hover { opacity: 0.92; }
+
+  .ffw-shop-product-image {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  .ffw-shop-product-image-stack {
+    width: 100%;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    padding-top: 10px;
+  }
+  .ffw-shop-product-image-stack img,
+  .ffw-shop-product-image > img {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+  .ffw-shop-product-image-primary,
+  .ffw-shop-product-image-secondary {
+    transition: opacity 0.3s ease;
+  }
+  .ffw-shop-product-image-secondary {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media screen and (min-width: 750px) and (hover: hover) and (pointer: fine) {
+    .ffw-shop-product:hover .ffw-shop-product-image--has-hover .ffw-shop-product-image-primary {
+      opacity: 0;
+    }
+
+    .ffw-shop-product:hover .ffw-shop-product-image--has-hover .ffw-shop-product-image-secondary {
+      opacity: 1;
+    }
+  }
+
+  /* Fixed height structure that leaves room for animation */
+  .ffw-shop-product-info {
+    position: relative;
+    width: 100%;
+    height: 60px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* The Text Group */
+  .ffw-shop-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    transform: translateY(12px); /* Resting position slightly lower to leave room for the icon */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ffw-shop-product:hover .ffw-shop-text-group {
+    transform: translateY(-16px); /* Moves up but stays visible */
+  }
+
+  /* Increased specificity to override global theme styles on real screens */
+  .ffw-shop-section .ffw-shop-product-info .ffw-shop-product-name {
+    font-size: 10px !important;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+  }
+  
+  .ffw-shop-section .ffw-shop-product-info .ffw-shop-product-price {
+    font-size: 9px !important;
+    color: #555;
+    margin: 0;
+  }
+  .ffw-price-compare {
+    text-decoration: line-through;
+    color: #bbb;
+    margin-right: 4px;
+  }
+
+  /* ── Sparkle Icon (Hidden by default, slides in from bottom) ── */
+  .ffw-shop-product-icon {
+    position: absolute;
+    bottom: 4px; 
+    left: 50%;
+    transform: translateX(-50%) translateY(30px);
+    background: transparent;
+    border: none;
+    padding: 10px; 
+    cursor: pointer;
+    line-height: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Show and slide the star in when the main product pill is hovered */
+  .ffw-shop-product:hover .ffw-shop-product-icon {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Scale the star up slightly when hovered directly */
+  .ffw-shop-product-icon:hover {
+    transform: translateX(-50%) scale(1.1) !important;
+  }
+
+  .ffw-shop-product-icon img {
+    width: 14px;
+    height: auto;
+    opacity: 0.6;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+  }
+  
+  .ffw-shop-product-icon:hover img { 
+    opacity: 1; 
+  }
+
+  .ffw-shop-product-icon.ffw-active img,
+  .ffw-shop-product-icon.ffwinks-sparkle--active img {
+    filter: brightness(0);
+    opacity: 1;
+  }
+
+  /* The Pop Animation */
+  @keyframes ffw-shop-sparkle-pop {
+    0%   { transform: translateX(-50%) scale(1); }
+    40%  { transform: translateX(-50%) scale(1.4); }
+    70%  { transform: translateX(-50%) scale(0.85); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+
+  .ffw-shop-product-icon.ffwinks-sparkle--pop,
+  .ffw-shop-product-icon.sparkle-popping {
+    animation: ffw-shop-sparkle-pop 0.35s ease forwards !important;
+  }
+
+  /* Placeholder */
+  .ffw-placeholder .placeholder-svg {
+    width: 60%;
+    height: auto;
+    opacity: 0.15;
+  }
+
+  /* View all */
+  .ffw-shop-viewall {
+    text-align: center;
+    margin-top: 60px;
+  }
+  .ffw-viewall-link {
+    font-size: 10px;
+    font-weight: bold;
+    color: #444;
+    text-decoration: none;
+  }
+  .ffw-viewall-link:hover { opacity: 0.85; font-weight: 700; }
+
+  .ffw-empty-msg {
+    font-size: 9px;
+    color: #aaa;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 1439px) and (min-width: 1024px) {
+    .ffw-shop-grid { gap: 20px; }
+    .ffw-shop-section { padding: 40px 40px; }
+  }
+  @media (max-width: 1023px) and (min-width: 768px) {
+    .ffw-shop-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .ffw-shop-section { padding: 30px 30px; }
+    .ffw-filter-trigger { margin-bottom: 100px; }
+  }
+  @media (max-width: 767px) and (min-width: 576px) {
+    .ffw-shop-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+    .ffw-shop-section { padding: 30px 20px; }
+  }
+  @media (max-width: 575px) {
+    .ffw-shop-grid { grid-template-columns: 1fr; gap: 12px; }
+    .ffw-shop-section { padding: 25px 15px; }
+    .ffw-shop-product { border-radius: 80px; padding: 40px 12px 25px; }
+    .ffw-shop-product-image img { width: 70%; }
+    .ffw-filter-trigger { margin-bottom: 60px; }
+  }
+
+ /* Mobile override: Keep sparkle permanently visible and prevent text cutoff */
+  @media (max-width: 1023px) {
+    .ffw-shop-product-info {
+      height: 75px !important; /* Makes the box tall enough to comfortably hold both! */
+    }
+    .ffw-shop-text-group {
+      transform: translateY(-12px) !important; 
+      margin-bottom: 0 !important; /* Removes the huge margin that was causing the clip */
+    }
+    .ffw-shop-product-icon {
+      bottom: 2px !important; 
+      transform: translateX(-50%) translateY(0) !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+  }
+{% endstylesheet %}
+
+{%- comment -%} ── Script ──────────────────────────────────────────────── {%- endcomment -%}
+<script>
+  (function() {
+    function initShopSection() {
+      /* Restore wishlist state */
+      var wishlist = JSON.parse(localStorage.getItem('ffw_wishlist') || '[]');
+      wishlist.forEach(function(p) {
+        var btn = document.querySelector('#ffw-shop-grid [data-product-id="' + p.id + '"].ffw-wishlist-btn');
+        if (btn) btn.classList.add('ffw-active');
+      });
+
+      /* Wire filter trigger */
+      const trigger = document.getElementById('ffw-shop-filter-trigger');
+      if (trigger) {
+        trigger.onclick = function(e) {
+          e.stopPropagation();
+          document.dispatchEvent(new CustomEvent('ffw:filter:open', { detail: { source: 'shop' } }));
+        };
+      }
+      
+      /* Make sure we don't accidentally attach this multiple times */
+      if (!window.ffwShopFilterActive) {
+        window.ffwShopFilterActive = true;
+        
+        document.addEventListener('ffw:filter:apply', function(e) {
+          if (e.detail.source !== 'shop') return; 
+          
+          const filters = e.detail.filters;
+          const type = filters.type;
+          const color = filters.color;
+          const size = filters.size;
+          const sort = filters.sort;
+          const availability = filters.availability;
+          
+          const cards = document.querySelectorAll('#ffw-shop-grid .ffw-shop-product');
+
+          cards.forEach(function(card) {
+            let show = true;
+            const tags = (card.dataset.productTags || '').split(',');
+            const productType = card.dataset.productType || '';
+            const isAvailable = card.dataset.productAvailable === 'true';
+
+            if (type && type !== '' && productType !== type && !tags.includes(type)) show = false;
+            if (color && color !== '' && !tags.includes(color)) show = false;
+            if (size && size !== '' && !tags.includes(size)) show = false;
+            if (availability === '1' && !isAvailable) show = false;
+
+            card.style.display = show ? '' : 'none';
+          });
+
+          if (sort && sort !== '') {
+            const grid = document.getElementById('ffw-shop-grid');
+            if(grid) {
+              const items = Array.from(grid.querySelectorAll('.ffw-shop-product:not([style*="none"])'));
+              items.sort(function(a, b) {
+                const pa = parseInt(a.dataset.productPrice || '0', 10);
+                const pb = parseInt(b.dataset.productPrice || '0', 10);
+                if (sort === 'price-asc') return pa - pb;
+                if (sort === 'price-desc') return pb - pa;
+                return 0;
+              });
+              items.forEach(function(el) { grid.appendChild(el); });
+            }
+          }
+        });
+      }
+    }
+
+    /* Run immediately if DOM is ready, otherwise wait */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initShopSection);
+    } else {
+      initShopSection();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "FFW – Shop",
+  "tag": "section",
+  "class": "ffw-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Select the main Shop collection to display"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 4,
+      "max": 48,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show \"View All\" link",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "\"View All\" label",
+      "default": "View All"
+    }
+  ],
+  "presets": [
+    {
+      "name": "FFW – Shop"
+    }
+  ]
+}
+{% endschema %}

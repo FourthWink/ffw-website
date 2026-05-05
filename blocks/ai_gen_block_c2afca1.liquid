@@ -1,0 +1,673 @@
+{% doc %}
+  @prompt
+    Create a clean, luxury-style footer section inspired by high-end brands like Aesop.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-luxury-footer-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.padding_vertical }}px 0;
+    box-shadow: 0 -20px 60px 20px rgba(255,255,255,0.9) !important;
+  }
+
+  .ai-luxury-footer-container-{{ ai_gen_id }} {
+    margin: 0 auto;
+    padding: 0 {{ block.settings.padding_horizontal }}px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 60px;
+  }
+
+  .ai-luxury-footer-column-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ai-luxury-footer-column-left-{{ ai_gen_id }} {
+    flex: 0 0 auto;
+    margin-right: 0px;
+  }
+
+  .ai-luxury-footer-column-center-{{ ai_gen_id }} {
+    flex: 1 1 auto;
+    max-width: {{ block.settings.center_max_width }}px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ai-luxury-footer-column-email-{{ ai_gen_id }} {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    margin-right: 90px;
+    margin-top: -5px;
+  }
+
+  .ai-luxury-footer-column-social-{{ ai_gen_id }} {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    margin-left: 100px;
+  }
+
+  .ai-luxury-footer-links-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.link_spacing }}px;
+  }
+
+  .ai-luxury-footer-link-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 10px;
+    line-height: {{ block.settings.line_height }};
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .ai-luxury-footer-link-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.text_hover_color }};
+  }
+
+  .ai-luxury-footer-paragraph-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 9px;
+    line-height: {{ block.settings.line_height }};
+    text-align: center;
+    margin: 0;
+  }
+
+  .ai-luxury-footer-brand-name-{{ ai_gen_id }} {
+    font-weight: 700;
+    
+  }
+
+  .ai-luxury-footer-social-{{ ai_gen_id }} {
+    display: flex;
+    align-items: flex-start;
+    gap: {{ block.settings.icon_spacing }}px;
+  }
+
+  .ai-luxury-footer-social-link-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    transition: color 0.2s ease;
+  }
+
+  .ai-luxury-footer-social-link-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.text_hover_color }};
+  }
+
+  .ai-luxury-footer-social-link-youtube-{{ ai_gen_id }} svg {
+    width: {{ block.settings.youtube_icon_size }}px;
+    height: {{ block.settings.youtube_icon_height }}px;
+    display: block;
+    preserveAspectRatio: none;
+  }
+
+  .ai-luxury-footer-social-link-instagram-{{ ai_gen_id }} {
+    margin-top: {{ block.settings.instagram_offset }}px;
+  }
+
+  .ai-luxury-footer-social-link-instagram-{{ ai_gen_id }} svg {
+    width: {{ block.settings.instagram_icon_size }}px;
+    height: {{ block.settings.instagram_icon_size }}px;
+    display: block;
+  }
+
+  .ai-luxury-footer-email-{{ ai_gen_id }} {
+    width: {{ block.settings.input_width }}px;
+    padding: {{ block.settings.input_padding }}px 0;
+    border: none;
+    border-bottom: 1px solid {{ block.settings.input_border_color }};
+    background: transparent;
+    color: {{ block.settings.text_color }};
+    font-size: 9px;
+    outline: none;
+  }
+
+  .ai-luxury-footer-email-{{ ai_gen_id }}::placeholder {
+    color: {{ block.settings.text_color }};
+    opacity: 0.6;
+  }
+
+  .ai-luxury-footer-email-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid {{ block.settings.input_border_color }};
+  }
+
+  .ai-luxury-footer-form-{{ ai_gen_id }} {
+    margin: 0;
+  }
+
+  .ai-luxury-footer-email-wrapper-{{ ai_gen_id }} .ai-luxury-footer-email-{{ ai_gen_id }} {
+    border-bottom: none;
+    flex: 1;
+  }
+
+  .ai-luxury-footer-submit-{{ ai_gen_id }} {
+    height: auto;
+    width: 23px;
+    background: none;
+    border: none;
+    padding: 0 0 0 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .ai-luxury-footer-submit-{{ ai_gen_id }}:hover {
+    opacity: 1;
+  }
+
+  .ai-luxury-footer-submit-{{ ai_gen_id }} img {
+    display: block;
+  }
+
+  .ai-luxury-footer-message-{{ ai_gen_id }} {
+    margin-top: 6px;
+    color: {{ block.settings.text_color }};
+    font-size: 9px;
+    line-height: 1.4;
+  }
+
+  .ai-luxury-footer-message-error-{{ ai_gen_id }} {
+    opacity: 0.9;
+  }
+
+  .ai-luxury-footer-message-success-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+@media screen and (max-width: 768px) {
+    .ai-luxury-footer-container-{{ ai_gen_id }} {
+      flex-direction: row; /* Allow items to sit side-by-side */
+      flex-wrap: wrap;     /* Allow items to break to the next line */
+      gap: {{ block.settings.mobile_spacing }}px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Force the Brand (Center) and Email sections to 100% width so they stack on top */
+    .ai-luxury-footer-column-center-{{ ai_gen_id }},
+    .ai-luxury-footer-column-email-{{ ai_gen_id }} {
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+      max-width: none;
+    }
+
+    /* Left Links: Allow to share the bottom row */
+    .ai-luxury-footer-column-left-{{ ai_gen_id }} {
+      width: auto;
+      order: 3;
+      flex: 1 1 auto;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    /* Social Icons: Allow to share the bottom row */
+    .ai-luxury-footer-column-social-{{ ai_gen_id }} {
+      width: auto;
+      order: 4;
+      margin-left: 0;
+      margin-right: 0;
+      align-items: flex-end;
+    }
+
+    .ai-luxury-footer-column-center-{{ ai_gen_id }} {
+      order: 1;
+    }
+
+    .ai-luxury-footer-column-email-{{ ai_gen_id }} {
+      order: 2;
+      margin-bottom: 24px;
+      align-items: stretch;
+    }
+
+    .ai-luxury-footer-column-email-{{ ai_gen_id }} form {
+      width: 100%;
+    }
+
+    .ai-luxury-footer-links-{{ ai_gen_id }} {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 24px; /* <--- Spreads the links further apart (was 8px) */
+    }
+
+    .ai-luxury-footer-paragraph-{{ ai_gen_id }} {
+      text-align: center; /* Fixed typo in your original code (was "middle") */
+      font-size: 9px;
+    }
+
+    .ai-luxury-footer-link-{{ ai_gen_id }} {
+      font-size: 10px;
+    }
+
+    .ai-luxury-footer-email-{{ ai_gen_id }} {
+      width: 100%;
+      font-size: 9px;
+    }
+
+    .ai-luxury-footer-email-wrapper-{{ ai_gen_id }} {
+      width: 100%;
+      max-width: none;
+    }
+
+    .ai-luxury-footer-social-{{ ai_gen_id }} {
+      margin-bottom: 0;
+    }
+
+    .ai-luxury-footer-social-link-instagram-{{ ai_gen_id }} {
+      margin-top: 0;
+    }
+  }
+{% endstyle %}
+
+<luxury-footer-{{ ai_gen_id }} class="ai-luxury-footer-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-luxury-footer-container-{{ ai_gen_id }}">
+
+    <!-- Column 1: Links -->
+    <div class="ai-luxury-footer-column-{{ ai_gen_id }} ai-luxury-footer-column-left-{{ ai_gen_id }}">
+      <nav class="ai-luxury-footer-links-{{ ai_gen_id }}">
+        {% if block.settings.link_1_text != blank %}
+          <a href="{{ block.settings.link_1_url }}" class="ai-luxury-footer-link-{{ ai_gen_id }}">
+            {{ block.settings.link_1_text }}
+          </a>
+        {% endif %}
+        {% if block.settings.link_2_text != blank %}
+          <a href="{{ block.settings.link_2_url }}" class="ai-luxury-footer-link-{{ ai_gen_id }}">
+            {{ block.settings.link_2_text }}
+          </a>
+        {% endif %}
+        {% if block.settings.link_3_text != blank %}
+          <a href="{{ block.settings.link_3_url }}" class="ai-luxury-footer-link-{{ ai_gen_id }}">
+            {{ block.settings.link_3_text }}
+          </a>
+        {% endif %}
+      </nav>
+    </div>
+
+    <!-- Column 2: Brand paragraph -->
+    <div class="ai-luxury-footer-column-{{ ai_gen_id }} ai-luxury-footer-column-center-{{ ai_gen_id }}">
+      {% if block.settings.brand_paragraph != blank %}
+        <p class="ai-luxury-footer-paragraph-{{ ai_gen_id }}">
+          {{ block.settings.brand_paragraph }}
+          <span class="ai-luxury-footer-brand-name-{{ ai_gen_id }}">{{ block.settings.brand_name }}</span>
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Column 3: Email signup -->
+    <div class="ai-luxury-footer-column-email-{{ ai_gen_id }}">
+      {%- form 'customer' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <div class="ai-luxury-footer-email-wrapper-{{ ai_gen_id }}">
+          <input
+            type="email"
+            name="contact[email]"
+            placeholder="{{ block.settings.email_placeholder }}"
+            class="ai-luxury-footer-email-{{ ai_gen_id }}"
+            aria-label="Email address"
+            autocomplete="email"
+            required
+            {% if form.errors %}
+              aria-invalid="true"
+            {% endif %}
+          >
+          <button
+            type="submit"
+            class="ai-luxury-footer-submit-{{ ai_gen_id }}"
+            aria-label="Subscribe"
+          >
+            <img src="https://cdn.shopify.com/s/files/1/0974/3538/5929/files/arrow.svg?v=1777718606" alt="" width="14" height="12">
+          </button>
+        </div>
+        {%- if form.errors -%}
+          <p class="ai-luxury-footer-message-{{ ai_gen_id }} ai-luxury-footer-message-error-{{ ai_gen_id }}">
+            Please enter a valid email address.
+          </p>
+        {%- elsif form.posted_successfully? -%}
+          <p class="ai-luxury-footer-message-{{ ai_gen_id }} ai-luxury-footer-message-success-{{ ai_gen_id }}">
+            Welcome to the dream.
+          </p>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+
+    <!-- Column 4: Social icons (independent) -->
+    <div class="ai-luxury-footer-column-social-{{ ai_gen_id }}">
+      <div class="ai-luxury-footer-social-{{ ai_gen_id }}">
+        {% if block.settings.youtube_url != blank %}
+          <a href="{{ block.settings.youtube_url }}" class="ai-luxury-footer-social-link-{{ ai_gen_id }} ai-luxury-footer-social-link-youtube-{{ ai_gen_id }}" target="_blank" rel="noopener" aria-label="YouTube">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" preserveAspectRatio="none">
+              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+              <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+            </svg>
+          </a>
+        {% endif %}
+        {% if block.settings.instagram_url != blank %}
+          <a href="{{ block.settings.instagram_url }}" class="ai-luxury-footer-social-link-{{ ai_gen_id }} ai-luxury-footer-social-link-instagram-{{ ai_gen_id }}" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</luxury-footer-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class LuxuryFooter{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {}
+    }
+    customElements.define('luxury-footer-{{ ai_gen_id }}', LuxuryFooter{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Luxury footer",
+  "settings": [
+    {
+      "type": "header",
+      "content": "General style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "text_hover_color",
+      "label": "Text hover color",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "font_size_desktop",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Desktop font size",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "min": 10,
+      "max": 14,
+      "step": 1,
+      "unit": "px",
+      "label": "Mobile font size",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "Line height",
+      "default": 1.5
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Vertical padding",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "min": 1,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Horizontal padding",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Left column - Links"
+    },
+    {
+      "type": "text",
+      "id": "link_1_text",
+      "label": "Link 1 text",
+      "default": "Privacy Policy"
+    },
+    {
+      "type": "url",
+      "id": "link_1_url",
+      "label": "Link 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "link_2_text",
+      "label": "Link 2 text",
+      "default": "Terms & Conditions"
+    },
+    {
+      "type": "url",
+      "id": "link_2_url",
+      "label": "Link 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "link_3_text",
+      "label": "Link 3 text",
+      "default": "Contact Us"
+    },
+    {
+      "type": "url",
+      "id": "link_3_url",
+      "label": "Link 3 URL"
+    },
+    {
+      "type": "range",
+      "id": "link_spacing",
+      "min": 8,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Link spacing",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Center column - Brand"
+    },
+    {
+      "type": "textarea",
+      "id": "brand_paragraph",
+      "label": "Brand paragraph",
+      "default": "Join the realms where dreams meet reality. Each message brings you closer to the hidden soul within, inviting you to explore the stories and visions that shape"
+    },
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand name",
+      "default": "FORTY FOUR WINKS."
+    },
+    {
+      "type": "range",
+      "id": "brand_letter_spacing",
+      "min": 0,
+      "max": 4,
+      "step": 0.5,
+      "label": "Brand letter spacing",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "center_max_width",
+      "min": 280,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "label": "Center column max width",
+      "default": 360
+    },
+    {
+      "type": "header",
+      "content": "Right column - Social & Email"
+    },
+    {
+      "type": "url",
+      "id": "youtube_url",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "range",
+      "id": "youtube_icon_size",
+      "min": 18,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "YouTube icon size",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "youtube_icon_height",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "YouTube icon height",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "instagram_icon_size",
+      "min": 18,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Instagram icon size",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "instagram_offset",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Instagram vertical offset",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "icon_spacing",
+      "min": 0,
+      "max": 128,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon spacing",
+      "default": 22
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Email"
+    },
+    {
+      "type": "range",
+      "id": "input_width",
+      "min": 180,
+      "max": 280,
+      "step": 10,
+      "unit": "px",
+      "label": "Input width",
+      "default": 220
+    },
+    {
+      "type": "range",
+      "id": "input_padding",
+      "min": 6,
+      "max": 16,
+      "step": 2,
+      "unit": "px",
+      "label": "Input padding",
+      "default": 10
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border color",
+      "default": "#DDDDDD"
+    },
+    {
+      "type": "range",
+      "id": "input_top_spacing",
+      "min": 12,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between icons and input",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Mobile layout"
+    },
+    {
+      "type": "range",
+      "id": "mobile_spacing",
+      "min": 12,
+      "max": 28,
+      "step": 2,
+      "unit": "px",
+      "label": "Vertical spacing",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Luxury footer"
+    }
+  ],
+  "tag": null
+}
+{% endschema %}

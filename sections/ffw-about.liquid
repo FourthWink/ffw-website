@@ -1,0 +1,200 @@
+{% comment %}
+  ffw-about.liquid — Fourth Wink
+  Bulletproof Fixed-Container Scroll Snapping
+{% endcomment %}
+
+<style>
+/* 1. Stop the main Shopify page from scrolling at all so it doesn't fight our snapper */
+  html, body {
+    overflow: hidden !important;
+    height: 100% !important;
+  }
+
+  /* 2. Hide the floating center star and text on this page */
+  .center-star-bg, .ffw-static-text { display: none !important; }
+/* Remove header and footer divider lines on this page */
+  #shopify-section-header .header__row,
+  .shopify-section-group-footer-group, 
+  footer {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  /* 3. The Bulletproof Fullscreen Container */
+  .ffw-snapper-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    z-index: 100; /* High enough to cover content, but sits under your header (which is 600) */
+    background-color: #ffffff; /* Match your site background color */
+    
+    /* Hide scrollbars for an absolute clean, app-like look */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .ffw-snapper-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 4. The Background Eye - locked perfectly to the center of the screen */
+  .ffw-snapper-eye {
+    position: fixed;
+    top: 49.5dvh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 150px;
+    width:auto;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+/* 5. The Snapping Blocks */
+  .ffw-snap-block {
+    width: 100%;
+    height: 100dvh; 
+    scroll-snap-align: start; 
+    scroll-snap-stop: always;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    
+    /* UPDATE THESE PADDING VALUES: */
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 49vh; /* <--- This pushes the whole block of text down */
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2; 
+  }
+  
+  /* 6. Typography */
+  .ffw-about-vision-title,
+  .ffw-about-subtitle {
+    font-size: 10px;
+    font-weight: bold;
+    color: #333;
+    
+    
+    margin-bottom: 100px;
+  }
+  
+/* 6. Typography - Maximum Specificity & Anti-Mobile-Scaling */
+  div.ffw-snapper-wrapper div.ffw-snap-block div.ffw-about-vision-title,
+  div.ffw-snapper-wrapper div.ffw-snap-block div.ffw-about-subtitle {
+    font-size: 10px !important;
+    font-weight: bold !important;
+    color: #444 !important;
+    margin-bottom: 100px !important;
+    -webkit-text-size-adjust: 100% !important; /* Stops iOS from shrinking text */
+    text-size-adjust: 100% !important;
+  }
+  
+  div.ffw-snapper-wrapper div.ffw-snap-block p.ffw-about-text,
+  div.ffw-snapper-wrapper div.ffw-snap-block .ffw-about-text {
+    max-width: 700px !important; 
+    font-size: 10px !important;
+    line-height: 1.8 !important;
+    color: #444 !important;
+    margin: 0 !important;
+    -webkit-text-size-adjust: 100% !important; /* Stops iOS from shrinking text */
+    text-size-adjust: 100% !important;
+  }
+ .ffw-about-body-image {
+    width: 100vw;
+    max-width: 100%;
+    display: block;
+    margin: 0;
+    position: relative;
+    z-index: 5;
+  }
+  /* Remove padding from the final block so the clouds touch the edges */
+  .ffw-snap-block:last-child {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0; /* Ensures the clouds sit exactly where you want them */
+    z-index: 6;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ffw-snapper-eye { height: 150px; }
+    .ffw-about-text, .ffw-about-subtitle, .ffw-about-vision-title { font-size: 10px; }
+    .ffw-snap-block { padding-top: calc(49dvh); }
+  }
+</style>
+
+<div class="ffw-snapper-wrapper">
+  <img src="{{ 'about.png' | asset_url }}" alt="Glass Eye" class="ffw-snapper-eye">
+
+  <div class="ffw-snap-block">
+    <div class="ffw-about-vision-title">THE VISION</div>
+    <p class="ffw-about-text">
+      <b>FOURTH WINK</b> does not exist in the waking world. It is a study of the subconscious, heavily rooted in the surreal. Inspired by the quiet absurdity of everyday moments and the philosophy of artists like René Magritte, our pieces are fragments of a dream state pulled into reality. We don't make clothes for the surface; we design for the spaces in between.
+    </p>
+  </div>
+
+  <div class="ffw-snap-block">
+    <div class="ffw-about-subtitle">CRAFTSMANSHIP</div>
+    <p class="ffw-about-text">
+      Stage one is drifting. Stage two is separation. Stage three is depth. The Fourth Wink is the final stage—the exact moment logic collapses and the unfiltered self takes over. But a wink is also a deliberate action. It is a shared secret, a flirtation with the absurd, and a playful nod to the surreal. Our name is an invitation to stop taking reality so seriously, and explore the hidden identities you only meet when your eyes are closed.
+    </p>
+  </div>
+
+  <div class="ffw-snap-block">
+    <div class="ffw-about-subtitle">THE MEANING</div>
+    <p class="ffw-about-text">
+    Stage one is drifting. Stage two is separation. Stage three is depth. The Fourth Wink is the final stage—the exact moment logic collapses and the unfiltered self takes over. But a wink is also a deliberate action. It is a shared secret, a flirtation with the absurd, and a playful nod to the surreal. Our name is an invitation to stop taking reality so seriously, and explore the hidden identities you only meet when your eyes are closed.
+    </p>
+  </div>
+
+  <div class="ffw-snap-block">
+    <div class="ffw-about-subtitle">THE EYE</div>
+    <p class="ffw-about-text">
+      Our anchor is the stylized eye, fractured into four distinct sections. It is the literal gateway between reality and the dream. While the core of our brand remains constant, the center of the eye shifts with every collection—a reflection of a mind that refuses to stay still.
+    </p>
+  </div>
+
+  <div class="ffw-snap-block">
+    <img src="{{ 'Clouds.png' | asset_url }}" alt="Body" class="ffw-about-body-image">
+  </div>
+
+</div>
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    var footerGroup = document.querySelector('.shopify-section-group-footer-group') || document.querySelector('footer');
+    var snapBlocks = document.querySelectorAll('.ffw-snap-block');
+    var finalBlock = snapBlocks[snapBlocks.length - 1];
+    
+    if (finalBlock && footerGroup) {
+      // 1. Let the footer flow naturally
+      footerGroup.style.position = 'relative';
+      footerGroup.style.bottom = 'auto';
+      footerGroup.style.width = '100%';
+      footerGroup.style.zIndex = '10';
+      footerGroup.style.marginTop = '0';
+      footerGroup.style.marginBottom = '0'; // Strip JS-injected bottom margin
+      
+      // 2. Wrap perfectly around the content (no forced 100vh minimum)
+      finalBlock.style.height = 'auto';
+      finalBlock.style.minHeight = 'auto'; // Changed from 100dvh to kill the extra empty space
+      finalBlock.style.paddingBottom = '0'; 
+      
+      // 3. Move the footer inside
+      finalBlock.appendChild(footerGroup);
+    }
+  });
+</script>
+{% schema %}
+{
+  "name": "FFW About",
+  "tag": "section",
+  "class": "ffw-about-wrapper",
+  "settings": [],
+  "presets": [{ "name": "FFW About" }]
+}
+{% endschema %}

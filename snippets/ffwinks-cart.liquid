@@ -1,0 +1,52 @@
+{% comment %}
+  FFWinks — Cart Fullscreen Overlay
+  Full-viewport panel that mirrors the Shopify cart via the AJAX Cart API.
+
+  Item rows (with size/colour selectors and quantity controls) are injected
+  at runtime by refreshCartOverlay() in ffwinks-js.liquid.
+  Quantity changes and removals call /cart/change.js directly.
+
+  Triggered by:
+    a[href="/cart"], a[href*="/cart"], [data-cart-nav],
+    .eye-basket, .header-actions__action--cart,
+    a:has(img[alt*="basket"]), a:has(img[src*="eye-icon"])
+
+  CSS: search in header.liquid for "► SECTION: ffwinks-cart.liquid"
+{% endcomment %}
+
+<div id="ffwinks-cart-overlay" class="ffwinks-fullscreen" aria-hidden="true" role="dialog" aria-label="Cart">
+
+  <button class="ffwinks-cart__close-btn mobile-only" id="cart-close-mobile-overlay" aria-label="Close cart">
+    x
+  </button>
+
+  <div class="ffwinks-soul-list" id="ffwinks-cart-list">
+    
+    <div id="ffwinks-cart-empty" class="ffwinks-soul-checkout-wrapper" style="pointer-events: none;">
+      <div class="ffwinks-img-btn-wrap">
+        <img src="{{ 'checkout.svg' | asset_url }}" alt="" class="ffwinks-action-img ffwinks-action-img--invert">
+        <span class="ffwinks-img-label">Cart is empty</span>
+      </div>
+    </div>
+    
+    {%- comment -%} 👇 THE STAR BUTTON IS NOW INSIDE THE LIST 👇 {%- endcomment -%}
+    <div class="ffwinks-soul-checkout-wrapper">
+      <a href="/checkout" class="ffwinks-soul-action-bottom ffwinks-checkout-link-wrap">
+        <div class="ffwinks-img-btn-wrap">
+          <img src="{{ 'checkout.svg' | asset_url }}" alt="" class="ffwinks-action-img ffwinks-action-img--invert">
+          <span class="ffwinks-img-label">Checkout</span>
+        </div>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="ffwinks-soul-subtotal-wrapper">
+    <div class="ffwinks-soul-subtotal-row">
+      <span class="ffwinks-soul-subtotal-label">Subtotal</span>
+      <span class="ffwinks-soul-subtotal-price" id="ffwinks-cart-subtotal">—</span>
+    </div>
+    <p class="ffwinks-soul-subtotal-info" id="ffwinks-cart-subtotal-info">Shipping and taxes calculated at checkout</p>
+  </div>
+
+</div>

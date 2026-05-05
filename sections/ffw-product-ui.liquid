@@ -1,0 +1,240 @@
+{%- if template.name == 'product' -%}
+
+{%- liquid
+  assign product_tags_downcase = product.tags | join: ',' | downcase
+  assign is_preorder = false
+  if product_tags_downcase contains 'preorder'
+    assign is_preorder = true
+  elsif product.metafields.custom.preorder_enabled.value == true
+    assign is_preorder = true
+  endif
+  assign v = product.selected_or_first_available_variant
+  assign deposit_price = v.price
+  assign balance_price = 0
+  if v.compare_at_price > v.price
+    assign balance_price = v.compare_at_price | minus: v.price
+  endif
+-%}
+
+{% if is_preorder %}
+<div class="ffw-preorder-note" id="ffw-preorder-note">
+  <p class="ffw-preorder-eyebrow">Preorder Now</p>
+  <p class="ffw-preorder-text"><span>Secure your piece with a 45% deposit of:</span> <strong id="ffw-deposit">{{ deposit_price | money }}</strong></p>
+  {% if balance_price > 0 %}
+  <p class="ffw-preorder-text"><span>The remaining balance of <strong id="ffw-balance">{{ balance_price | money }}</strong> + shipping will be due at a later date.</span></p>
+  {% endif %}
+</div>
+
+<style>
+  .ffw-preorder-note {
+    /* Changed to relative so it naturally pushes the image down instead of overlapping */
+    position: relative;
+    margin-bottom: 20px; /* The small gap below the note */
+    margin-left: var(--ffwinks-master-spacing, 24px);
+    z-index: 50;
+    
+    /* Premium Floating Banner Aesthetics */
+    padding: 10px 10px;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 9px;
+    width: calc(100% - 48px);
+    max-width: 360px; /* Keeps it tight and elegant on desktop */
+  }
+  
+  @media (max-width: 749px) {
+    .ffw-preorder-note {
+      margin-left: 18px;
+      margin-bottom: 15px; /* Slightly smaller gap on mobile */
+      width: calc(100% - 32px);
+    }
+  }
+
+  .ffw-preorder-eyebrow {
+    margin: 0 0 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ffw-preorder-text {
+    margin: 0 0 4px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    color: #555;
+  }
+  .ffw-preorder-text strong {
+    color: #000;
+  }
+</style>
+{% endif %}
+
+{%- liquid
+  assign product_title     = product.title | escape
+  assign product_price_fmt = product.selected_or_first_available_variant.price | money
+  assign product_price_raw = product.selected_or_first_available_variant.price | divided_by: 100.0
+  assign product_image     = product.featured_media | image_url: width: 300
+  assign product_url       = product.url
+  assign variant_id        = product.selected_or_first_available_variant.id
+-%}
+
+<button
+  id="ffwinks-product-sparkle"
+  class="ffw-wishlist-btn"
+  data-ffwinks-sparkle
+  type="button"
+  aria-label="Add {{ product_title }} to wishlist"
+  data-variant-id="{{ variant_id }}"
+  data-title="{{ product_title }}"
+  data-price="{{ product_price_raw }}"
+  data-price-formatted="{{ product_price_fmt }}"
+  data-image="{{ product_image }}"
+  data-url="{{ product_url }}"
+  data-svg-empty="{{ 'sparkle.svg' | asset_url }}"
+  data-svg-filled="{{ 'sparkle-icon.svg' | asset_url }}"
+>
+  <img src="{{ 'sparkle.svg' | asset_url }}" alt="Wishlist" class="ffwinks-sparkle-img">
+</button>
+
+<div id="ffwinks-mobile-atc">
+  <button type="button" class="floating-atc-btn ffwinks-mobile-atc-btn">Add to cart</button>
+</div>
+
+<style>
+  /* Wishlist sparkle — fixed top-right, same size as header sparkle (--icon-size-md = 1.375rem) */
+  #ffwinks-product-sparkle {
+    position: fixed;
+    top: calc(var(--header-group-height, 72px) + 20px);
+    right: 54px;
+    z-index: 9000;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    padding: 6px;
+    line-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+  #ffwinks-product-sparkle:hover {
+    transform: none;
+    opacity: 0.8;
+  }
+  /* Match header icon size exactly */
+  .ffwinks-sparkle-img {
+    width: auto;
+    height: 15px;
+  }
+  #ffwinks-product-sparkle.ffwinks-sparkle--pop {
+    animation: sparklePop 0.3s ease;
+  }
+  @keyframes sparklePop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.5); }
+    100% { transform: scale(1); }
+  }
+
+  /* Mobile ATC bar — hidden on desktop */
+  #ffwinks-mobile-atc { display: none; }
+
+  @media (max-width: 749px) {
+    /* Hide sparkle on mobile */
+    #ffwinks-product-sparkle {
+      display: none !important;
+    }
+
+    /* Hide the floating star on mobile */
+    .floating-atc { display: none !important; }
+
+    /* Show mobile bar */
+    #ffwinks-mobile-atc {
+      display: flex !important;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 999999;
+      padding: 12px 16px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      background: #fff;
+      box-sizing: border-box;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+
+    /* The Smooth Top Fade (Fog) */
+    #ffwinks-mobile-atc::before {
+      content: '';
+      position: absolute;
+      bottom: 100%; /* Sits exactly on top of the solid white ATC bar */
+      left: 0;
+      width: 100%;
+      height: 40px; 
+      background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none; 
+    }
+
+    .ffwinks-mobile-atc-btn {
+      width: 100%;
+      padding: 16px;
+      background: transparent !important;
+      color: #666 !important;
+      border: none !important;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 400;
+      
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .ffwinks-mobile-atc-btn:active { opacity: 0.7; }
+    body.cart-overlay-open #ffwinks-mobile-atc,
+    body.ffwinks-adding #ffwinks-mobile-atc {
+      opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    /* Push content above the bar */
+    body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
+  }
+</style>
+
+<script>
+// Deselect all variant options on first load (custom AI variant picker)
+(function () {
+  // Only deselect if the user didn't arrive with a ?variant= param
+  if (window.location.search.indexOf('variant=') !== -1) return;
+
+  function deselect() {
+    // Remove .selected from all custom picker buttons
+    document.querySelectorAll('[class*="ai-variant-picker__value"]').forEach(function(btn) {
+      btn.classList.remove('selected');
+    });
+
+    // Reset the hidden select to no selection
+    var sel = document.querySelector('[class*="ai-variant-picker"] select[name="id"]');
+    if (sel) {
+      sel.value = '';
+      sel.querySelectorAll('option[selected]').forEach(function(opt) {
+        opt.removeAttribute('selected');
+      });
+    }
+  }
+
+  // Run at multiple points to beat any late JS hydration
+  deselect();
+  document.addEventListener('DOMContentLoaded', deselect);
+  setTimeout(deselect, 100);
+  setTimeout(deselect, 400);
+})();
+</script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product UI",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [],
+  "presets": [{ "name": "Product UI" }]
+}
+{% endschema %}
