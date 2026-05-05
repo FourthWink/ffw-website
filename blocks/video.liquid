@@ -1,587 +1,211 @@
-{% comment %}
-  Video Intro Section
-  Usage: Add this as a new section in your Shopify theme
-  File name: sections/video-intro.liquid
-{% endcomment %}
+{% liquid
+  assign block_settings = block.settings
+  assign ratio = block_settings.aspect_ratio
 
-{% if section.settings.intro_desktop_video != blank %}
-<div id="shopi_video_intro_{{ section.id }}">
-  <div id="just-black-{{ section.id }}"></div>
-  
-  {% if section.settings.intro_skip != blank %}
-    <button type="button" class="skip-button" onclick="skipVideoIntro('{{ section.id }}')" aria-label="{{ section.settings.intro_skip }}">
-      {{ section.settings.intro_skip }}
-    </button>
-  {% endif %}
-  
-  <div class="vi-intro-window" id="intro-window-{{ section.id }}">
-    {% if section.settings.intro_audio_file != blank %}
-      <audio id="enter-sound-{{ section.id }}">
-        <source src="{{ section.settings.intro_audio_file }}">
-      </audio>
-    {% endif %}
-    
-    <div class="vi-animation-container vi-animation" id="animation-container-{{ section.id }}">
-      <video style='opacity:0;' class="vi-desktop-only vid" id="animation-desktop-{{ section.id }}" muted playsinline webkit-playsinline onended="removeIntroWindow('{{ section.id }}')" preload="auto">
-        <source src="{{ section.settings.intro_desktop_video }}">
-      </video>
-      
-      {% if section.settings.intro_mobile_video != blank %}
-        <video style='opacity:0;' class="vi-mobile-only vid" id="animation-mobile-{{ section.id }}" muted playsinline webkit-playsinline onended="removeIntroWindow('{{ section.id }}')" preload="auto">
-          <source src="{{ section.settings.intro_mobile_video }}">
-        </video>
-      {% endif %}
-    </div>
-  </div>
-</div>
+  if ratio == 'adapt'
+    assign ratio = block_settings.video.aspect_ratio
+  endif
 
-<style>
-#shopi_video_intro_{{ section.id }} #just-black-{{ section.id }} {
-  position: fixed;
-  background: {{ section.settings.overlay_color | default: '#000000' }};
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9998;
-  display: none;
-}
+  if ratio == blank or ratio == 0
+    assign ratio = '16 / 9'
+  endif
+%}
 
-#shopi_video_intro_{{ section.id }} .vi-desktop-only {
-  display: block;
-}
+{% capture class %}
+  video-block video-block--{{ block.id }} spacing-style size-style
+{% endcapture %}
 
-#shopi_video_intro_{{ section.id }} .vi-mobile-only {
-  display: none;
-}
+{% capture style %}
+  --ratio: {{ ratio }};
+  {% render 'size-style', settings: block_settings %}
+  {% render 'spacing-style', settings: block_settings %}
+{% endcapture %}
 
-#shopi_video_intro_{{ section.id }} .vi-intro-window {
-  display: none;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-}
+{% render 'video',
+  video: block_settings.video,
+  video_autoplay: block_settings.video_autoplay,
+  video_loop: block_settings.video_loop,
+  video_class: class,
+  video_style: style,
+  section_id: section.id,
+  block: block
+%}
 
-#shopi_video_intro_{{ section.id }} .vi-intro-window.show {
-  display: block;
-}
-
-#shopi_video_intro_{{ section.id }} .vi-intro-window.fade-out {
-  opacity: 0;
-  transition: opacity {{ section.settings.fade_duration | default: 0.5 }}s linear;
-}
-
-/* Hide scrollbar when video is showing */
-body.vi-video-active {
-  overflow: hidden;
-}
-
-#shopi_video_intro_{{ section.id }} .vi-animation-container {
-  width: 100%;
-  height: 100%;
-  z-index: 80;
-}
-
-#shopi_video_intro_{{ section.id }} .vi-animation-container video {
-  width: 100%;
-  height: 100%;
-  object-fit: {{ section.settings.video_fit | default: 'cover' }};
-}
-
-@media (max-width: {{ section.settings.mobile_breakpoint | default: 768 }}px) {
-  #shopi_video_intro_{{ section.id }} .vi-desktop-only {
-    display: none !important;
-  }
-  #shopi_video_intro_{{ section.id }} .vi-mobile-only {
+{% stylesheet %}
+  .video-block {
+    aspect-ratio: var(--ratio);
     display: block;
-  }
-}
-
-#shopi_video_intro_{{ section.id }} .skip-button {
-  position: fixed;
-  top: {{ section.settings.skip_top | default: 20 }}px;
-  right: {{ section.settings.skip_right | default: 20 }}px;
-  background: {{ section.settings.skip_background | default: 'rgba(255, 255, 255, 0.2)' }};
-  color: {{ section.settings.skip_color | default: '#ffffff' }};
-  border: 1px solid {{ section.settings.skip_color | default: '#ffffff' }};
-  padding: {{ section.settings.skip_padding | default: '8px 16px' }};
-  border-radius: {{ section.settings.skip_border_radius | default: 20 }}px;
-  font-size: {{ section.settings.skip_font_size | default: 14 }}px;
-  cursor: pointer;
-  z-index: 10001;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  pointer-events: auto;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  opacity: 1;
-  visibility: visible;
-}
-
-#shopi_video_intro_{{ section.id }} .skip-button.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-#shopi_video_intro_{{ section.id }} .skip-button:hover {
-  background: {{ section.settings.skip_hover_background | default: 'rgba(255, 255, 255, 0.3)' }};
-  transform: scale(1.05);
-}
-
-@media (max-width: {{ section.settings.mobile_breakpoint | default: 768 }}px) {
-  #shopi_video_intro_{{ section.id }} .skip-button {
-    top: {{ section.settings.skip_top_mobile | default: 12 }}px;
-    right: {{ section.settings.skip_right_mobile | default: 12 }}px;
-    padding: {{ section.settings.skip_padding_mobile | default: '6px 12px' }};
-    font-size: {{ section.settings.skip_font_size_mobile | default: 13 }}px;
-  }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const sectionId = '{{ section.id }}';
-  const justBlack = document.querySelector("#just-black-" + sectionId);
-  const enterSound = document.querySelector("#enter-sound-" + sectionId);
-  const introWindow = document.querySelector("#intro-window-" + sectionId);
-  const animationVideoContainer = document.querySelector("#animation-container-" + sectionId);
-  const animationVideos = document.querySelectorAll("#shopi_video_intro_" + sectionId + " .vid");
-  const skipButton = document.querySelector("#shopi_video_intro_" + sectionId + " .skip-button");
-  
-  const settings = {
-    volumeIntro: {{ section.settings.volume_intro | default: 50 }},
-    showFrequency: '{{ section.settings.show_frequency | default: "once" }}',
-    loadTimeout: {{ section.settings.load_timeout | default: 10 | times: 1000 }},
-    slowConnectionThreshold: {{ section.settings.slow_connection_threshold | default: 1.5 }},
-    enableConnectionCheck: {{ section.settings.enable_connection_check | default: true }},
-    autoplay: {{ section.settings.autoplay | default: false }},
-    clickToPlay: {{ section.settings.click_to_play | default: true }}
-  };
-  
-  let videoEnded = false;
-  let videosLoaded = false;
-  let isPlaying = false;
-  const storageKey = 'videoPlayed_' + sectionId;
-
-  function setVideoScrollLock(locked) {
-    document.body.classList.toggle('vi-video-active', locked);
+    width: 100%;
   }
 
-  function checkConnectionSpeed() {
-    if (!settings.enableConnectionCheck) return false;
-    
-    if ('connection' in navigator) {
-      const connection = navigator.connection;
-      if (connection.effectiveType === '3g' || 
-          connection.effectiveType === '2g' || 
-          connection.downlink < settings.slowConnectionThreshold) {
-        if (settings.showFrequency === 'once') {
-          sessionStorage.setItem(storageKey, 'true');
-        }
-        return true;
-      }
-      return false;
-    }
-    return false;
+  .video-block :is(iframe, video),
+  .video-placeholder-wrapper {
+    aspect-ratio: var(--ratio);
+    height: 100%;
+    width: 100%;
   }
-
-  function preloadVideos() {
-    let loadedCount = 0;
-    
-    animationVideos.forEach(video => {
-      video.addEventListener('loadeddata', () => {
-        loadedCount++;
-        if (loadedCount === animationVideos.length) {
-          videosLoaded = true;
-          if (settings.autoplay && !checkConnectionSpeed() && !videoEnded) {
-            playVideo();
-          }
-        }
-      });
-      
-      video.addEventListener('error', () => {
-        console.error('Video failed to load:', video.src);
-        removeIntroWindow();
-      });
-      
-      video.load();
-    });
-  }
-
-  function shouldShowVideo() {
-    if (settings.showFrequency === 'always') {
-      return true;
-    }
-    return !sessionStorage.getItem(storageKey);
-  }
-
-  function initializeVideoIntro() {
-    setVideoScrollLock(false);
-
-    if (!shouldShowVideo()) {
-      console.log('Video intro skipped - already shown this session');
-      return;
-    }
-
-    // Skip before showing/locking the intro UI so slow connections
-    // never get stuck with a scroll-locked overlay.
-    if (checkConnectionSpeed()) {
-      console.log('Slow connection detected - skipping intro before lock');
-      return;
-    }
-    
-    justBlack.style.display = 'block';
-    introWindow.style.display = 'block';
-    introWindow.classList.add('show');
-    
-    if (skipButton) {
-      skipButton.style.display = 'block';
-      skipButton.classList.remove('hidden');
-    }
-    
-    const videoLoadTimeout = setTimeout(() => {
-      console.log('Video load timeout reached');
-      removeIntroWindow();
-    }, settings.loadTimeout);
-    
-    requestAnimationFrame(() => {
-      animationVideos.forEach(vid => {
-        vid.style.opacity = '1';
-        vid.addEventListener('error', () => {
-          clearTimeout(videoLoadTimeout);
-          removeIntroWindow();
-        });
-      });
-      
-      if (videosLoaded) {
-        clearTimeout(videoLoadTimeout);
-      }
-    });
-  }
-
-  function removeIntroWindow() {
-    hideSkipButton();
-    
-    if (introWindow) {
-      introWindow.classList.add("fade-out");
-      
-      setTimeout(() => {
-        if (introWindow) introWindow.style.display = 'none';
-      }, {{ section.settings.fade_duration | default: 0.5 | times: 1000 }});
-    }
-    
-    if (settings.showFrequency === 'once') {
-      sessionStorage.setItem(storageKey, 'true');
-    }
-    
-    setVideoScrollLock(false);
-    if (justBlack) justBlack.style.display = "none";
-    videoEnded = true;
-    isPlaying = false;
-  }
-
-  function hideSkipButton() {
-    if (skipButton) {
-      skipButton.classList.add('hidden');
-    }
-  }
-
-  function showSkipButton() {
-    if (skipButton) {
-      skipButton.classList.remove('hidden');
-    }
-  }
-
-  function playVideo() {
-    if (checkConnectionSpeed() || videoEnded || !videosLoaded || isPlaying) return;
-    
-    setVideoScrollLock(true);
-    isPlaying = true;
-    
-    animationVideos.forEach((vid) => {
-      vid.play().catch(e => {
-        console.error('Video play failed:', e);
-        setVideoScrollLock(false);
-        isPlaying = false;
-        showSkipButton();
-      });
-    });
-    
-    if (enterSound && settings.volumeIntro > 0) {
-      enterSound.volume = settings.volumeIntro / 100;
-      enterSound.play().catch(e => {
-        console.log('Audio play failed (this is normal on some browsers):', e);
-      });
-    }
-    
-    hideSkipButton();
-  }
-
-  window.skipVideoIntro = function(id) {
-    if (id !== sectionId) return;
-    
-    animationVideos.forEach(vid => {
-      vid.pause();
-      vid.currentTime = 0;
-    });
-    
-    if (enterSound) {
-      enterSound.pause();
-      enterSound.currentTime = 0;
-    }
-    
-    removeIntroWindow();
-  };
-
-  window.resetVideoIntro = function(id) {
-    if (id !== sectionId) return;
-    sessionStorage.removeItem(storageKey);
-    console.log('Video intro reset - will show on next page load');
-  };
-
-  preloadVideos();
-  initializeVideoIntro();
-
-  // Defensive cleanup to avoid any sticky lock state.
-  window.addEventListener('pagehide', () => setVideoScrollLock(false));
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') setVideoScrollLock(false);
-  });
-
-  if (animationVideoContainer && settings.clickToPlay) {
-    animationVideoContainer.addEventListener("click", playVideo);
-  }
-
-  animationVideos.forEach(video => {
-    video.addEventListener('ended', () => {
-      isPlaying = false;
-      removeIntroWindow();
-    });
-    
-    video.addEventListener('play', () => {
-      isPlaying = true;
-    });
-    
-    video.addEventListener('pause', () => {
-      isPlaying = false;
-    });
-    
-    video.addEventListener('error', () => {
-      showSkipButton();
-      isPlaying = false;
-    });
-  });
-});
-</script>
-
-{% endif %}
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "Video Intro",
-  "tag": "section",
-  "class": "video-intro-section",
+  "name": "t:names.video",
+  "tag": null,
   "settings": [
     {
-      "type": "header",
-      "content": "📹 Video Settings"
-    },
-    {
-      "type": "url",
-      "id": "intro_desktop_video",
-      "label": "Desktop Video",
-      "info": "MP4 format recommended. Max file size 10MB for better performance."
-    },
-    {
-      "type": "url",
-      "id": "intro_mobile_video",
-      "label": "Mobile Video (Optional)",
-      "info": "Separate video for mobile devices. If not set, desktop video will be used."
-    },
-    {
-      "type": "url",
-      "id": "intro_audio_file",
-      "label": "Background Audio (Optional)",
-      "info": "MP3 or WAV format. Will play along with the video."
-    },
-    {
-      "type": "select",
-      "id": "video_fit",
-      "label": "Video Fit",
-      "options": [
-        { "value": "cover", "label": "Cover (Fill screen)" },
-        { "value": "contain", "label": "Contain (Fit within screen)" },
-        { "value": "fill", "label": "Fill (Stretch to fit)" }
-      ],
-      "default": "cover"
-    },
-    {
-      "type": "header",
-      "content": "🎛️ Display Settings"
-    },
-    {
-      "type": "select",
-      "id": "show_frequency",
-      "label": "Show Video",
-      "options": [
-        { "value": "once", "label": "Once per session (Recommended)" },
-        { "value": "always", "label": "Every time page loads" }
-      ],
-      "default": "once",
-      "info": "Choose when to display the video intro to visitors"
+      "type": "video",
+      "id": "video",
+      "label": "t:settings.video"
     },
     {
       "type": "checkbox",
-      "id": "autoplay",
-      "label": "Auto-play video",
-      "default": false,
-      "info": "Start playing automatically when loaded (may not work on all devices)"
+      "id": "video_autoplay",
+      "label": "t:settings.autoplay",
+      "default": false
     },
     {
       "type": "checkbox",
-      "id": "click_to_play",
-      "label": "Click to play",
-      "default": true,
-      "info": "Allow users to click anywhere on the video to start playback"
+      "id": "video_loop",
+      "label": "t:settings.loop",
+      "default": true
     },
     {
-      "type": "range",
-      "id": "fade_duration",
-      "min": 0.1,
-      "max": 3.0,
-      "step": 0.1,
-      "unit": "s",
-      "label": "Fade out duration",
-      "default": 0.5
+      "type": "select",
+      "id": "aspect_ratio",
+      "label": "t:settings.aspect_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:options.auto"
+        },
+        {
+          "value": "16/9",
+          "label": "16:9"
+        },
+        {
+          "value": "4/5",
+          "label": "4:5"
+        },
+        {
+          "value": "1/1",
+          "label": "1:1"
+        }
+      ],
+      "default": "16/9"
     },
     {
       "type": "header",
-      "content": "🔊 Audio Settings"
+      "content": "t:content.size"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:settings.width_desktop",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
     },
     {
       "type": "range",
-      "id": "volume_intro",
+      "id": "custom_width",
+      "label": "t:settings.custom_width",
       "min": 0,
       "max": 100,
-      "step": 5,
+      "step": 1,
       "unit": "%",
-      "label": "Audio Volume",
-      "default": 50
+      "default": 100,
+      "visible_if": "{{ block.settings.width == 'custom' }}"
     },
     {
-      "type": "header",
-      "content": "📱 Mobile Settings"
-    },
-    {
-      "type": "range",
-      "id": "mobile_breakpoint",
-      "min": 320,
-      "max": 1024,
-      "step": 8,
-      "unit": "px",
-      "label": "Mobile breakpoint",
-      "default": 768,
-      "info": "Screen width below which mobile video will be shown"
-    },
-    {
-      "type": "header",
-      "content": "⏩ Skip Button"
-    },
-    {
-      "type": "text",
-      "id": "intro_skip",
-      "label": "Skip Button Text",
-      "default": "Skip Intro",
-      "info": "Leave blank to hide the skip button"
-    },
-    {
-      "type": "color",
-      "id": "skip_color",
-      "label": "Skip Button Text Color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "skip_background",
-      "label": "Skip Button Background",
-      "default": "rgba(255, 255, 255, 0.2)"
-    },
-    {
-      "type": "color",
-      "id": "skip_hover_background",
-      "label": "Skip Button Hover Background",
-      "default": "rgba(255, 255, 255, 0.3)"
+      "type": "select",
+      "id": "width_mobile",
+      "label": "t:settings.width_mobile",
+      "options": [
+        {
+          "value": "fit-content",
+          "label": "t:options.fit_content"
+        },
+        {
+          "value": "fill",
+          "label": "t:options.fill"
+        },
+        {
+          "value": "custom",
+          "label": "t:options.custom"
+        }
+      ],
+      "default": "fill"
     },
     {
       "type": "range",
-      "id": "skip_top",
+      "id": "custom_width_mobile",
+      "label": "t:settings.custom_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ block.settings.width_mobile == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
       "min": 0,
       "max": 100,
       "step": 1,
       "unit": "px",
-      "label": "Skip Button - Top Position",
-      "default": 20
+      "default": 0
     },
     {
       "type": "range",
-      "id": "skip_right",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
       "min": 0,
       "max": 100,
       "step": 1,
       "unit": "px",
-      "label": "Skip Button - Right Position",
-      "default": 20
-    },
-    {
-      "type": "header",
-      "content": "⚡ Performance Settings"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_connection_check",
-      "label": "Enable slow connection detection",
-      "default": true,
-      "info": "Automatically skip video for users with slow internet"
+      "default": 0
     },
     {
       "type": "range",
-      "id": "slow_connection_threshold",
-      "min": 0.5,
-      "max": 5.0,
-      "step": 0.1,
-      "unit": "MB",
-      "label": "Slow connection threshold",
-      "default": 1.5,
-      "info": "Video will be skipped if connection is slower than this"
-    },
-    {
-      "type": "range",
-      "id": "load_timeout",
-      "min": 3,
-      "max": 30,
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
       "step": 1,
-      "unit": "sec",
-      "label": "Video load timeout",
-      "default": 10,
-      "info": "How long to wait for video to load before skipping"
+      "unit": "px",
+      "default": 0
     },
     {
-      "type": "color",
-      "id": "overlay_color",
-      "label": "Loading overlay color",
-      "default": "#000000",
-      "info": "Background color shown while video loads"
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     }
-    
   ],
   "presets": [
     {
-      "name": "Video Intro"
+      "name": "t:names.video"
     }
   ]
 }
