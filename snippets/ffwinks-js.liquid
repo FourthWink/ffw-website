@@ -4,6 +4,15 @@
 (function () {
   'use strict';
 
+  /*
+    FFWinks interaction layer.
+
+    This snippet coordinates the custom header islands, fullscreen wishlist,
+    fullscreen cart, wishlist persistence, cart badges, and mobile menu state.
+    It intentionally exposes a few window.ffwinks* helpers because product
+    cards and product-detail blocks call into this shared state.
+  */
+
   var header      = document.getElementById('header-component');
   var overlay     = document.getElementById('ffwinks-global-overlay');
   var searchBar   = document.getElementById('ffwinks-search-bar');
@@ -13,9 +22,8 @@
   var wishlistOverlay = document.getElementById('ffwinks-wishlist-overlay');
   var cartOverlay     = document.getElementById('ffwinks-cart-overlay');
 
-  // ==========================================
-  // FIXED STAR SCROLL LOGIC
-  // ==========================================
+  // Positions the floating soul action inside whichever cart/wishlist list is
+  // currently active. The exact pixel constants below are visual tuning values.
   function ffwinksUpdateStar() {
     var openOverlay = document.querySelector('.ffwinks-fullscreen.ffwinks-fullscreen--open');
     var isOverlay = !!openOverlay;
@@ -938,6 +946,8 @@
     return cartFetchPromise;
   }
 
+  // Shared cart API for other custom snippets. It de-duplicates /cart.js reads
+  // and keeps a short-lived session cache for badges and overlay rendering.
   window.ffwinksCartApi = {
     readCache: readCartCache,
     writeCache: writeCartCache,
@@ -1257,6 +1267,8 @@
   window.addEventListener('pageshow', function () { scheduleSparkleSync(); });
   document.addEventListener('DOMContentLoaded', function () { scheduleSparkleSync(); });
 
+  // Patch fetch once so cart badges and open cart overlays stay current when
+  // another component mutates /cart/add, /cart/change, /cart/update, or clear.
   (function interceptCartFetches() {
     if (!window.fetch) return;
     if (window.__ffwinksFetchPatched) return;
@@ -1300,6 +1312,8 @@
   })();
 
 
+  // Header-level event delegation. This keeps nav search, wishlist, and cart
+  // triggers in one place so overlapping overlays close in a predictable order.
   document.addEventListener('click', function (e) {
 
     var searchTriggerNav = e.target.closest(
@@ -1466,6 +1480,8 @@
 
   overlay.addEventListener('click', closeAll);
 
+  // Public helpers used by product cards, product detail blocks, and cart route
+  // shims. Keep these names stable unless all callers are updated together.
   window.ffwinksAddToWishlist = function (item) {
     var wl  = getWishlist();
     var idx = wl.findIndex(function (i) {

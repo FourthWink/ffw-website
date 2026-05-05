@@ -1,3 +1,12 @@
+{% comment %}
+  Fourth Wink cart overlay section.
+
+  This file still includes the standard Custom Liquid wrapper at the top, but
+  the rest of the section is brand-specific cart overlay UI. It owns the legacy
+  #cart-overlay drawer, its floating checkout star, and the click handlers that
+  bridge custom Add to Cart controls into Shopify's cart APIs.
+{% endcomment %}
+
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div
   class="section section--{{ section.settings.section_width }} spacing-style {% if section.settings.color_scheme != blank %}color-{{ section.settings.color_scheme }}{% endif %} {% if section.settings.fixed_bottom %}fixed-bottom-section{% endif %}"
@@ -6,6 +15,10 @@
   {{ section.settings.custom_liquid }}
 </div>
 
+{% comment %}
+  Desktop checkout star for the legacy cart overlay. Its position is adjusted
+  from the script below so it can float near the active cart item.
+{% endcomment %}
 <div class="cart-overlay__floating-wrapper desktop-only" id="cart-checkout-wrapper-desktop">
   <a href="/checkout" class="ffwinks-soul-action-bottom cart-overlay__floating-btn" aria-label="Checkout">
     <div class="ffwinks-img-btn-wrap">
@@ -15,6 +28,10 @@
   </a>
 </div>
 
+{% comment %}
+  Legacy cart overlay markup. The newer FFWinks fullscreen cart also exists in
+  snippets/ffwinks-cart.liquid; keep both systems separate when refactoring.
+{% endcomment %}
 <div id="cart-overlay" class="cart-overlay" aria-hidden="true">
   <div class="cart-overlay__backdrop" id="cart-backdrop"></div>
   
@@ -289,17 +306,20 @@
 <script>
 (function () {
   try {
+    // Cache the overlay nodes once. Most helpers below are defensive because
+    // this section can be rendered on templates where only part of the cart UI
+    // is present.
     var overlay = document.getElementById('cart-overlay');
     var backdrop = document.getElementById('cart-backdrop');
     var desktopFloatingWrapper = document.getElementById('cart-checkout-wrapper-desktop');
     
-    // Desktop Elements
+    // Desktop overlay controls and render targets.
     var closeBtnDesktop = document.getElementById('cart-close-desktop');
     var itemsWrapDesktop = document.getElementById('cart-items-desktop');
     var subtotalDesktop = document.getElementById('cart-subtotal-desktop');
     var taxNoteDesktop = document.querySelector('.cart-overlay__tax-note');
     
-    // Mobile Elements
+    // Mobile overlay controls and render targets.
     var closeBtnMobile = document.getElementById('cart-close-mobile');
     var itemsWrapMobile = document.getElementById('cart-items-mobile');
     var subtotalMobile = document.getElementById('cart-subtotal-mobile');
@@ -307,9 +327,7 @@
     var checkoutWrapMobile = document.getElementById('cart-checkout-wrapper-mobile');
     var closeBtnMobileOverlay = document.getElementById('cart-close-mobile-overlay');
 
-    // ==========================================
-    // DYNAMIC PADDING & STAR POSITION CALCULATOR
-    // ==========================================
+    // Keeps the last rendered cart item scrollable past the fixed checkout UI.
     function updateDynamicPadding() {
       var isMobile = window.innerWidth <= 749;
       var container = isMobile ? document.querySelector('.mobile-scrollable-area') : document.getElementById('cart-items-desktop');
@@ -326,9 +344,7 @@
       document.documentElement.style.setProperty('--cart-items-padding-bottom', padding + 'px');
     }
 
-    // ==========================================
-    // DYNAMIC CART STAR SCROLL LOGIC
-    // ==========================================
+    // Repositions the checkout star so it floats until it meets the last item.
     function ffwinksUpdateCartStar() {
       var isMobile = window.innerWidth <= 749;
 
@@ -422,8 +438,9 @@
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleCartViewportChange);
     }
-    // ==========================================
 
+    // Preorder-only carts use different checkout copy because shipping is not
+    // collected at deposit time.
     function updateCartTaxNote(cart) {
       var isPreorder = cart.items && cart.items.every(function(item) {
         var p = (item && item.properties) || {};
@@ -441,6 +458,8 @@
     if (overlay._cartBound) return;
     overlay._cartBound = true;
 
+    // Keep the native theme cart badge in sync when this custom drawer handles
+    // cart mutations outside Shopify's default cart components.
     function updateCartBubble(totalQty) {
       document.dispatchEvent(new CustomEvent('cart:update', { bubbles: true, detail: { data: { itemCount: totalQty } } }));
       document.querySelectorAll('[ref="cartBubbleCount"]').forEach(function(el) {
@@ -459,6 +478,8 @@
       }
     }
 
+    // Move the overlay to <body> before opening so fixed positioning is not
+    // affected by section wrappers or Shopify view-transition containers.
     function openCart() {
       mountDesktopFloatingWrapper();
       if (overlay.parentNode !== document.body) {
@@ -494,6 +515,8 @@
       }).replace('.00', '');
     }
 
+    // Renders both desktop drawer rows and mobile "soul" rows from /cart.js.
+    // Keep the two HTML strings aligned when changing quantity or variant UI.
     function renderCart(cart) {
       var priceStr = formatMoney(cart.total_price);
       if (subtotalDesktop) subtotalDesktop.textContent = priceStr;
@@ -645,6 +668,9 @@
       });
     }
 
+    // One delegated listener owns cart quantity actions, cart triggers, checkout
+    // cleanup, and the floating Add to Cart button. Splitting this should be a
+    // deliberate refactor because event order matters.
     document.addEventListener('click', function (e) {
       var actionBtn = e.target.closest('.cart-item__qty-btn, .ffwinks-soul-qty__btn, .cart-item__remove-btn-desktop, .ffwinks-soul-remove');
       
@@ -686,6 +712,8 @@
         }
 
         if (!variantId) {
+          // A missing variant means the custom picker has no complete selection.
+          // Nudge the picker instead of submitting an invalid add-to-cart request.
           var picker = document.querySelector('[class*="variant-picker"]');
           if (picker) {
             picker.style.transition = 'opacity 0.15s';

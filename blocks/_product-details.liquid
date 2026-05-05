@@ -66,6 +66,11 @@
 
 <script>
 (function () {
+  /*
+    Keeps the custom PDP header in sync with variant changes. The native theme
+    updates the main product form; this block owns the price text and wishlist
+    sparkle shown beside the custom title/price row.
+  */
   var sectionId  = {{ section.id | json }};
   var sparkleBtn = document.getElementById('ffw-pdp-sparkle-' + sectionId);
   var priceEl    = document.getElementById('ffw-pdp-price-' + sectionId);
@@ -73,25 +78,27 @@
   if (!sparkleBtn || !priceEl) return;
 
   // ── Listen on the theme's own variant events (events.js) ──────────────
-  // 'variant:selected' fires when the user picks a variant (detail.resource = variant)
+  // Prefer theme variant events when available; this fires when a variant is picked.
   document.addEventListener('variant:selected', function (e) {
     var v = e.detail && e.detail.resource;
     if (v) updateSparkle(v);
   });
 
-  // 'variant:update' fires after the page DOM has been updated with new variant HTML
+  // This fires after the page DOM has been updated with new variant HTML.
   document.addEventListener('variant:update', function (e) {
     var v = e.detail && e.detail.resource;
     if (v) updateSparkle(v);
   });
 
   // ── Also watch the hidden [name="id"] input directly as a fallback ─────
+  // Fall back to hidden variant inputs because some AI-generated picker blocks
+  // update form fields without emitting the theme variant events above.
   function bindInputs() {
     document.querySelectorAll('input[name="id"], select[name="id"]').forEach(function (input) {
       if (input.dataset.ffwBound) return;
       input.dataset.ffwBound = '1';
       input.addEventListener('change', function () {
-        // Fetch fresh variant data from Shopify AJAX API
+        // Fetch fresh variant data from Shopify AJAX API.
         var vid = this.value;
         var handle = {{ closest.product.handle | json }};
         fetch('/products/' + handle + '.js')
@@ -107,14 +114,14 @@
     });
   }
 
-  // Run now + after any section re-render
+  // Run now and after Shopify re-renders the section in the theme editor.
   bindInputs();
   document.addEventListener('shopify:section:load', bindInputs);
 
   // ── Initial wishlist state sync ────────────────────────────────────────
   syncWishlistState();
 
-  // Re-sync whenever localStorage changes (e.g. sparkle clicked on another card)
+  // Re-sync when another tab/card changes the wishlist localStorage entry.
   window.addEventListener('storage', function (e) {
     if (e.key === 'ffwinks_wishlist') syncWishlistState();
   });

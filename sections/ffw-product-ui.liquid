@@ -1,5 +1,14 @@
 {%- if template.name == 'product' -%}
 
+{% comment %}
+  Fourth Wink product UI helpers.
+
+  This section renders product-page overlays that sit outside the native Shopify
+  product-information section: preorder messaging, the fixed wishlist sparkle,
+  and the mobile Add to Cart bar. The desktop floating ATC currently comes from
+  templates/product.json and is handled by sections/custom-liquid.liquid.
+{% endcomment %}
+
 {%- liquid
   assign product_tags_downcase = product.tags | join: ',' | downcase
   assign is_preorder = false

@@ -30,6 +30,17 @@
   ╚══════════════════════════════════════════════════════════════════╝
 {% endcomment %}
 
+{% comment %}
+  Fourth Wink header ownership map:
+  - This section owns the native Shopify header layout.
+  - The FFWinks search, account, wishlist, cart, and mobile-menu markup lives
+    in snippets rendered below.
+  - The CSS for those snippets stays in this section because Shopify processes
+    {% stylesheet %} blocks only in section files, not snippets.
+  - Keep global body classes coordinated with snippets/ffwinks-js.liquid:
+    ffwinks-open, ffwinks-body-lock, ffw-filter-open, and cart-overlay-open.
+{% endcomment %}
+
 {% liquid
   assign order = 'logo,menu,localization,search,mobile_search,actions'
 
@@ -413,6 +424,10 @@
 </script>
 
 <div id="ffwinks-global-overlay"></div>
+{% comment %}
+  FFWinks panel snippets are rendered once here so shared JavaScript can
+  coordinate one overlay system for search, account, wishlist, cart, and menu.
+{% endcomment %}
 {% render 'ffwinks-search' %}
 {% render 'ffwinks-account' %}
 {% render 'ffwinks-wishlist' %}
