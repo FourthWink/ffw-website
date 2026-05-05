@@ -14,20 +14,6 @@
       "name": "Product UI",
       "settings": {}
     },
-    "eye_icon": {
-      "type": "custom-liquid",
-      "disabled": true,
-      "custom_css": [],
-      "name": "Eye Icon",
-      "settings": {
-        "custom_liquid": "<div id=\"floating-atc-slot-{{ section.id }}\" class=\"floating-atc-slot\">\n  <div class=\"floating-atc\">\n    <button type=\"button\" class=\"ffwinks-soul-action-bottom floating-atc-btn\">\n      <div class=\"ffwinks-img-btn-wrap\">\n        <img src=\"{{ 'soul.svg' | asset_url }}\" alt=\"Star\" class=\"ffwinks-action-img\">\n        <span class=\"ffwinks-img-label floating-atc-text\">Add to cart</span>\n      </div>\n    </button>\n  </div>\n</div>\n\n<style>\nbutton[name=add],\n.product-form__submit {\n  position: absolute !important;\n  left: -9999px !important;\n  visibility: hidden;\n}\n\n.floating-atc {\n  position: fixed;\n  top: 50vh;\n  left: 50vw;\n  transform: translate(-50%, -50%);\n  z-index: 10002;\n  transition: opacity 0.3s ease, visibility 0.3s;\n}\n\n.ffwinks-action-img {\n  filter: brightness(0);\n  mix-blend-mode: difference;\n}\n\n.ffwinks-img-label {\n  color: #666;\n  transition: color 0.3s ease;\n  font-weight: normal !important;\n}\n\n.floating-atc-text {\n  color: #666;\n  mix-blend-mode: normal;\n  font-weight: bold !important;\n}\n\nbody.cart-overlay-open .floating-atc {\n  opacity: 0;\n  visibility: hidden;\n  pointer-events: none;\n}\n\n.floating-atc-btn:hover .ffwinks-img-label,\n.floating-atc-btn:hover .floating-atc-text {\n  color: #000 !important;\n  font-weight: normal !important;\n}\n\n@media(max-width:900px) {\n  .floating-atc {\n    display: flex;\n    justify-content: center;\n  }\n}\n</style>\n\n<script>\n(function(){\n  function bind() {\n    var btn = document.querySelector('.floating-atc-btn');\n    var main = document.querySelector('button[name=\"add\"]') || document.querySelector('.product-form__submit');\n    var label = document.querySelector('.floating-atc-text'); \n    if (!btn || !main || !label) return;\n    if (btn.dataset.bound === '1') return;\n    btn.dataset.bound = '1';\n    btn.addEventListener('click', function(){\n      main.click();\n      var t = label.textContent;\n      label.textContent = 'Added';\n      setTimeout(function(){ label.textContent = t; }, 1200);\n    });\n  }\n  setInterval(bind, 500);\n})();\n</script>",
-        "fixed_bottom": false,
-        "color_scheme": "",
-        "section_width": "page-width",
-        "padding-block-start": 0,
-        "padding-block-end": 0
-      }
-    },
     "main": {
       "type": "product-information",
       "blocks": {
@@ -284,7 +270,6 @@
   },
   "order": [
     "ffw_product_ui",
-    "eye_icon",
     "main",
     "floating_atc"
   ]
