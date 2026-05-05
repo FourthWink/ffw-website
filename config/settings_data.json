@@ -10,8 +10,8 @@
 {
   "current": {
     "logo": "shopify://shop_images/title.svg",
-    "logo_height": 17,
-    "logo_height_mobile": 17,
+    "logo_height": 62,
+    "logo_height_mobile": 62,
     "favicon": "shopify://shop_images/favicon.svg",
     "type_body_font": "montserrat_n4",
     "type_subheading_font": "montserrat_n4",

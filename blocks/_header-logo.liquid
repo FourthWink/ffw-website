@@ -40,7 +40,10 @@
       style="
         --header-logo-image-height: {{ settings.logo_height }}px;
         --header-logo-image-height-mobile: {{ settings.logo_height_mobile }}px;
-        max-width: 120px !important; height: auto !important;
+        height: {{ settings.logo_height_mobile }}px !important;
+        max-height: {{ settings.logo_height_mobile }}px !important;
+        width: auto !important;
+        max-width: none !important;
       "
       loading="eager"
     >
@@ -58,6 +61,10 @@
         style="
           --header-logo-image-height: {{ settings.logo_height }}px;
           --header-logo-image-height-mobile: {{ settings.logo_height_mobile }}px;
+          height: {{ settings.logo_height_mobile }}px !important;
+          max-height: {{ settings.logo_height_mobile }}px !important;
+          width: auto !important;
+          max-width: none !important;
         "
         loading="eager"
       >
@@ -109,12 +116,12 @@
   .header-logo__image {
     object-fit: contain;
     height: var(--header-logo-image-height-mobile);
-    width: 9px;
-    max-width: 9px; /* Add this to control mobile width */
+    width: auto;
+    max-width: none;
 
     @media screen and (min-width: 750px) {
       height: var(--header-logo-image-height);
-      max-width: 10px; /* Add this to control desktop width */
+      max-width: none;
     }
   }
 
