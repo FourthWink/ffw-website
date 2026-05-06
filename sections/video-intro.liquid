@@ -218,7 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function initializeVideoIntro() {
     if (!shouldShowVideo()) {
-      console.log('Video intro skipped - already shown this session');
       return;
     }
     
@@ -233,13 +232,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (checkConnectionSpeed()) {
-      console.log('Slow connection detected - skipping intro and releasing scroll lock');
       removeIntroWindow();
       return;
     }
     
     const videoLoadTimeout = setTimeout(() => {
-      console.log('Video load timeout reached');
       removeIntroWindow();
     }, settings.loadTimeout);
     
@@ -306,9 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (enterSound && settings.volumeIntro > 0) {
       enterSound.volume = settings.volumeIntro / 100;
-      enterSound.play().catch(e => {
-        console.log('Audio play failed (this is normal on some browsers):', e);
-      });
+      enterSound.play().catch(() => {});
     }
     
     hideSkipButton();
@@ -333,7 +328,6 @@ document.addEventListener('DOMContentLoaded', function() {
   window.resetVideoIntro = function(id) {
     if (id !== sectionId) return;
     sessionStorage.removeItem(storageKey);
-    console.log('Video intro reset - will show on next page load');
   };
 
   preloadVideos();

@@ -320,8 +320,6 @@ document.addEventListener('click', function(event) {
   // ---------------------------------------------------------
   // 3. YOUR CUSTOM LOGIC GOES HERE
   // ---------------------------------------------------------
-  console.log("Checkout intercepted! Running custom logic...");
-  
   // Example: Check if cart total is above a certain amount
   // Example: Run an API call to a 3rd party service
   // Example: Prevent checkout if a specific checkbox isn't checked
