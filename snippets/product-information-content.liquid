@@ -314,6 +314,12 @@
   }
 
   @media screen and (min-width: 990px) {
+    html:has(body main[data-template="product"]),
+    body:has(main[data-template="product"]) {
+      height: 100dvh;
+      overflow: hidden !important;
+    }
+
     body:has(main[data-template="product"]) .product-information.section {
       height: 100dvh;
       max-height: 100dvh;
@@ -350,47 +356,5 @@
       overflow: visible;
       max-height: none;
     }
-
-    body:has(main[data-template="product"]).ffw-pdp-footer-scroll .floating-atc {
-      position: absolute !important;
-      top: 50vh !important;
-      left: 50vw !important;
-    }
   }
 {% endstylesheet %}
-
-<script>
-  (function () {
-    if (!window.matchMedia('(min-width: 990px)').matches) return;
-    if (!document.querySelector('main[data-template="product"]')) return;
-
-    var mediaScroller = document.querySelector('.product-information__media');
-    var productSection = document.querySelector('.product-information.section');
-    if (!mediaScroller || !productSection) return;
-
-    function mediaCanScroll(deltaY) {
-      var maxScroll = mediaScroller.scrollHeight - mediaScroller.clientHeight;
-      if (maxScroll <= 1) return false;
-      if (deltaY > 0) return mediaScroller.scrollTop < maxScroll - 1;
-      if (deltaY < 0) return mediaScroller.scrollTop > 1 && window.scrollY <= 1;
-      return false;
-    }
-
-    function updateFooterState() {
-      document.body.classList.toggle('ffw-pdp-footer-scroll', window.scrollY > 1);
-    }
-
-    window.addEventListener('wheel', function (event) {
-      if (!window.matchMedia('(min-width: 990px)').matches) return;
-      if (event.ctrlKey || event.metaKey) return;
-      if (!mediaCanScroll(event.deltaY)) return;
-
-      event.preventDefault();
-      mediaScroller.scrollTop += event.deltaY;
-    }, { passive: false });
-
-    window.addEventListener('scroll', updateFooterState, { passive: true });
-    mediaScroller.addEventListener('scroll', updateFooterState, { passive: true });
-    updateFooterState();
-  })();
-</script>
