@@ -307,19 +307,40 @@
   body:has(#header-group #header-component[data-sticky-state='active']) .product-details.sticky-content--desktop {
     --sticky-header-offset: var(--header-height);
   }
-  /* Keep the product details column fixed while the media column scrolls */
+  /* Desktop PDP split: the media column scrolls while details stay still. */
   .product-information.section {
     padding-top: 0 !important;
     margin-top: 0 !important;
   }
 
   @media screen and (min-width: 990px) {
+    html:has(body main[data-template="product"]),
+    body:has(main[data-template="product"]) {
+      height: 100dvh;
+      overflow: hidden !important;
+    }
+
+    body:has(main[data-template="product"]) .product-information.section {
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
+    }
+
     .product-information__grid {
+      height: 100%;
       align-items: start;
     }
 
     .product-information__media {
       align-self: start;
+      height: 100dvh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: none;
+    }
+
+    .product-information__media::-webkit-scrollbar {
+      display: none;
     }
 
     .product-details {
@@ -327,6 +348,7 @@
       top: calc(var(--sticky-header-offset, 0px) + 20px);
       align-self: start;
       height: max-content;
+      max-height: 100dvh;
       overflow: visible;
     }
 
