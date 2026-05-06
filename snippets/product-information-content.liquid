@@ -307,7 +307,7 @@
   body:has(#header-group #header-component[data-sticky-state='active']) .product-details.sticky-content--desktop {
     --sticky-header-offset: var(--header-height);
   }
-  /* Desktop PDP: native page scroll is driven by the media column height. */
+  /* Desktop PDP: document scroll follows the media stack, while details stay fixed until the footer phase. */
   .product-information.section {
     padding-top: 0 !important;
     margin-top: 0 !important;
@@ -322,12 +322,25 @@
       align-self: start;
     }
 
-    .product-details {
-      position: sticky;
-      top: var(--sticky-header-offset, 0px);
+    body:has(main[data-template="product"]):not(.ffw-pdp-footer-phase) .product-details {
+      position: fixed !important;
+      top: 0 !important;
+      right: 0;
+      width: 50vw;
+      height: 100dvh;
+      box-sizing: border-box;
       align-self: start;
-      height: max-content;
       overflow: visible;
+      z-index: var(--layer-flat);
+    }
+
+    body.ffw-pdp-footer-phase .product-details {
+      position: absolute !important;
+      top: var(--ffw-pdp-details-lock-y, 0px) !important;
+      right: 0;
+      width: 50vw;
+      box-sizing: border-box;
+      z-index: var(--layer-flat);
     }
 
     .product-details > .group-block {
@@ -335,7 +348,7 @@
       max-height: none;
     }
 
-    body.ffw-pdp-atc-locked .floating-atc {
+    body.ffw-pdp-footer-phase .floating-atc {
       position: absolute !important;
       top: var(--ffw-pdp-atc-lock-y, 50vh) !important;
       left: 50vw !important;
@@ -345,46 +358,57 @@
 
 <script>
   (function () {
-    function initProductAtcLock() {
+    function initProductScrollPhase() {
       var mq = window.matchMedia('(min-width: 990px)');
       var main = document.querySelector('main[data-template="product"]');
       var productSection = document.querySelector('.product-information.section');
       var mediaColumn = document.querySelector('.product-information__media');
+      var details = document.querySelector('.product-details');
       var atc = document.querySelector('.floating-atc');
 
-      if (!main || !productSection || !mediaColumn || !atc) return;
+      if (!main || !productSection || !mediaColumn || !details || !atc) return;
 
       function getLockScrollY() {
-        return Math.max(0, productSection.offsetTop + mediaColumn.scrollHeight - window.innerHeight);
+        var mediaBottom = mediaColumn.getBoundingClientRect().bottom + window.scrollY;
+        return Math.max(productSection.offsetTop, mediaBottom - window.innerHeight);
       }
 
-      function updateAtcLock() {
+      function getDocumentTop(element) {
+        return element.getBoundingClientRect().top + window.scrollY;
+      }
+
+      function updateProductScrollPhase() {
         if (!mq.matches) {
-          document.body.classList.remove('ffw-pdp-atc-locked');
+          document.body.classList.remove('ffw-pdp-footer-phase');
+          document.body.style.removeProperty('--ffw-pdp-details-lock-y');
           document.body.style.removeProperty('--ffw-pdp-atc-lock-y');
           return;
         }
 
         var lockScrollY = getLockScrollY();
         if (window.scrollY >= lockScrollY - 1) {
-          document.body.style.setProperty('--ffw-pdp-atc-lock-y', (lockScrollY + window.innerHeight / 2) + 'px');
-          document.body.classList.add('ffw-pdp-atc-locked');
+          var atcContainer = atc.closest('.section') || atc.offsetParent || document.body;
+          document.body.style.setProperty('--ffw-pdp-details-lock-y', (lockScrollY - productSection.offsetTop) + 'px');
+          document.body.style.setProperty('--ffw-pdp-atc-lock-y', (lockScrollY + window.innerHeight / 2 - getDocumentTop(atcContainer)) + 'px');
+          document.body.classList.add('ffw-pdp-footer-phase');
         } else {
-          document.body.classList.remove('ffw-pdp-atc-locked');
+          document.body.classList.remove('ffw-pdp-footer-phase');
+          document.body.style.removeProperty('--ffw-pdp-details-lock-y');
           document.body.style.removeProperty('--ffw-pdp-atc-lock-y');
         }
       }
 
-      window.addEventListener('scroll', updateAtcLock, { passive: true });
-      window.addEventListener('resize', updateAtcLock);
-      if (mq.addEventListener) mq.addEventListener('change', updateAtcLock);
-      updateAtcLock();
+      window.addEventListener('scroll', updateProductScrollPhase, { passive: true });
+      window.addEventListener('resize', updateProductScrollPhase);
+      window.addEventListener('load', updateProductScrollPhase);
+      if (mq.addEventListener) mq.addEventListener('change', updateProductScrollPhase);
+      updateProductScrollPhase();
     }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initProductAtcLock);
+      document.addEventListener('DOMContentLoaded', initProductScrollPhase);
     } else {
-      initProductAtcLock();
+      initProductScrollPhase();
     }
   })();
 </script>
