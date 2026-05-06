@@ -322,7 +322,7 @@
       align-self: start;
     }
 
-    body:has(main[data-template="product"]):not(.ffw-pdp-footer-phase) .product-details {
+    body:not(.ffw-pdp-footer-phase) .product-information.section .product-details {
       position: fixed !important;
       top: 0 !important;
       right: 0;
@@ -360,12 +360,11 @@
   (function () {
     function initProductScrollPhase() {
       var mq = window.matchMedia('(min-width: 990px)');
-      var main = document.querySelector('main[data-template="product"]');
       var productSection = document.querySelector('.product-information.section');
       var mediaColumn = document.querySelector('.product-information__media');
       var details = document.querySelector('.product-details');
 
-      if (!main || !productSection || !mediaColumn || !details) return;
+      if (!productSection || !mediaColumn || !details) return;
 
       function getFloatingAtc() {
         return document.getElementById('ffwinks-floating-atc') || document.querySelector('.floating-atc');
@@ -417,7 +416,7 @@
         updateProductScrollPhase();
       }
 
-      window.addEventListener('wheel', forwardFixedLayerWheel, { passive: false });
+      window.addEventListener('wheel', forwardFixedLayerWheel, { capture: true, passive: false });
       window.addEventListener('scroll', updateProductScrollPhase, { passive: true });
       window.addEventListener('resize', updateProductScrollPhase);
       window.addEventListener('load', updateProductScrollPhase);
