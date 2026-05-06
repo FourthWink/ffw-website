@@ -329,7 +329,7 @@
       align-self: start;
       height: 100dvh;
       overflow-y: auto;
-      overscroll-behavior: contain;
+      overscroll-behavior: auto;
       scrollbar-width: none;
     }
 
@@ -351,9 +351,9 @@
       max-height: none;
     }
 
-    body:has(main[data-template="product"]).ffw-pdp-footer-scroll .floating-atc {
+    body.ffw-pdp-footer-scroll .floating-atc {
       position: absolute !important;
-      top: 50vh !important;
+      top: var(--ffw-pdp-atc-lock-top, 50vh) !important;
       left: 50vw !important;
     }
   }
@@ -368,6 +368,23 @@
     var productSection = document.querySelector('.product-information.section');
     if (!mediaScroller || !productSection) return;
 
+    function getMaxMediaScroll() {
+      return Math.max(0, mediaScroller.scrollHeight - mediaScroller.clientHeight);
+    }
+
+    function mediaAtBottom() {
+      return mediaScroller.scrollTop >= getMaxMediaScroll() - 1;
+    }
+
+    function mediaAtTop() {
+      return mediaScroller.scrollTop <= 1;
+    }
+
+    function lockAtcToCurrentSpot() {
+      document.body.style.setProperty('--ffw-pdp-atc-lock-top', (window.scrollY + window.innerHeight / 2) + 'px');
+      document.body.classList.add('ffw-pdp-footer-scroll');
+    }
+
     function mediaCanScroll(deltaY) {
       var maxScroll = mediaScroller.scrollHeight - mediaScroller.clientHeight;
       if (maxScroll <= 1) return false;
@@ -377,16 +394,44 @@
     }
 
     function updateFooterState() {
-      document.body.classList.toggle('ffw-pdp-footer-scroll', window.scrollY > 1);
+      if (window.scrollY > 1 || mediaAtBottom()) {
+        if (!document.body.classList.contains('ffw-pdp-footer-scroll')) lockAtcToCurrentSpot();
+      } else {
+        document.body.classList.remove('ffw-pdp-footer-scroll');
+        document.body.style.removeProperty('--ffw-pdp-atc-lock-top');
+      }
     }
 
     window.addEventListener('wheel', function (event) {
       if (!window.matchMedia('(min-width: 990px)').matches) return;
       if (event.ctrlKey || event.metaKey) return;
-      if (!mediaCanScroll(event.deltaY)) return;
 
-      event.preventDefault();
-      mediaScroller.scrollTop += event.deltaY;
+      if (event.deltaY > 0 && mediaCanScroll(event.deltaY)) {
+        event.preventDefault();
+        mediaScroller.scrollTop += event.deltaY;
+        updateFooterState();
+        return;
+      }
+
+      if (event.deltaY > 0 && mediaAtBottom()) {
+        event.preventDefault();
+        lockAtcToCurrentSpot();
+        window.scrollBy(0, event.deltaY);
+        return;
+      }
+
+      if (event.deltaY < 0 && window.scrollY > 1) {
+        event.preventDefault();
+        window.scrollBy(0, event.deltaY);
+        updateFooterState();
+        return;
+      }
+
+      if (event.deltaY < 0 && !mediaAtTop()) {
+        event.preventDefault();
+        mediaScroller.scrollTop += event.deltaY;
+        updateFooterState();
+      }
     }, { passive: false });
 
     window.addEventListener('scroll', updateFooterState, { passive: true });
