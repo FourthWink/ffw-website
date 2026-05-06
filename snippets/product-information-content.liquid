@@ -398,6 +398,16 @@
         }
       }
 
+      function forwardFixedLayerWheel(event) {
+        if (!mq.matches || event.ctrlKey || event.metaKey) return;
+        if (!event.target.closest('.product-details, .floating-atc, .floating-atc-slot')) return;
+
+        event.preventDefault();
+        window.scrollBy(0, event.deltaY);
+        updateProductScrollPhase();
+      }
+
+      window.addEventListener('wheel', forwardFixedLayerWheel, { passive: false });
       window.addEventListener('scroll', updateProductScrollPhase, { passive: true });
       window.addEventListener('resize', updateProductScrollPhase);
       window.addEventListener('load', updateProductScrollPhase);
