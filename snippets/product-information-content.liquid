@@ -364,9 +364,12 @@
       var productSection = document.querySelector('.product-information.section');
       var mediaColumn = document.querySelector('.product-information__media');
       var details = document.querySelector('.product-details');
-      var atc = document.querySelector('.floating-atc');
 
-      if (!main || !productSection || !mediaColumn || !details || !atc) return;
+      if (!main || !productSection || !mediaColumn || !details) return;
+
+      function getFloatingAtc() {
+        return document.getElementById('ffwinks-floating-atc') || document.querySelector('.floating-atc');
+      }
 
       function getLockScrollY() {
         var mediaBottom = mediaColumn.getBoundingClientRect().bottom + window.scrollY;
@@ -387,9 +390,12 @@
 
         var lockScrollY = getLockScrollY();
         if (window.scrollY >= lockScrollY - 1) {
-          var atcContainer = atc.closest('.section') || atc.offsetParent || document.body;
+          var atc = getFloatingAtc();
           document.body.style.setProperty('--ffw-pdp-details-lock-y', (lockScrollY - productSection.offsetTop) + 'px');
-          document.body.style.setProperty('--ffw-pdp-atc-lock-y', (lockScrollY + window.innerHeight / 2 - getDocumentTop(atcContainer)) + 'px');
+          if (atc) {
+            var atcContainer = atc.closest('.section') || atc.offsetParent || document.body;
+            document.body.style.setProperty('--ffw-pdp-atc-lock-y', (lockScrollY + window.innerHeight / 2 - getDocumentTop(atcContainer)) + 'px');
+          }
           document.body.classList.add('ffw-pdp-footer-phase');
         } else {
           document.body.classList.remove('ffw-pdp-footer-phase');
@@ -400,7 +406,11 @@
 
       function forwardFixedLayerWheel(event) {
         if (!mq.matches || event.ctrlKey || event.metaKey) return;
-        if (!event.target.closest('.product-details, .floating-atc, .floating-atc-slot')) return;
+
+        var target = event.target;
+        var isFixedLayer = target && target.closest && target.closest('.product-details, .floating-atc, .floating-atc-slot');
+        var isRightHalf = event.clientX >= window.innerWidth / 2;
+        if (!isFixedLayer && !isRightHalf) return;
 
         event.preventDefault();
         window.scrollBy(0, event.deltaY);
@@ -413,6 +423,7 @@
       window.addEventListener('load', updateProductScrollPhase);
       if (mq.addEventListener) mq.addEventListener('change', updateProductScrollPhase);
       updateProductScrollPhase();
+      setTimeout(updateProductScrollPhase, 250);
     }
 
     if (document.readyState === 'loading') {
