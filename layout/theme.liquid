@@ -479,6 +479,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         if (getCookie('intro_seen')) {
           if (overlay) overlay.style.display = 'none';
         } else if (eye) {
+          if (overlay) overlay.style.display = 'flex';
           // =========================================================
           // INTRO OVERLAY REQUIRES CLICK ON THE EYE TO ENTER
           // =========================================================
