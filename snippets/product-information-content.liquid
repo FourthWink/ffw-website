@@ -370,13 +370,34 @@
         return document.getElementById('ffwinks-floating-atc') || document.querySelector('.floating-atc');
       }
 
+      function getScrollElement() {
+        var root = document.scrollingElement || document.documentElement;
+        if (root && root.scrollHeight > root.clientHeight + 1) return root;
+        if (document.body && document.body.scrollHeight > document.body.clientHeight + 1) return document.body;
+        return root;
+      }
+
+      function getScrollY() {
+        var scrollElement = getScrollElement();
+        return scrollElement ? scrollElement.scrollTop : window.scrollY;
+      }
+
+      function scrollPageBy(deltaY) {
+        var scrollElement = getScrollElement();
+        if (scrollElement) {
+          scrollElement.scrollTop += deltaY;
+        } else {
+          window.scrollBy(0, deltaY);
+        }
+      }
+
       function getLockScrollY() {
-        var mediaBottom = mediaColumn.getBoundingClientRect().bottom + window.scrollY;
-        return Math.max(productSection.offsetTop, mediaBottom - window.innerHeight);
+        var mediaBottom = mediaColumn.getBoundingClientRect().bottom + getScrollY();
+        return Math.max(getDocumentTop(productSection), mediaBottom - window.innerHeight);
       }
 
       function getDocumentTop(element) {
-        return element.getBoundingClientRect().top + window.scrollY;
+        return element.getBoundingClientRect().top + getScrollY();
       }
 
       function updateProductScrollPhase() {
@@ -388,9 +409,9 @@
         }
 
         var lockScrollY = getLockScrollY();
-        if (window.scrollY >= lockScrollY - 1) {
+        if (getScrollY() >= lockScrollY - 1) {
           var atc = getFloatingAtc();
-          document.body.style.setProperty('--ffw-pdp-details-lock-y', (lockScrollY - productSection.offsetTop) + 'px');
+          document.body.style.setProperty('--ffw-pdp-details-lock-y', (lockScrollY - getDocumentTop(productSection)) + 'px');
           if (atc) {
             var atcContainer = atc.closest('.section') || atc.offsetParent || document.body;
             document.body.style.setProperty('--ffw-pdp-atc-lock-y', (lockScrollY + window.innerHeight / 2 - getDocumentTop(atcContainer)) + 'px');
@@ -412,12 +433,14 @@
         if (!isFixedLayer && !isRightHalf) return;
 
         event.preventDefault();
-        window.scrollBy(0, event.deltaY);
+        scrollPageBy(event.deltaY);
         updateProductScrollPhase();
       }
 
       window.addEventListener('wheel', forwardFixedLayerWheel, { capture: true, passive: false });
       window.addEventListener('scroll', updateProductScrollPhase, { passive: true });
+      document.documentElement.addEventListener('scroll', updateProductScrollPhase, { passive: true });
+      document.body.addEventListener('scroll', updateProductScrollPhase, { passive: true });
       window.addEventListener('resize', updateProductScrollPhase);
       window.addEventListener('load', updateProductScrollPhase);
       if (mq.addEventListener) mq.addEventListener('change', updateProductScrollPhase);
