@@ -307,7 +307,7 @@
   body:has(#header-group #header-component[data-sticky-state='active']) .product-details.sticky-content--desktop {
     --sticky-header-offset: var(--header-height);
   }
-  /* Keep the product details column fixed while the media column scrolls */
+  /* Desktop PDP: native page scroll is driven by the media column height. */
   .product-information.section {
     padding-top: 0 !important;
     margin-top: 0 !important;
@@ -324,7 +324,7 @@
 
     .product-details {
       position: sticky;
-      top: calc(var(--sticky-header-offset, 0px) + 20px);
+      top: var(--sticky-header-offset, 0px);
       align-self: start;
       height: max-content;
       overflow: visible;
@@ -334,5 +334,57 @@
       overflow: visible;
       max-height: none;
     }
+
+    body.ffw-pdp-atc-locked .floating-atc {
+      position: absolute !important;
+      top: var(--ffw-pdp-atc-lock-y, 50vh) !important;
+      left: 50vw !important;
+    }
   }
 {% endstylesheet %}
+
+<script>
+  (function () {
+    function initProductAtcLock() {
+      var mq = window.matchMedia('(min-width: 990px)');
+      var main = document.querySelector('main[data-template="product"]');
+      var productSection = document.querySelector('.product-information.section');
+      var mediaColumn = document.querySelector('.product-information__media');
+      var atc = document.querySelector('.floating-atc');
+
+      if (!main || !productSection || !mediaColumn || !atc) return;
+
+      function getLockScrollY() {
+        return Math.max(0, productSection.offsetTop + mediaColumn.scrollHeight - window.innerHeight);
+      }
+
+      function updateAtcLock() {
+        if (!mq.matches) {
+          document.body.classList.remove('ffw-pdp-atc-locked');
+          document.body.style.removeProperty('--ffw-pdp-atc-lock-y');
+          return;
+        }
+
+        var lockScrollY = getLockScrollY();
+        if (window.scrollY >= lockScrollY - 1) {
+          document.body.style.setProperty('--ffw-pdp-atc-lock-y', (lockScrollY + window.innerHeight / 2) + 'px');
+          document.body.classList.add('ffw-pdp-atc-locked');
+        } else {
+          document.body.classList.remove('ffw-pdp-atc-locked');
+          document.body.style.removeProperty('--ffw-pdp-atc-lock-y');
+        }
+      }
+
+      window.addEventListener('scroll', updateAtcLock, { passive: true });
+      window.addEventListener('resize', updateAtcLock);
+      if (mq.addEventListener) mq.addEventListener('change', updateAtcLock);
+      updateAtcLock();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initProductAtcLock);
+    } else {
+      initProductAtcLock();
+    }
+  })();
+</script>
