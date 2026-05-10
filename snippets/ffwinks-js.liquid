@@ -304,6 +304,11 @@
       });
     }
 
+    if (isOverlay && !isCart) {
+      ffwinksCenterStar(star);
+      return;
+    }
+
     var transformValue = 'translate(-50%, -50%)';
 
     if (rows.length === 1) {
