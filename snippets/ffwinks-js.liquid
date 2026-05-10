@@ -655,6 +655,24 @@
     el.classList.add('ffwinks-fullscreen--open');
     el.setAttribute('aria-hidden', 'false');
     document.body.classList.add('ffwinks-body-lock');
+    syncHeaderActionCurrent(el);
+  }
+
+  function setHeaderActionsCurrent(selector, isCurrent) {
+    document.querySelectorAll(selector).forEach(function (action) {
+      action.classList.toggle('is-current', isCurrent);
+    });
+  }
+
+  function syncHeaderActionCurrent(activeOverlay) {
+    setHeaderActionsCurrent(
+      '.action__wishlist, .header-actions__action--wishlist, a[href*="/wishlist"]',
+      activeOverlay === wishlistOverlay
+    );
+    setHeaderActionsCurrent(
+      '.action__cart, .header-actions__action--cart, [data-testid="cart-drawer-trigger"]',
+      activeOverlay === cartOverlay
+    );
   }
 
   function clearHeaderActionFocus(el) {
@@ -674,6 +692,7 @@
     el.classList.remove('ffwinks-fullscreen--open');
     el.setAttribute('aria-hidden', 'true');
     if (wasOpen) clearHeaderActionFocus(el);
+    if (wasOpen) syncHeaderActionCurrent(null);
     if (!wishlistOverlay.classList.contains('ffwinks-fullscreen--open') &&
         !cartOverlay.classList.contains('ffwinks-fullscreen--open') &&
         !isMobileMenuOpen()) {
