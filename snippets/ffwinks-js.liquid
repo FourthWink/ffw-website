@@ -307,6 +307,20 @@
     }
 
     if (isOverlay && !isCart) {
+      if (isMobile && rows.length >= 2) {
+        var wishFirstRow = rows[0].getBoundingClientRect();
+        var wishSecondRow = rows[1].getBoundingClientRect();
+        var wishGapY = (wishFirstRow.bottom + wishSecondRow.top) / 2;
+
+        star.style.setProperty('position', 'fixed', 'important');
+        star.style.setProperty('z-index', STAR_Z_INDEX, 'important');
+        star.style.setProperty('left', '50%', 'important');
+        star.style.setProperty('right', 'auto', 'important');
+        star.style.setProperty('bottom', 'auto', 'important');
+        star.style.setProperty('top', wishGapY + 'px', 'important');
+        star.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
+        return;
+      }
       ffwinksCenterStar(star);
       return;
     }
