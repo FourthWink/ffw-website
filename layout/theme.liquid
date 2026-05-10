@@ -550,6 +550,76 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         init();
       });
 
+      window.addEventListener('DOMContentLoaded', function() {
+        var isHomepage = document.querySelector('main[data-template="index"]');
+        var mobileQuery = window.matchMedia('(max-width: 749px)');
+        if (!isHomepage || !mobileQuery.matches) return;
+
+        var snapLockUntil = 0;
+        var touchStartY = null;
+
+        function getDreamPicksTarget() {
+          var grids = document.querySelectorAll("[class*='ai-picks-grid-container']");
+          for (var i = 0; i < grids.length; i++) {
+            var rect = grids[i].getBoundingClientRect();
+            if (rect.height > 50) {
+              return Math.max(0, window.scrollY + rect.top + (rect.height / 2) - (window.innerHeight / 2));
+            }
+          }
+          return null;
+        }
+
+        function snapToDreamPicks() {
+          var target = getDreamPicksTarget();
+          if (target === null) return;
+          snapLockUntil = Date.now() + 700;
+          window.scrollTo({ top: target, behavior: 'smooth' });
+        }
+
+        function shouldSnapDown() {
+          var target = getDreamPicksTarget();
+          return target !== null && window.scrollY < target - 4;
+        }
+
+        function hasBlockingOverlay() {
+          return document.body.classList.contains('ffwinks-open') ||
+            document.body.classList.contains('ffwinks-body-lock') ||
+            document.querySelector('.ffwinks-fullscreen.ffwinks-fullscreen--open');
+        }
+
+        window.addEventListener('wheel', function(event) {
+          if (hasBlockingOverlay()) return;
+          if (event.deltaY <= 0) return;
+          if (Date.now() < snapLockUntil) {
+            event.preventDefault();
+            return;
+          }
+          if (shouldSnapDown()) {
+            event.preventDefault();
+            snapToDreamPicks();
+          }
+        }, { passive: false });
+
+        window.addEventListener('touchstart', function(event) {
+          touchStartY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', function(event) {
+          if (hasBlockingOverlay()) return;
+          if (touchStartY === null || !event.touches || !event.touches[0]) return;
+          var isScrollingDown = touchStartY - event.touches[0].clientY > 8;
+          if (!isScrollingDown) return;
+          if (Date.now() < snapLockUntil) {
+            event.preventDefault();
+            return;
+          }
+          if (shouldSnapDown()) {
+            event.preventDefault();
+            snapToDreamPicks();
+          }
+        }, { passive: false });
+      });
+
       function clearStaleScrollLocks() {
         var searchBar      = document.getElementById('ffwinks-search-bar');
         var accountBar     = document.getElementById('ffwinks-account-bar');
