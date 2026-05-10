@@ -272,14 +272,16 @@
     var footer = contextNode.querySelector('.ffwinks-soul-subtotal-wrapper');
     if (!isOverlay && footer && footer.closest('.ffwinks-fullscreen')) footer = null;
     var footerHeight = footer ? footer.getBoundingClientRect().height : 0;
-    
-    var requiredDesktopGap = Math.max(80, window.innerHeight - baseFloatY);
-    var bottomGap = isMobile ? (footerHeight + 90) : (footerHeight + requiredDesktopGap);
-    if (!footer) bottomGap = isMobile ? 120 : requiredDesktopGap + 40; 
-    
-    if (activeList.dataset.bgap !== String(bottomGap)) {
-      activeList.style.setProperty('padding-bottom', bottomGap + 'px', 'important');
-      activeList.dataset.bgap = String(bottomGap);
+
+    if (!isOverlay || isCart) {
+      var requiredDesktopGap = Math.max(80, window.innerHeight - baseFloatY);
+      var bottomGap = isMobile ? (footerHeight + 90) : (footerHeight + requiredDesktopGap);
+      if (!footer) bottomGap = isMobile ? 120 : requiredDesktopGap + 40;
+
+      if (activeList.dataset.bgap !== String(bottomGap)) {
+        activeList.style.setProperty('padding-bottom', bottomGap + 'px', 'important');
+        activeList.dataset.bgap = String(bottomGap);
+      }
     }
 
     if (!isMobile) {
