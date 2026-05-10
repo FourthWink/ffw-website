@@ -46,7 +46,7 @@
     </a>
   {% comment %} WISHLIST - Third position {% endcomment %}
   <a href="/pages/wishlist"
-    class="header-actions__action action__wishlist"
+    class="header-actions__action action__wishlist{% if request.path contains '/pages/wishlist' %} is-current{% endif %}"
     aria-label="Wishlist"
   >
     <span class="svg-wrapper" aria-hidden="true">
@@ -170,7 +170,7 @@
     </cart-drawer-component>
   {% else %}
     <a href="{{ routes.cart_url }}"
-      class="header-actions__action action__cart"
+      class="header-actions__action action__cart{% if request.path == routes.cart_url %} is-current{% endif %}"
       aria-label="{{ 'accessibility.cart' | t }}"
       aria-describedby="cart-bubble-text"
     >

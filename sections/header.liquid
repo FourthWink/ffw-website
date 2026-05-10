@@ -613,18 +613,11 @@ header-component .header__menu-item:hover {
   stroke-width: 0 !important;
 }
 
-{% if request.page_type == 'page' and page.handle == 'wishlist' %}
-  .action__wishlist svg {
-    stroke-width: 0.4px !important;
-  }
-{% endif %}
-
-{% if request.page_type == 'cart' or template.name == 'cart' %}
-  .action__cart svg,
-  .header-actions__action:has(.header-actions__cart-icon) svg {
-    stroke-width: 0.4px !important;
-  }
-{% endif %}
+.action__wishlist.is-current svg,
+.action__cart.is-current svg,
+.header-actions__action.is-current:has(.header-actions__cart-icon) svg {
+  stroke-width: 0.4px !important;
+}
 
 
 /* Matched the account icon to the rest of the header icons */
