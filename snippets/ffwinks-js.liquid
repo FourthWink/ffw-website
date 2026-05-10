@@ -232,6 +232,11 @@
       openOverlay.style.overflowY = (rows.length <= 2) ? 'hidden' : '';
     }
 
+    if (isOverlay && !isCart) {
+      activeList.style.removeProperty('padding-bottom');
+      delete activeList.dataset.bgap;
+    }
+
     if (rows.length === 0) {
       if (emptyStar) emptyStar.style.setProperty('display', 'flex', 'important');
       star.style.display = 'none';
