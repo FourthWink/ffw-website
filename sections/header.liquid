@@ -1229,6 +1229,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-top: var(--header-overlay-offset, 60px);
+  overscroll-behavior: contain;
 }
 .ffwinks-fullscreen::-webkit-scrollbar { display: none; }
 .ffwinks-fullscreen.ffwinks-fullscreen--open {
@@ -2196,6 +2197,8 @@ header-actions { overflow: visible !important; }
   #ffwinks-wishlist-overlay {
     --soul-img-h:                36vh;
     --soul-row-min-h:            var(--soul-img-h);
+    --soul-list-pb:              18svh;
+    overscroll-behavior: contain;
   }
   /* Pushes product text down to clear the wishlist share button */
   .ffwinks-soul-details-box {

@@ -21,6 +21,9 @@
 
   var wishlistOverlay = document.getElementById('ffwinks-wishlist-overlay');
   var cartOverlay     = document.getElementById('ffwinks-cart-overlay');
+  var wishlistSnapAnimationFrame = null;
+  var wishlistSnapLockUntil = 0;
+  var wishlistTouchStartY = null;
 
   // Positions the floating soul action inside whichever cart/wishlist list is
   // currently active. The exact pixel constants below are visual tuning values.
@@ -310,14 +313,19 @@
       if (isMobile && rows.length >= 2) {
         var wishFirstRow = rows[0].getBoundingClientRect();
         var wishSecondRow = rows[1].getBoundingClientRect();
-        var wishGapY = (wishFirstRow.bottom + wishSecondRow.top) / 2;
+        var wishAnchorY = parseFloat(openOverlay.dataset.wishlistSnapAnchorY || '');
+
+        if (isNaN(wishAnchorY)) {
+          wishAnchorY = ((wishFirstRow.bottom + wishSecondRow.top) / 2) + openOverlay.scrollTop;
+          openOverlay.dataset.wishlistSnapAnchorY = String(wishAnchorY);
+        }
 
         star.style.setProperty('position', 'fixed', 'important');
         star.style.setProperty('z-index', STAR_Z_INDEX, 'important');
         star.style.setProperty('left', '50%', 'important');
         star.style.setProperty('right', 'auto', 'important');
         star.style.setProperty('bottom', 'auto', 'important');
-        star.style.setProperty('top', wishGapY + 'px', 'important');
+        star.style.setProperty('top', wishAnchorY + 'px', 'important');
         star.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
         return;
       }
@@ -417,6 +425,142 @@
   if (wishlistOverlay) wishlistOverlay.addEventListener('scroll', onOverlayScroll);
   if (cartOverlay) cartOverlay.addEventListener('scroll', onOverlayScroll);
   window.addEventListener('scroll', onOverlayScroll); 
+
+  function isMobileWishlistOpen() {
+    return wishlistOverlay &&
+      wishlistOverlay.classList.contains('ffwinks-fullscreen--open') &&
+      window.innerWidth <= 549;
+  }
+
+  function getWishlistSnapData() {
+    if (!isMobileWishlistOpen()) return null;
+
+    var rows = Array.from(wishlistOverlay.querySelectorAll('.ffwinks-soul-row'));
+    if (rows.length < 2) return null;
+
+    var firstGapY = (rows[0].getBoundingClientRect().bottom + rows[1].getBoundingClientRect().top) / 2;
+    var anchorY = parseFloat(wishlistOverlay.dataset.wishlistSnapAnchorY || '');
+
+    if (isNaN(anchorY)) {
+      anchorY = firstGapY + wishlistOverlay.scrollTop;
+      wishlistOverlay.dataset.wishlistSnapAnchorY = String(anchorY);
+    }
+
+    var current = wishlistOverlay.scrollTop;
+    var max = Math.max(0, wishlistOverlay.scrollHeight - wishlistOverlay.clientHeight);
+    var targets = [];
+
+    for (var i = 0; i < rows.length - 1; i++) {
+      var currentRect = rows[i].getBoundingClientRect();
+      var nextRect = rows[i + 1].getBoundingClientRect();
+      var gapY = (currentRect.bottom + nextRect.top) / 2;
+      var target = current + gapY - anchorY;
+      target = Math.max(0, Math.min(max, target));
+
+      if (!targets.length || Math.abs(targets[targets.length - 1] - target) > 1) {
+        targets.push(target);
+      }
+    }
+
+    return {
+      current: current,
+      max: max,
+      targets: targets
+    };
+  }
+
+  function scrollWishlistTo(target) {
+    var start = wishlistOverlay.scrollTop;
+    var distance = target - start;
+    var duration = 1100;
+    var startTime = performance.now();
+
+    if (Math.abs(distance) < 1) {
+      wishlistOverlay.scrollTop = target;
+      ffwinksUpdateStar();
+      return;
+    }
+
+    if (wishlistSnapAnimationFrame) cancelAnimationFrame(wishlistSnapAnimationFrame);
+    wishlistSnapLockUntil = Date.now() + 1200;
+
+    function step(now) {
+      var progress = Math.min((now - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      wishlistOverlay.scrollTop = start + (distance * eased);
+      ffwinksUpdateStar();
+
+      if (progress < 1) {
+        wishlistSnapAnimationFrame = requestAnimationFrame(step);
+      } else {
+        wishlistOverlay.scrollTop = target;
+        wishlistSnapAnimationFrame = null;
+        ffwinksUpdateStar();
+      }
+    }
+
+    wishlistSnapAnimationFrame = requestAnimationFrame(step);
+  }
+
+  function snapWishlist(direction) {
+    var data = getWishlistSnapData();
+    if (!data || !data.targets.length) return false;
+
+    var threshold = 4;
+    var target = null;
+
+    if (direction > 0) {
+      for (var i = 0; i < data.targets.length; i++) {
+        if (data.targets[i] > data.current + threshold) {
+          target = data.targets[i];
+          break;
+        }
+      }
+    } else {
+      for (var j = data.targets.length - 1; j >= 0; j--) {
+        if (data.targets[j] < data.current - threshold) {
+          target = data.targets[j];
+          break;
+        }
+      }
+    }
+
+    if (target === null) return true;
+    scrollWishlistTo(target);
+    return true;
+  }
+
+  if (wishlistOverlay) {
+    wishlistOverlay.addEventListener('wheel', function(event) {
+      if (!isMobileWishlistOpen() || event.deltaY === 0) return;
+
+      event.preventDefault();
+      if (Date.now() < wishlistSnapLockUntil) return;
+      snapWishlist(event.deltaY > 0 ? 1 : -1);
+    }, { passive: false });
+
+    wishlistOverlay.addEventListener('touchstart', function(event) {
+      wishlistTouchStartY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
+    }, { passive: true });
+
+    wishlistOverlay.addEventListener('touchmove', function(event) {
+      if (!isMobileWishlistOpen()) return;
+      if (wishlistTouchStartY === null || !event.touches || !event.touches[0]) return;
+
+      var deltaY = wishlistTouchStartY - event.touches[0].clientY;
+      if (Math.abs(deltaY) <= 8) return;
+
+      event.preventDefault();
+      if (Date.now() >= wishlistSnapLockUntil) {
+        snapWishlist(deltaY > 0 ? 1 : -1);
+      }
+      wishlistTouchStartY = event.touches[0].clientY;
+    }, { passive: false });
+
+    wishlistOverlay.addEventListener('touchend', function() {
+      wishlistTouchStartY = null;
+    }, { passive: true });
+  }
   // ==========================================
 
 
@@ -666,6 +810,12 @@
 
   function openFullscreen(el) {
     setOverlayOffset();
+    if (el === wishlistOverlay) {
+      delete el.dataset.wishlistSnapAnchorY;
+      if (wishlistSnapAnimationFrame) cancelAnimationFrame(wishlistSnapAnimationFrame);
+      wishlistSnapAnimationFrame = null;
+      wishlistSnapLockUntil = 0;
+    }
     el.classList.add('ffwinks-fullscreen--open');
     el.setAttribute('aria-hidden', 'false');
     document.body.classList.add('ffwinks-body-lock');
@@ -737,6 +887,7 @@
     var totalEl = document.getElementById('ffwinks-wishlist-subtotal');
 
     listEl.querySelectorAll('.ffwinks-soul-row').forEach(function (el) { el.remove(); });
+    if (wishlistOverlay) delete wishlistOverlay.dataset.wishlistSnapAnchorY;
 
     var addAllWrapper = document.querySelector('.ffwinks-soul-addall-wrapper:not(#ffwinks-wishlist-empty)');
 
