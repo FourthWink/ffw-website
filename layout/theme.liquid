@@ -576,7 +576,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
           var scrollElement = getScrollElement();
           var start = getScrollTop();
           var distance = target - start;
-          var duration = 900;
+          var duration = 1100;
           var startTime = performance.now();
 
           if (snapAnimationFrame) cancelAnimationFrame(snapAnimationFrame);
@@ -617,7 +617,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         function snapToDreamPicks() {
           var target = getDreamPicksTarget();
           if (target === null) return;
-          snapLockUntil = Date.now() + 1000;
+          snapLockUntil = Date.now() + 1200;
           scrollToPosition(target);
         }
 
