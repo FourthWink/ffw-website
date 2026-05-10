@@ -552,8 +552,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
 
       window.addEventListener('DOMContentLoaded', function() {
         var isHomepage = document.querySelector('main[data-template="index"]');
-        var mobileQuery = window.matchMedia('(max-width: 749px)');
-        if (!isHomepage || !mobileQuery.matches) return;
+        if (!isHomepage) return;
 
         var snapLockUntil = 0;
         var snapAnimationFrame = null;
