@@ -556,6 +556,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         if (!isHomepage || !mobileQuery.matches) return;
 
         var snapLockUntil = 0;
+        var snapAnimationFrame = null;
         var touchStartY = null;
 
         function getScrollElement() {
@@ -573,11 +574,33 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
 
         function scrollToPosition(target) {
           var scrollElement = getScrollElement();
-          if (scrollElement === document.body) {
-            document.body.scrollTo({ top: target, behavior: 'smooth' });
-            return;
+          var start = getScrollTop();
+          var distance = target - start;
+          var duration = 900;
+          var startTime = performance.now();
+
+          if (snapAnimationFrame) cancelAnimationFrame(snapAnimationFrame);
+
+          function setScrollTop(value) {
+            if (scrollElement === document.body) {
+              document.body.scrollTop = value;
+            } else {
+              window.scrollTo(0, value);
+            }
           }
-          window.scrollTo({ top: target, behavior: 'smooth' });
+
+          function step(now) {
+            var progress = Math.min((now - startTime) / duration, 1);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            setScrollTop(start + (distance * eased));
+            if (progress < 1) {
+              snapAnimationFrame = requestAnimationFrame(step);
+            } else {
+              snapAnimationFrame = null;
+            }
+          }
+
+          snapAnimationFrame = requestAnimationFrame(step);
         }
 
         function getDreamPicksTarget() {
@@ -594,7 +617,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         function snapToDreamPicks() {
           var target = getDreamPicksTarget();
           if (target === null) return;
-          snapLockUntil = Date.now() + 700;
+          snapLockUntil = Date.now() + 1000;
           scrollToPosition(target);
         }
 
