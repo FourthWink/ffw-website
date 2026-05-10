@@ -558,12 +558,34 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         var snapLockUntil = 0;
         var touchStartY = null;
 
+        function getScrollElement() {
+          var scrollingElement = document.scrollingElement || document.documentElement;
+          if (scrollingElement && scrollingElement.scrollHeight > scrollingElement.clientHeight + 1) return scrollingElement;
+          if (document.body && document.body.scrollHeight > document.body.clientHeight + 1) return document.body;
+          return scrollingElement;
+        }
+
+        function getScrollTop() {
+          var scrollElement = getScrollElement();
+          if (scrollElement === document.body) return document.body.scrollTop;
+          return window.scrollY || (scrollElement ? scrollElement.scrollTop : 0);
+        }
+
+        function scrollToPosition(target) {
+          var scrollElement = getScrollElement();
+          if (scrollElement === document.body) {
+            document.body.scrollTo({ top: target, behavior: 'smooth' });
+            return;
+          }
+          window.scrollTo({ top: target, behavior: 'smooth' });
+        }
+
         function getDreamPicksTarget() {
           var grids = document.querySelectorAll("[class*='ai-picks-grid-container']");
           for (var i = 0; i < grids.length; i++) {
             var rect = grids[i].getBoundingClientRect();
             if (rect.height > 50) {
-              return Math.max(0, window.scrollY + rect.top + (rect.height / 2) - (window.innerHeight / 2));
+              return Math.max(0, getScrollTop() + rect.top + (rect.height / 2) - (window.innerHeight / 2));
             }
           }
           return null;
@@ -573,12 +595,12 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
           var target = getDreamPicksTarget();
           if (target === null) return;
           snapLockUntil = Date.now() + 700;
-          window.scrollTo({ top: target, behavior: 'smooth' });
+          scrollToPosition(target);
         }
 
         function shouldSnapDown() {
           var target = getDreamPicksTarget();
-          return target !== null && window.scrollY < target - 4;
+          return target !== null && getScrollTop() < target - 4;
         }
 
         function hasBlockingOverlay() {
