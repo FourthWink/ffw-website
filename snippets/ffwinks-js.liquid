@@ -657,9 +657,23 @@
     document.body.classList.add('ffwinks-body-lock');
   }
 
+  function clearHeaderActionFocus(el) {
+    var activeEl = document.activeElement;
+    var selector = el === wishlistOverlay
+      ? '.action__wishlist, .header-actions__action--wishlist, a[href*="/wishlist"]'
+      : '.action__cart, .header-actions__action--cart, [data-testid="cart-drawer-trigger"], a[href="/cart"], a[href*="/cart"]';
+    var activeHeaderAction = activeEl && activeEl.closest ? activeEl.closest(selector) : null;
+
+    if (activeHeaderAction && activeHeaderAction.blur) {
+      activeHeaderAction.blur();
+    }
+  }
+
   function closeFullscreen(el) {
+    var wasOpen = el.classList.contains('ffwinks-fullscreen--open');
     el.classList.remove('ffwinks-fullscreen--open');
     el.setAttribute('aria-hidden', 'true');
+    if (wasOpen) clearHeaderActionFocus(el);
     if (!wishlistOverlay.classList.contains('ffwinks-fullscreen--open') &&
         !cartOverlay.classList.contains('ffwinks-fullscreen--open') &&
         !isMobileMenuOpen()) {
