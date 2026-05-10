@@ -603,6 +603,29 @@ header-component .header__menu-item:hover {
   transition: stroke-width 0.2s ease !important;
 }
 
+/* Wishlist/cart icons stay light except on their own pages. */
+.action__wishlist svg,
+.action__wishlist:is(:hover, :focus, :focus-visible, :active) svg,
+.action__cart svg,
+.action__cart:is(:hover, :focus, :focus-visible, :active) svg,
+.header-actions__action:has(.header-actions__cart-icon) svg,
+.header-actions__action:has(.header-actions__cart-icon):is(:hover, :focus, :focus-visible, :active) svg {
+  stroke-width: 0 !important;
+}
+
+{% if request.page_type == 'page' and page.handle == 'wishlist' %}
+  .action__wishlist svg {
+    stroke-width: 0.4px !important;
+  }
+{% endif %}
+
+{% if request.page_type == 'cart' or template.name == 'cart' %}
+  .action__cart svg,
+  .header-actions__action:has(.header-actions__cart-icon) svg {
+    stroke-width: 0.4px !important;
+  }
+{% endif %}
+
 
 /* Matched the account icon to the rest of the header icons */
 a[href*="account"] svg,
