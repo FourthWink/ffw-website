@@ -681,23 +681,229 @@
     closeMobileMenu();
   }, true);
 
+  var sharedWishlistItems = null;
+
   function getWishlist() {
+    if (sharedWishlistItems) return sharedWishlistItems.slice();
+
     try { return JSON.parse(localStorage.getItem('ffwinks_wishlist') || '[]'); }
     catch (e) { return []; }
   }
 
   function saveWishlist(list) {
+    if (sharedWishlistItems) {
+      sharedWishlistItems = list;
+      return;
+    }
+
     localStorage.setItem('ffwinks_wishlist', JSON.stringify(list));
+  }
+
+  function getShopifyRoot() {
+    return (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
+  }
+
+  function buildProductJsonUrl(handle) {
+    var productUrl = getShopifyRoot() + 'products/' + encodeURIComponent(handle) + '.js';
+
+    try {
+      var url = new URL(productUrl, window.location.origin);
+      var currentParams = new URLSearchParams(window.location.search);
+      ['_ab', '_fd', '_sc', 'key', 'preview_theme_id'].forEach(function (paramName) {
+        if (currentParams.has(paramName)) {
+          url.searchParams.set(paramName, currentParams.get(paramName));
+        }
+      });
+      return url.pathname + url.search;
+    } catch (e) {
+      return productUrl;
+    }
   }
 
   function shouldOpenWishlistFromUrl() {
     if (window.location.hash === '#wishlist') return true;
 
     try {
-      return new URLSearchParams(window.location.search).has('wishlist_ids');
+      var params = new URLSearchParams(window.location.search);
+      return params.has('wishlist') || params.has('wishlist_ids');
     } catch (e) {
       return false;
     }
+  }
+
+  function getWishlistItemHandle(item) {
+    var itemUrl = item && (item.url || item.product_url);
+    if (!itemUrl) return '';
+
+    try {
+      var parsedUrl = new URL(itemUrl, window.location.origin);
+      var match = parsedUrl.pathname.match(/\/products\/([^\/?#]+)/);
+      return match ? decodeURIComponent(match[1]) : '';
+    } catch (e) {
+      var fallbackMatch = String(itemUrl).match(/\/products\/([^\/?#]+)/);
+      return fallbackMatch ? decodeURIComponent(fallbackMatch[1]) : '';
+    }
+  }
+
+  function buildWishlistShareUrl() {
+    var url;
+
+    try {
+      url = new URL(window.location.href);
+    } catch (e) {
+      url = new URL(window.location.origin + '/');
+    }
+
+    url.pathname = getShopifyRoot();
+    url.searchParams.delete('wishlist');
+    url.searchParams.delete('wishlist_ids');
+    url.searchParams.delete('variant');
+
+    var entries = getWishlist().map(function (item) {
+      var handle = getWishlistItemHandle(item);
+      var variantId = item.variant_id || '';
+      if (!handle || !variantId) return '';
+      return handle + ':' + variantId;
+    }).filter(Boolean);
+
+    if (entries.length) {
+      url.searchParams.set('wishlist', entries.join(','));
+    }
+    url.hash = 'wishlist';
+
+    return url.toString();
+  }
+
+  function getSharedWishlistEntriesFromUrl() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var wishlistParam = params.get('wishlist');
+      if (wishlistParam) {
+        return wishlistParam.split(',').map(function (entry) {
+          var parts = entry.split(':');
+          return {
+            handle: decodeURIComponent(parts[0] || ''),
+            variant_id: decodeURIComponent(parts[1] || '')
+          };
+        }).filter(function (entry) {
+          return entry.handle && entry.variant_id;
+        });
+      }
+
+      var idsParam = params.get('wishlist_ids');
+      if (idsParam) {
+        return idsParam.split(',').map(function (variantId) {
+          return { variant_id: variantId.trim() };
+        }).filter(function (entry) {
+          return entry.variant_id;
+        });
+      }
+    } catch (e) {}
+
+    return [];
+  }
+
+  function normalizeWishlistImageUrl(imageUrl) {
+    if (!imageUrl) return '';
+    return imageUrl.indexOf('//') === 0 ? window.location.protocol + imageUrl : imageUrl;
+  }
+
+  function getWishlistCurrencyLabel() {
+    var activeCurrency = window.Shopify && window.Shopify.currency ? window.Shopify.currency.active : '';
+    return activeCurrency === 'GBP' || !activeCurrency ? '£' : activeCurrency;
+  }
+
+  function formatWishlistSharedPrice(cents) {
+    var amount = Number(cents || 0) / 100;
+    var currency = getWishlistCurrencyLabel();
+    return currency === '£' ? currency + amount.toFixed(amount % 1 ? 2 : 0) : amount.toFixed(2) + ' ' + currency;
+  }
+
+  function getProductOptionName(option) {
+    return typeof option === 'string' ? option : (option && option.name) || '';
+  }
+
+  function getProductOptionIndex(product, pattern) {
+    var options = product.options || [];
+    for (var i = 0; i < options.length; i++) {
+      if (pattern.test(getProductOptionName(options[i]))) return i;
+    }
+    return -1;
+  }
+
+  function getProductOptionValues(product, optionIndex) {
+    if (optionIndex < 0) return [];
+
+    var values = [];
+    (product.variants || []).forEach(function (variant) {
+      var value = variant.options && variant.options[optionIndex];
+      if (value && values.indexOf(value) === -1) values.push(value);
+    });
+    return values;
+  }
+
+  function buildWishlistItemFromProduct(product, entry) {
+    var variants = product.variants || [];
+    var variant = variants.find(function (candidate) {
+      return String(candidate.id) === String(entry.variant_id);
+    }) || variants[0] || {};
+    var price = Number(variant.price || product.price || 0);
+    var sizeIndex = getProductOptionIndex(product, /size/i);
+    var colorIndex = getProductOptionIndex(product, /colou?r/i);
+    var variantOptions = variant.options || [];
+    var variantImage = variant.featured_image && (variant.featured_image.src || variant.featured_image);
+
+    return {
+      variant_id: String(variant.id || entry.variant_id || ''),
+      title: product.title || '',
+      price: price / 100,
+      price_formatted: formatWishlistSharedPrice(price),
+      currency: getWishlistCurrencyLabel(),
+      image: normalizeWishlistImageUrl(variantImage || product.featured_image || (product.images && product.images[0]) || ''),
+      url: product.url || ('/products/' + entry.handle),
+      available_sizes: getProductOptionValues(product, sizeIndex),
+      available_colors: getProductOptionValues(product, colorIndex),
+      selected_size: sizeIndex >= 0 ? (variantOptions[sizeIndex] || '') : 'O/S',
+      selected_color: colorIndex >= 0 ? (variantOptions[colorIndex] || '') : 'Default'
+    };
+  }
+
+  function getWishlistItemFromCurrentPage(variantId) {
+    var sparkles = document.querySelectorAll('[data-ffwinks-sparkle], .product-sparkle-icon, .shop-product-icon, .newin-product-icon');
+    for (var i = 0; i < sparkles.length; i++) {
+      if (String(sparkles[i].dataset.variantId || '') === String(variantId)) {
+        return getProductFromSparkle(sparkles[i]);
+      }
+    }
+    return null;
+  }
+
+  function fetchSharedWishlistItem(entry) {
+    if (!entry.handle) {
+      return Promise.resolve(getWishlistItemFromCurrentPage(entry.variant_id));
+    }
+
+    return fetch(buildProductJsonUrl(entry.handle))
+      .then(function (response) {
+        if (!response.ok) throw new Error('Unable to load shared wishlist product');
+        return response.json();
+      })
+      .then(function (product) {
+        return buildWishlistItemFromProduct(product, entry);
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
+  function loadSharedWishlistFromUrl() {
+    var entries = getSharedWishlistEntriesFromUrl();
+    if (!entries.length) return Promise.resolve(false);
+
+    return Promise.all(entries.map(fetchSharedWishlistItem)).then(function (items) {
+      sharedWishlistItems = items.filter(Boolean);
+      return sharedWishlistItems.length > 0;
+    });
   }
 
   function getProductFromSparkle(sparkleEl) {
@@ -1060,8 +1266,7 @@
   }
 
   document.getElementById('ffwinks-wishlist-share').addEventListener('click', function () {
-    var ids = getWishlist().map(function (i) { return i.variant_id; }).filter(Boolean).join(',');
-    var url = window.location.origin + '/?wishlist_ids=' + encodeURIComponent(ids) + '#wishlist';
+    var url = buildWishlistShareUrl();
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
       this.textContent = 'Link copied!';
@@ -1898,9 +2103,11 @@
   updateAllSparkleStates();
 
   if (shouldOpenWishlistFromUrl()) {
-    renderWishlistOverlay();
-    openFullscreen(wishlistOverlay);
-    setTimeout(ffwinksUpdateStar, 100);
+    loadSharedWishlistFromUrl().then(function () {
+      renderWishlistOverlay();
+      openFullscreen(wishlistOverlay);
+      setTimeout(ffwinksUpdateStar, 100);
+    });
   }
 
 })();
