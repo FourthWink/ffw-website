@@ -11,6 +11,13 @@
   mount duplicate cart drawers with the same IDs.
 {% endcomment %}
 
+{%- liquid
+  assign is_product_floating_atc_section = false
+  if template.name == 'product' and section.settings.custom_liquid contains 'floating-atc'
+    assign is_product_floating_atc_section = true
+  endif
+-%}
+
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 <div
   class="section section--{{ section.settings.section_width }} spacing-style {% if section.settings.color_scheme != blank %}color-{{ section.settings.color_scheme }}{% endif %} {% if section.settings.fixed_bottom %}fixed-bottom-section{% endif %}"
@@ -19,7 +26,7 @@
   {{ section.settings.custom_liquid }}
 </div>
 
-{% unless template.name == 'product' and section.id contains 'floating_atc' %}
+{% unless is_product_floating_atc_section %}
 {% comment %}
   Desktop checkout star for the legacy cart overlay. Its position is adjusted
   from the script below so it can float near the active cart item.
