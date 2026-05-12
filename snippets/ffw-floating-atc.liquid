@@ -2,9 +2,8 @@
   Fourth Wink product floating Add to Cart.
 
   Rendered from templates/product.json through the custom-liquid section so the
-  legacy cart overlay in sections/custom-liquid.liquid stays mounted. Keep the
-  click behavior coordinated with that section's delegated .floating-atc-btn
-  handler.
+  legacy cart overlay in sections/custom-liquid.liquid stays mounted. This
+  snippet owns markup/styles only; that section owns .floating-atc-btn clicks.
 {% endcomment %}
 
 <div id="floating-atc-slot-{{ section.id }}" class="floating-atc-slot">
@@ -77,24 +76,3 @@
     }
   }
 </style>
-
-<script>
-  (function(){
-    function bind() {
-      var btn = document.querySelector('.floating-atc-btn');
-      var main = document.querySelector('button[name="add"]') || document.querySelector('.product-form__submit');
-      var label = document.querySelector('.floating-atc-text');
-      if (!btn || !main || !label) return;
-      if (btn.dataset.bound === '1') return;
-      btn.dataset.bound = '1';
-      btn.addEventListener('click', function(){
-        main.click();
-        var t = label.textContent;
-        label.textContent = 'Added';
-        setTimeout(function(){ label.textContent = t; }, 1200);
-      });
-    }
-
-    setInterval(bind, 500);
-  })();
-</script>
