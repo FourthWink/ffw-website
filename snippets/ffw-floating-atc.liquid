@@ -1,0 +1,100 @@
+{% comment %}
+  Fourth Wink product floating Add to Cart.
+
+  Rendered from templates/product.json through the custom-liquid section so the
+  legacy cart overlay in sections/custom-liquid.liquid stays mounted. Keep the
+  click behavior coordinated with that section's delegated .floating-atc-btn
+  handler.
+{% endcomment %}
+
+<div id="floating-atc-slot-{{ section.id }}" class="floating-atc-slot">
+  <div class="floating-atc">
+    <button type="button" class="ffwinks-soul-action-bottom floating-atc-btn">
+      <div class="ffwinks-img-btn-wrap">
+        <img src="{{ 'soul.svg' | asset_url }}" alt="Star" class="ffwinks-action-img inverted-star">
+        <span class="ffwinks-img-label floating-atc-text">Add to cart</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<style>
+  button[name=add],
+  .product-form__submit {
+    position: absolute !important;
+    left: -9999px !important;
+    visibility: hidden;
+  }
+
+  .floating-atc {
+    position: fixed;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    z-index: 999999;
+  }
+
+  .floating-atc-btn,
+  .ffwinks-img-btn-wrap {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+  }
+
+  .inverted-star {
+    filter: invert(1);
+    mix-blend-mode: normal;
+  }
+
+  .ffwinks-img-label {
+    color: #666;
+    transition: color 0.3s ease;
+    font-weight: normal !important;
+  }
+
+  .floating-atc-text {
+    color: #666;
+    font-weight: normal !important;
+  }
+
+  body.cart-overlay-open .floating-atc {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .floating-atc-btn:hover .ffwinks-img-label,
+  .floating-atc-btn:hover .floating-atc-text {
+    color: #000 !important;
+    font-weight: normal !important;
+  }
+
+  @media(max-width:900px) {
+    .floating-atc {
+      display: flex;
+      justify-content: center;
+    }
+  }
+</style>
+
+<script>
+  (function(){
+    function bind() {
+      var btn = document.querySelector('.floating-atc-btn');
+      var main = document.querySelector('button[name="add"]') || document.querySelector('.product-form__submit');
+      var label = document.querySelector('.floating-atc-text');
+      if (!btn || !main || !label) return;
+      if (btn.dataset.bound === '1') return;
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', function(){
+        main.click();
+        var t = label.textContent;
+        label.textContent = 'Added';
+        setTimeout(function(){ label.textContent = t; }, 1200);
+      });
+    }
+
+    setInterval(bind, 500);
+  })();
+</script>

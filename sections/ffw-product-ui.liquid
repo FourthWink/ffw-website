@@ -5,8 +5,9 @@
 
   This section renders product-page overlays that sit outside the native Shopify
   product-information section: preorder messaging, the fixed wishlist sparkle,
-  and the mobile Add to Cart bar. The desktop floating ATC currently comes from
-  templates/product.json and is handled by sections/custom-liquid.liquid.
+  and the mobile Add to Cart bar. The desktop floating ATC is rendered by
+  snippets/ffw-floating-atc.liquid through templates/product.json, while
+  sections/custom-liquid.liquid still owns the delegated cart handler.
 {% endcomment %}
 
 {%- liquid
