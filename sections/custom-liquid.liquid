@@ -5,6 +5,10 @@
   the rest of the section is brand-specific cart overlay UI. It owns the legacy
   #cart-overlay drawer, its floating checkout star, and the click handlers that
   bridge custom Add to Cart controls into Shopify's cart APIs.
+
+  The product template also uses this section type only to render the floating
+  ATC snippet. That instance skips the overlay below so product pages do not
+  mount duplicate cart drawers with the same IDs.
 {% endcomment %}
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
@@ -15,6 +19,7 @@
   {{ section.settings.custom_liquid }}
 </div>
 
+{% unless template.name == 'product' and section.id contains 'floating_atc' %}
 {% comment %}
   Desktop checkout star for the legacy cart overlay. Its position is adjusted
   from the script below so it can float near the active cart item.
@@ -846,6 +851,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
+{% endunless %}
 
 {% schema %}
 {

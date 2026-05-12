@@ -1,9 +1,9 @@
 {% comment %}
   Fourth Wink product floating Add to Cart.
 
-  Rendered from templates/product.json through the custom-liquid section so the
-  legacy cart overlay in sections/custom-liquid.liquid stays mounted. This
-  snippet owns markup/styles only; that section owns .floating-atc-btn clicks.
+  Rendered from templates/product.json through the custom-liquid section for
+  theme-editor compatibility. This snippet owns markup/styles only; the global
+  cart overlay section owns .floating-atc-btn clicks.
 {% endcomment %}
 
 <div id="floating-atc-slot-{{ section.id }}" class="floating-atc-slot">
