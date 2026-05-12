@@ -1,13 +1,12 @@
-{% if template.name == 'product' %}
+{% comment %}
+  Legacy product-only Custom Liquid block override.
 
-  {%- liquid
-    assign product_title    = product.title | escape
-    assign product_price    = product.selected_or_first_available_variant.price | divided_by: 100.0
-    assign product_price_fmt = product.selected_or_first_available_variant.price | money
-    assign product_image    = product.featured_media | image_url: width: 300
-    assign product_url      = product.url
-    assign variant_id       = product.selected_or_first_available_variant.id
-  -%}
+  This file is not the current product ATC owner in templates/product.json. The
+  active desktop floating ATC is snippets/ffw-floating-atc.liquid, and
+  sections/custom-liquid.liquid owns the delegated cart/add handler.
+{% endcomment %}
+
+{% if template.name == 'product' %}
 
   {{- '' -}}
 
