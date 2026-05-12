@@ -1,0 +1,173 @@
+{% comment %}
+  Fourth Wink shared wishlist page.
+
+  The page body is rendered from snippets/ffwinks-js.liquid so shared wishlist
+  links and the fullscreen wishlist overlay use the same product-loading logic.
+{% endcomment %}
+
+<section class="ffw-shared-wishlist" id="ffw-shared-wishlist-page" aria-labelledby="ffw-shared-wishlist-title">
+  <div class="ffw-shared-wishlist__inner">
+    <header class="ffw-shared-wishlist__header">
+      <h1 id="ffw-shared-wishlist-title">Wishlist</h1>
+      <p class="ffw-shared-wishlist__meta" id="ffw-shared-wishlist-count" aria-live="polite"></p>
+    </header>
+
+    <div class="ffw-shared-wishlist__status" id="ffw-shared-wishlist-status" role="status">Loading wishlist...</div>
+    <div class="ffw-shared-wishlist__grid" id="ffw-shared-wishlist-list"></div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .ffw-shared-wishlist {
+    min-height: 100svh;
+    padding: calc(var(--header-group-height, 72px) + 42px) 30px 72px;
+    background: #fff;
+    color: #111;
+    font-family: 'Montserrat', Arial, sans-serif;
+  }
+
+  .ffw-shared-wishlist__inner {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+  }
+
+  .ffw-shared-wishlist__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    margin-bottom: 34px;
+  }
+
+  .ffw-shared-wishlist__header h1 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.3;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .ffw-shared-wishlist__meta,
+  .ffw-shared-wishlist__status {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.5;
+    color: #777;
+  }
+
+  .ffw-shared-wishlist__status {
+    padding-top: 20vh;
+    text-align: center;
+  }
+
+  .ffw-shared-wishlist__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 38px 30px;
+  }
+
+  .ffw-shared-wishlist__item {
+    display: grid;
+    grid-template-columns: minmax(160px, 52%) minmax(0, 1fr);
+    gap: 22px;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .ffw-shared-wishlist__image-link {
+    display: block;
+    min-width: 0;
+    text-decoration: none;
+  }
+
+  .ffw-shared-wishlist__image-box {
+    aspect-ratio: 1 / 1.18;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 70px;
+    background: #f4f4f4;
+  }
+
+  .ffw-shared-wishlist__image-box img {
+    display: block;
+    width: 72%;
+    height: 88%;
+    object-fit: contain;
+  }
+
+  .ffw-shared-wishlist__details {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .ffw-shared-wishlist__title,
+  .ffw-shared-wishlist__price,
+  .ffw-shared-wishlist__options,
+  .ffw-shared-wishlist__button {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .ffw-shared-wishlist__title {
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .ffw-shared-wishlist__price,
+  .ffw-shared-wishlist__options {
+    margin: 0;
+    color: #555;
+  }
+
+  .ffw-shared-wishlist__button {
+    width: fit-content;
+    margin-top: 4px;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid currentColor;
+    border-radius: 0;
+    background: transparent;
+    color: #111;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .ffw-shared-wishlist__button:disabled {
+    color: #999;
+    cursor: default;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ffw-shared-wishlist {
+      padding: calc(var(--header-group-height, 60px) + 28px) 20px 54px;
+    }
+
+    .ffw-shared-wishlist__header {
+      margin-bottom: 28px;
+    }
+
+    .ffw-shared-wishlist__grid {
+      grid-template-columns: 1fr;
+      gap: 34px;
+    }
+
+    .ffw-shared-wishlist__item {
+      grid-template-columns: minmax(0, 58%) minmax(112px, 1fr);
+      gap: 16px;
+    }
+
+    .ffw-shared-wishlist__image-box {
+      border-radius: 52px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Shared wishlist",
+  "settings": []
+}
+{% endschema %}
