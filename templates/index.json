@@ -78,20 +78,11 @@
             "title_4": ""
           },
           "blocks": {}
-        },
-        "custom_liquid_zCQiFH": {
-          "type": "custom-liquid",
-          "name": "t:names.custom_liquid",
-          "settings": {
-            "custom_liquid": "<style>\n  @media (max-width: 749px) {\n    [data-block-id=\"sections--20875991613673__17690349093da47b93__ai_gen_block_2aaeb7a_BxnrEL\"] {\n      display: none !important;\n    }\n  }\n</style>"
-          },
-          "blocks": {}
         }
       },
       "block_order": [
         "ai_gen_block_2aaeb7a_hUQGdb",
-        "ai_gen_block_7f81031_iR3GDc",
-        "custom_liquid_zCQiFH"
+        "ai_gen_block_7f81031_iR3GDc"
       ],
       "custom_css": [],
       "name": "Product Grid",
