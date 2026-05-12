@@ -690,6 +690,16 @@
     localStorage.setItem('ffwinks_wishlist', JSON.stringify(list));
   }
 
+  function shouldOpenWishlistFromUrl() {
+    if (window.location.hash === '#wishlist') return true;
+
+    try {
+      return new URLSearchParams(window.location.search).has('wishlist_ids');
+    } catch (e) {
+      return false;
+    }
+  }
+
   function getProductFromSparkle(sparkleEl) {
     var card = sparkleEl.closest('.product-card, .shop-product, .newin-product, [data-product-id], .card, .product-item');
     var rawSizes = (card && card.dataset.availableSizes) ? card.dataset.availableSizes : (sparkleEl.dataset.availableSizes || '');
@@ -1050,8 +1060,8 @@
   }
 
   document.getElementById('ffwinks-wishlist-share').addEventListener('click', function () {
-    var url = window.location.origin + '/pages/wishlist?ids=' +
-      getWishlist().map(function (i) { return i.variant_id; }).filter(Boolean).join(',');
+    var ids = getWishlist().map(function (i) { return i.variant_id; }).filter(Boolean).join(',');
+    var url = window.location.origin + '/?wishlist_ids=' + encodeURIComponent(ids) + '#wishlist';
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
       this.textContent = 'Link copied!';
@@ -1886,6 +1896,12 @@
   });
 
   updateAllSparkleStates();
+
+  if (shouldOpenWishlistFromUrl()) {
+    renderWishlistOverlay();
+    openFullscreen(wishlistOverlay);
+    setTimeout(ffwinksUpdateStar, 100);
+  }
 
 })();
 </script>
