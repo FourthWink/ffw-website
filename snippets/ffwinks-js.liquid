@@ -1312,84 +1312,208 @@
     var listEl = document.getElementById('ffw-shared-wishlist-list');
     var statusEl = document.getElementById('ffw-shared-wishlist-status');
     var countEl = document.getElementById('ffw-shared-wishlist-count');
+    var emptyEl = document.getElementById('ffw-shared-wishlist-empty');
+    var addAllWrapper = document.getElementById('ffw-shared-wishlist-add-all-wrapper');
     var wl = getWishlist();
 
     if (!listEl || !statusEl) return;
 
-    listEl.innerHTML = '';
+    listEl.querySelectorAll('.ffwinks-soul-row').forEach(function (el) { el.remove(); });
     setElementText(countEl, wl.length ? wl.length + (wl.length === 1 ? ' item' : ' items') : '');
 
     if (!wl.length) {
-      statusEl.hidden = false;
+      statusEl.hidden = true;
       statusEl.textContent = 'This wishlist is empty.';
+      if (emptyEl) emptyEl.style.display = 'flex';
+      if (addAllWrapper) addAllWrapper.style.display = 'none';
+      setTimeout(ffwinksUpdateStar, 50);
       return;
     }
 
     statusEl.hidden = true;
+    if (emptyEl) emptyEl.style.display = 'none';
+    if (addAllWrapper) addAllWrapper.style.display = 'flex';
 
-    wl.forEach(function (item) {
-      var itemEl = document.createElement('article');
-      itemEl.className = 'ffw-shared-wishlist__item';
-
-      var imageLink = document.createElement('a');
-      imageLink.className = 'ffw-shared-wishlist__image-link';
-      imageLink.href = item.url || '#';
-
-      var imageBox = document.createElement('div');
-      imageBox.className = 'ffw-shared-wishlist__image-box';
-      if (item.image) {
-        var image = document.createElement('img');
-        image.src = item.image;
-        image.alt = item.title || '';
-        image.loading = 'lazy';
-        imageBox.appendChild(image);
+    wl.forEach(function (item, idx) {
+      if (item.available_sizes && item.available_sizes.length === 1 && !item.selected_size) {
+        item.selected_size = item.available_sizes[0].trim();
+        wl[idx].selected_size = item.selected_size;
       }
-      imageLink.appendChild(imageBox);
-
-      var details = document.createElement('div');
-      details.className = 'ffw-shared-wishlist__details';
-      appendTextEl(details, 'h2', 'ffw-shared-wishlist__title', item.title || 'Wishlist item');
-      appendTextEl(details, 'p', 'ffw-shared-wishlist__price', item.price_formatted || '');
-
-      var optionText = getSharedWishlistOptionText(item);
-      if (optionText) {
-        appendTextEl(details, 'p', 'ffw-shared-wishlist__options', optionText);
+      if (item.available_colors && item.available_colors.length === 1 && !item.selected_color) {
+        item.selected_color = item.available_colors[0].trim();
+        wl[idx].selected_color = item.selected_color;
       }
 
-      var button = document.createElement('button');
-      button.className = 'ffw-shared-wishlist__button';
-      button.type = 'button';
-      button.textContent = 'Add to cart';
-      button.disabled = !item.variant_id;
-      button.addEventListener('click', function () {
-        if (!item.variant_id) return;
+      var sizeHTML = '<div class="ffwinks-text-options-wrap">';
+      if (item.available_sizes && item.available_sizes.length) {
+        item.available_sizes.forEach(function (size) {
+          var val = size.trim();
+          var activeClass = (item.selected_size === val) ? ' is-active' : '';
+          sizeHTML += '<span class="ffwinks-text-option ffwinks-shared-size-text' + activeClass + '" data-idx="' + idx + '" data-val="' + val + '">' + val + '</span>';
+        });
+      } else {
+        var sizeActiveClass = (item.selected_size === 'O/S') ? ' is-active' : '';
+        sizeHTML += '<span class="ffwinks-text-option ffwinks-shared-size-text' + sizeActiveClass + '" data-idx="' + idx + '" data-val="O/S">O/S</span>';
+      }
+      sizeHTML += '</div>';
 
-        button.disabled = true;
-        button.textContent = 'Adding...';
+      var colorHTML = '<div class="ffwinks-text-options-wrap">';
+      if (item.available_colors && item.available_colors.length) {
+        item.available_colors.forEach(function (color) {
+          var val = color.trim();
+          var activeClass = (item.selected_color === val) ? ' is-active' : '';
+          colorHTML += '<span class="ffwinks-text-option ffwinks-shared-color-text' + activeClass + '" data-idx="' + idx + '" data-val="' + val + '">' + val + '</span>';
+        });
+      } else {
+        var colorActiveClass = (item.selected_color === 'Default') ? ' is-active' : '';
+        colorHTML += '<span class="ffwinks-text-option ffwinks-shared-color-text' + colorActiveClass + '" data-idx="' + idx + '" data-val="Default">Default</span>';
+      }
+      colorHTML += '</div>';
+
+      var errorMsg = '<div class="ffwinks-error-msg" id="ffwinks-shared-error-' + idx + '" style="display:none; color: #d9534f; font-size: 9px; grid-column: 1 / -1; margin-top: -5px; margin-bottom: 5px; font-weight: bold;"></div>';
+      var itemUrl = item.url || item.product_url || '#';
+
+      var row = document.createElement('div');
+      row.className = 'ffwinks-soul-row';
+      row.innerHTML =
+        '<button class="ffwinks-soul-remove" data-idx="' + idx + '" aria-label="Remove">&times;</button>' +
+        '<a class="ffwinks-soul-img-box" href="' + itemUrl + '" aria-label="View ' + item.title + '">' +
+          (item.image ? '<img src="' + item.image + '" alt="' + item.title + '" loading="lazy">' : '') +
+        '</a>' +
+        '<div class="ffwinks-soul-details-box">' +
+          '<div class="ffwinks-soul-grid">' +
+            '<span class="ffwinks-soul-label">' + (item.price_formatted || '') + '</span>' +
+            '<span class="ffwinks-soul-value">' + item.title + '</span>' +
+            '<span class="ffwinks-soul-label">Size</span>' +
+            '<span class="ffwinks-soul-value">' + sizeHTML + '</span>' +
+            '<span class="ffwinks-soul-label">Color</span>' +
+            '<span class="ffwinks-soul-value">' + colorHTML + '</span>' +
+            errorMsg +
+            '<span></span>' +
+            '<button class="ffwinks-soul-action-btn" data-idx="' + idx + '" data-variant="' + (item.variant_id || '') + '">Add to cart</button>' +
+          '</div>' +
+        '</div>';
+
+      listEl.appendChild(row);
+    });
+
+    saveWishlist(wl);
+
+    listEl.querySelectorAll('.ffwinks-shared-size-text').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var list = getWishlist();
+        list[this.dataset.idx].selected_size = this.dataset.val;
+        saveWishlist(list);
+        renderSharedWishlistPage();
+      });
+    });
+
+    listEl.querySelectorAll('.ffwinks-shared-color-text').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var list = getWishlist();
+        list[this.dataset.idx].selected_color = this.dataset.val;
+        saveWishlist(list);
+        renderSharedWishlistPage();
+      });
+    });
+
+    listEl.querySelectorAll('.ffwinks-soul-action-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var variantId = this.dataset.variant;
+        var btnIdx = parseInt(this.dataset.idx, 10);
+        var list = getWishlist();
+        var item = list[btnIdx];
+        var errorEl = document.getElementById('ffwinks-shared-error-' + btnIdx);
+
+        if (!item.selected_size || !item.selected_color) {
+          errorEl.textContent = 'Please choose ' + item.title + ' size/color';
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        if (!variantId) return;
+
+        this.disabled = true;
+        this.textContent = 'Adding...';
+        var button = this;
+
         fetch(getShopifyPath('cart/add.js'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            id: item.variant_id,
-            quantity: 1
+            id: variantId,
+            quantity: 1,
+            properties: {
+              'Size': item.selected_size,
+              'Color': item.selected_color
+            }
           })
         })
           .then(function (response) {
             if (!response.ok) throw new Error('Unable to add wishlist item');
+            button.disabled = false;
             button.textContent = 'Added';
             updateCartBadge();
+            refreshCartOverlay();
           })
           .catch(function () {
             button.disabled = false;
             button.textContent = 'Try again';
           });
       });
-      details.appendChild(button);
-
-      itemEl.appendChild(imageLink);
-      itemEl.appendChild(details);
-      listEl.appendChild(itemEl);
     });
+
+    listEl.querySelectorAll('.ffwinks-soul-remove').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var list = getWishlist();
+        list.splice(parseInt(this.dataset.idx, 10), 1);
+        saveWishlist(list);
+        renderSharedWishlistPage();
+      });
+    });
+
+    setTimeout(ffwinksUpdateStar, 50);
+  }
+
+  function addSharedWishlistItemsToCart() {
+    var btn = document.getElementById('ffw-shared-wishlist-add-all');
+    var wl = getWishlist();
+    var itemsToCart = [];
+
+    wl.forEach(function (item) {
+      if (!item.variant_id) return;
+      itemsToCart.push({
+        id: item.variant_id,
+        quantity: 1,
+        properties: {
+          'Size': item.selected_size || 'O/S',
+          'Color': item.selected_color || 'Default'
+        }
+      });
+    });
+
+    if (!btn || !itemsToCart.length) return;
+
+    btn.disabled = true;
+
+    fetch(getShopifyPath('cart/add.js'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: itemsToCart })
+    })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Unable to add shared wishlist');
+        btn.disabled = false;
+        updateCartBadge();
+        refreshCartOverlay();
+        var label = btn.querySelector('.ffwinks-img-label');
+        if (label) label.textContent = 'Added';
+      })
+      .catch(function () {
+        btn.disabled = false;
+        var label = btn.querySelector('.ffwinks-img-label');
+        if (label) label.textContent = 'Try again';
+      });
   }
 
   function initSharedWishlistPage() {
@@ -1397,6 +1521,9 @@
     if (!pageEl || pageEl.dataset.ffwSharedWishlistBound) return false;
 
     pageEl.dataset.ffwSharedWishlistBound = 'true';
+    var addAllBtn = document.getElementById('ffw-shared-wishlist-add-all');
+    if (addAllBtn) addAllBtn.addEventListener('click', addSharedWishlistItemsToCart);
+
     loadSharedWishlistFromUrl().then(function () {
       renderSharedWishlistPage();
       updateWishlistBadge();
