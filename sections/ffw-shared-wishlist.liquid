@@ -52,9 +52,10 @@
 
   .ffw-shared-wishlist .ffw-shared-wishlist__header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: flex-start;
     gap: 24px;
+    text-align: right;
   }
 
   .ffw-shared-wishlist__heading {
@@ -108,6 +109,11 @@
       --soul-row-min-h: var(--soul-img-h);
       --soul-list-pb: 36svh;
       overscroll-behavior: contain;
+    }
+
+    .ffw-shared-wishlist .ffw-shared-wishlist__header {
+      justify-content: space-between;
+      text-align: left;
     }
 
     .ffw-shared-wishlist .ffwinks-soul-details-box {
