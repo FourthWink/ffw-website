@@ -1293,11 +1293,20 @@
 
     pageEl.dataset.ffwSharedWishlistBound = 'true';
 
-    loadSharedWishlistFromUrl().then(function () {
+    function openSharedWishlistOverlay() {
       renderWishlistOverlay();
       updateWishlistBadge();
       openFullscreen(wishlistOverlay);
       setTimeout(ffwinksUpdateStar, 100);
+    }
+
+    loadSharedWishlistFromUrl().then(function () {
+      openSharedWishlistOverlay();
+      if (document.readyState !== 'complete') {
+        window.addEventListener('load', function () {
+          setTimeout(openSharedWishlistOverlay, 0);
+        }, { once: true });
+      }
     });
 
     return true;
