@@ -830,8 +830,11 @@
 
   function formatWishlistSharedPrice(cents) {
     var amount = Number(cents || 0) / 100;
+    var fmt = {{ shop.money_format | json }};
+    if (fmt) {
+      return fmt.replace(/\{\{amount\}\}/g, amount.toFixed(2));
+    }
     var currency = getWishlistCurrencyLabel();
-    if (currency === 'EGP') return 'LE ' + amount.toFixed(2);
     return currency === '£' ? currency + amount.toFixed(amount % 1 ? 2 : 0) : amount.toFixed(2) + ' ' + currency;
   }
 
@@ -1298,6 +1301,18 @@
     });
 
     return true;
+  }
+
+  function scheduleSharedWishlistPageInit() {
+    var attempts = 0;
+
+    function tryInit() {
+      if (initSharedWishlistPage()) return;
+      attempts += 1;
+      if (attempts < 10) setTimeout(tryInit, 100);
+    }
+
+    tryInit();
   }
 
   document.getElementById('ffwinks-wishlist-share').addEventListener('click', function () {
@@ -2137,9 +2152,8 @@
 
   updateAllSparkleStates();
 
-  if (!initSharedWishlistPage()) {
-    document.addEventListener('DOMContentLoaded', initSharedWishlistPage, { once: true });
-  }
+  scheduleSharedWishlistPageInit();
+  document.addEventListener('DOMContentLoaded', scheduleSharedWishlistPageInit, { once: true });
 
   if (shouldOpenWishlistFromUrl()) {
     loadSharedWishlistFromUrl().then(function () {
