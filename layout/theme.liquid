@@ -209,14 +209,12 @@
   ========================================================== */
   body:has(main[data-template="page.about"]) .center-star-bg,
   body:has(main[data-template="page.contact"]) .center-star-bg,
-  body:has(main[data-template="page.wishlist"]) .center-star-bg,
   body:has(main[data-template="ffw-shop"]) .center-star-bg,
   body:has(main[data-template="ffw-newin"]) .center-star-bg,
   body:has(main[data-template="search"]) .center-star-bg,
   body:has(main[data-template="product"]) .center-star-bg,
   body:has(main[data-template="page.about"]) .ffw-static-text,
   body:has(main[data-template="page.contact"]) .ffw-static-text,
-  body:has(main[data-template="page.wishlist"]) .ffw-static-text,
   body:has(main[data-template="ffw-shop"]) .ffw-static-text,
   body:has(main[data-template="ffw-newin"]) .ffw-static-text,
   body:has(main[data-template="search"]) .ffw-static-text,
@@ -246,7 +244,6 @@
      HIDE STAR AND TEXT ON SPECIFIC PAGES
   ========================================================== */
   body:has(main[data-template="page.about"]) .center-star-bg,
-  body:has(main[data-template="page.wishlist"]) .center-star-bg,
   body:has(main[data-template="ffw-shop"]) .center-star-bg,
   body:has(main[data-template="ffw-newin"]) .center-star-bg,
   body:has(main[data-template="search"]) .center-star-bg,
@@ -254,7 +251,6 @@
   html.ffw-policy-page .center-star-bg,
   body.ffw-policy-page .center-star-bg,
   body:has(main[data-template="page.about"]) .ffw-static-text,
-  body:has(main[data-template="page.wishlist"]) .ffw-static-text,
   body:has(main[data-template="ffw-shop"]) .ffw-static-text,
   body:has(main[data-template="ffw-newin"]) .ffw-static-text,
   body:has(main[data-template="search"]) .ffw-static-text,
@@ -468,11 +464,6 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         var overlay = document.getElementById('intro-overlay');
         var eye = document.getElementById('eye');
         var text = document.getElementById('intro-text');
-        var isSharedWishlistPage = document.querySelector('main[data-template="page.wishlist"]');
-        if (isSharedWishlistPage) {
-          if (overlay) overlay.style.display = 'none';
-          return;
-        }
 
         function getCookie(name) {
           var found = document.cookie.split('; ').filter(function(row) {
