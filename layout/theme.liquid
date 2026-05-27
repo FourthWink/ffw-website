@@ -679,8 +679,10 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         if (searchBar)    { searchBar.classList.remove('is-open'); searchBar.setAttribute('aria-hidden', 'true'); }
         if (accountBar)   { accountBar.classList.remove('is-open'); accountBar.setAttribute('aria-hidden', 'true'); }
         if (globalOverlay){ globalOverlay.classList.remove('is-active'); }
+        var keepWishlistOverlay = !!document.getElementById('ffw-shared-wishlist-page');
         [wishlistOverlay, cartOverlay].forEach(function(ov) {
           if (!ov) return;
+          if (ov === wishlistOverlay && keepWishlistOverlay) return;
           ov.classList.remove('ffwinks-fullscreen--open');
           ov.setAttribute('aria-hidden', 'true');
         });
