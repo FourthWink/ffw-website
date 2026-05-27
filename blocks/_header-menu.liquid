@@ -482,6 +482,11 @@
     }
   }
 
+  .header-menu:not([data-overflow-expanded='true']) .menu-list__list-item:where([slot='overflow']) > .menu-list__link {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   .header-menu[data-overflow-expanded='true'] .menu-list__list-item:where([slot='overflow']) .menu-list__link {
     --submenu-content-opacity: 1;
   }
