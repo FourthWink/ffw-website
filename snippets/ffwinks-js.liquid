@@ -23,7 +23,11 @@
   var cartOverlay     = document.getElementById('ffwinks-cart-overlay');
   var wishlistSnapAnimationFrame = null;
   var wishlistSnapLockUntil = 0;
+  var wishlistSnapSettleTimer = null;
   var wishlistTouchStartY = null;
+  var WISHLIST_SNAP_DURATION_MS = 1100;
+  var WISHLIST_SNAP_LOCK_MS = 1200;
+  var WISHLIST_SNAP_TOUCH_THRESHOLD = 8;
 
   // Positions the floating soul action inside whichever cart/wishlist list is
   // currently active. The exact pixel constants below are visual tuning values.
@@ -426,7 +430,10 @@
     }
   }
   
-  if (wishlistOverlay) wishlistOverlay.addEventListener('scroll', onOverlayScroll);
+  if (wishlistOverlay) wishlistOverlay.addEventListener('scroll', function() {
+    onOverlayScroll();
+    queueWishlistSnapToNearest();
+  });
   if (cartOverlay) cartOverlay.addEventListener('scroll', onOverlayScroll);
   window.addEventListener('scroll', onOverlayScroll); 
 
@@ -476,7 +483,7 @@
   function scrollWishlistTo(target) {
     var start = wishlistOverlay.scrollTop;
     var distance = target - start;
-    var duration = 1100;
+    var duration = WISHLIST_SNAP_DURATION_MS;
     var startTime = performance.now();
 
     if (Math.abs(distance) < 1) {
@@ -486,7 +493,8 @@
     }
 
     if (wishlistSnapAnimationFrame) cancelAnimationFrame(wishlistSnapAnimationFrame);
-    wishlistSnapLockUntil = Date.now() + 1200;
+    if (wishlistSnapSettleTimer) clearTimeout(wishlistSnapSettleTimer);
+    wishlistSnapLockUntil = Date.now() + WISHLIST_SNAP_LOCK_MS;
 
     function step(now) {
       var progress = Math.min((now - startTime) / duration, 1);
@@ -504,6 +512,32 @@
     }
 
     wishlistSnapAnimationFrame = requestAnimationFrame(step);
+  }
+
+  function snapWishlistToNearest() {
+    var data = getWishlistSnapData();
+    if (!data || !data.targets.length) return false;
+
+    var target = data.targets.reduce(function(closest, option) {
+      return Math.abs(option - data.current) < Math.abs(closest - data.current) ? option : closest;
+    }, data.targets[0]);
+
+    if (Math.abs(target - data.current) < 1) return false;
+    scrollWishlistTo(target);
+    return true;
+  }
+
+  function queueWishlistSnapToNearest() {
+    if (!isMobileWishlistOpen()) return;
+    if (wishlistSnapAnimationFrame || Date.now() < wishlistSnapLockUntil) return;
+
+    clearTimeout(wishlistSnapSettleTimer);
+    wishlistSnapSettleTimer = setTimeout(function() {
+      wishlistSnapSettleTimer = null;
+      if (!wishlistSnapAnimationFrame && Date.now() >= wishlistSnapLockUntil) {
+        snapWishlistToNearest();
+      }
+    }, 140);
   }
 
   function snapWishlist(direction) {
@@ -552,17 +586,20 @@
       if (wishlistTouchStartY === null || !event.touches || !event.touches[0]) return;
 
       var deltaY = wishlistTouchStartY - event.touches[0].clientY;
-      if (Math.abs(deltaY) <= 8) return;
+      if (Math.abs(deltaY) <= WISHLIST_SNAP_TOUCH_THRESHOLD) return;
 
       event.preventDefault();
-      if (Date.now() >= wishlistSnapLockUntil) {
-        snapWishlist(deltaY > 0 ? 1 : -1);
+      if (Date.now() < wishlistSnapLockUntil) {
+        return;
       }
+
+      snapWishlist(deltaY > 0 ? 1 : -1);
       wishlistTouchStartY = event.touches[0].clientY;
     }, { passive: false });
 
     wishlistOverlay.addEventListener('touchend', function() {
       wishlistTouchStartY = null;
+      queueWishlistSnapToNearest();
     }, { passive: true });
   }
   // ==========================================
