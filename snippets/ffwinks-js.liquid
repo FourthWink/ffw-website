@@ -24,10 +24,9 @@
   var wishlistSnapAnimationFrame = null;
   var wishlistSnapLockUntil = 0;
   var wishlistSnapSettleTimer = null;
-  var wishlistTouchStartY = null;
+  var wishlistTouchActive = false;
   var WISHLIST_SNAP_DURATION_MS = 1100;
   var WISHLIST_SNAP_LOCK_MS = 1200;
-  var WISHLIST_SNAP_TOUCH_THRESHOLD = 8;
 
   // Positions the floating soul action inside whichever cart/wishlist list is
   // currently active. The exact pixel constants below are visual tuning values.
@@ -529,6 +528,7 @@
 
   function queueWishlistSnapToNearest() {
     if (!isMobileWishlistOpen()) return;
+    if (wishlistTouchActive) return;
     if (wishlistSnapAnimationFrame || Date.now() < wishlistSnapLockUntil) return;
 
     clearTimeout(wishlistSnapSettleTimer);
@@ -540,65 +540,27 @@
     }, 140);
   }
 
-  function snapWishlist(direction) {
-    var data = getWishlistSnapData();
-    if (!data || !data.targets.length) return false;
-
-    var threshold = 4;
-    var target = null;
-
-    if (direction > 0) {
-      for (var i = 0; i < data.targets.length; i++) {
-        if (data.targets[i] > data.current + threshold) {
-          target = data.targets[i];
-          break;
-        }
-      }
-    } else {
-      for (var j = data.targets.length - 1; j >= 0; j--) {
-        if (data.targets[j] < data.current - threshold) {
-          target = data.targets[j];
-          break;
-        }
-      }
-    }
-
-    if (target === null) return true;
-    scrollWishlistTo(target);
-    return true;
-  }
-
   if (wishlistOverlay) {
     wishlistOverlay.addEventListener('wheel', function(event) {
       if (!isMobileWishlistOpen() || event.deltaY === 0) return;
-
-      event.preventDefault();
-      if (Date.now() < wishlistSnapLockUntil) return;
-      snapWishlist(event.deltaY > 0 ? 1 : -1);
-    }, { passive: false });
-
-    wishlistOverlay.addEventListener('touchstart', function(event) {
-      wishlistTouchStartY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
+      queueWishlistSnapToNearest();
     }, { passive: true });
 
-    wishlistOverlay.addEventListener('touchmove', function(event) {
-      if (!isMobileWishlistOpen()) return;
-      if (wishlistTouchStartY === null || !event.touches || !event.touches[0]) return;
-
-      var deltaY = wishlistTouchStartY - event.touches[0].clientY;
-      if (Math.abs(deltaY) <= WISHLIST_SNAP_TOUCH_THRESHOLD) return;
-
-      event.preventDefault();
-      if (Date.now() < wishlistSnapLockUntil) {
-        return;
-      }
-
-      snapWishlist(deltaY > 0 ? 1 : -1);
-      wishlistTouchStartY = event.touches[0].clientY;
-    }, { passive: false });
+    wishlistOverlay.addEventListener('touchstart', function() {
+      wishlistTouchActive = true;
+      wishlistSnapLockUntil = 0;
+      clearTimeout(wishlistSnapSettleTimer);
+      if (wishlistSnapAnimationFrame) cancelAnimationFrame(wishlistSnapAnimationFrame);
+      wishlistSnapAnimationFrame = null;
+    }, { passive: true });
 
     wishlistOverlay.addEventListener('touchend', function() {
-      wishlistTouchStartY = null;
+      wishlistTouchActive = false;
+      queueWishlistSnapToNearest();
+    }, { passive: true });
+
+    wishlistOverlay.addEventListener('touchcancel', function() {
+      wishlistTouchActive = false;
       queueWishlistSnapToNearest();
     }, { passive: true });
   }
@@ -1091,9 +1053,11 @@
     setOverlayOffset();
     if (el === wishlistOverlay) {
       delete el.dataset.wishlistSnapAnchorY;
+      clearTimeout(wishlistSnapSettleTimer);
       if (wishlistSnapAnimationFrame) cancelAnimationFrame(wishlistSnapAnimationFrame);
       wishlistSnapAnimationFrame = null;
       wishlistSnapLockUntil = 0;
+      wishlistTouchActive = false;
     }
     el.classList.add('ffwinks-fullscreen--open');
     el.setAttribute('aria-hidden', 'false');
