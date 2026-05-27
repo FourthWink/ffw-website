@@ -21,13 +21,23 @@
 
   var wishlistOverlay = document.getElementById('ffwinks-wishlist-overlay');
   var cartOverlay     = document.getElementById('ffwinks-cart-overlay');
-  var wishlistSnapAnimationFrame = null;
-  var wishlistSnapLockUntil = 0;
-  var wishlistSnapSettleTimer = null;
-  var wishlistTouchActive = false;
-  var WISHLIST_SNAP_DURATION_MS = 450;
-  var WISHLIST_SNAP_LOCK_MS = 550;
-  var WISHLIST_SNAP_SETTLE_DELAY_MS = 90;
+  var SOUL_SNAP_DURATION_MS = 450;
+  var SOUL_SNAP_LOCK_MS = 550;
+  var SOUL_SNAP_SETTLE_DELAY_MS = 90;
+  var wishlistSnapState = {
+    animationFrame: null,
+    lockUntil: 0,
+    settleTimer: null,
+    touchActive: false,
+    anchorKey: 'wishlistSnapAnchorY'
+  };
+  var cartSnapState = {
+    animationFrame: null,
+    lockUntil: 0,
+    settleTimer: null,
+    touchActive: false,
+    anchorKey: 'cartSnapAnchorY'
+  };
 
   // Positions the floating soul action inside whichever cart/wishlist list is
   // currently active. The exact pixel constants below are visual tuning values.
@@ -432,33 +442,36 @@
   
   if (wishlistOverlay) wishlistOverlay.addEventListener('scroll', function() {
     onOverlayScroll();
-    queueWishlistSnapToNearest();
+    queueSoulOverlaySnapToNearest(wishlistOverlay, wishlistSnapState);
   });
-  if (cartOverlay) cartOverlay.addEventListener('scroll', onOverlayScroll);
+  if (cartOverlay) cartOverlay.addEventListener('scroll', function() {
+    onOverlayScroll();
+    queueSoulOverlaySnapToNearest(cartOverlay, cartSnapState);
+  });
   window.addEventListener('scroll', onOverlayScroll); 
 
-  function isMobileWishlistOpen() {
-    return wishlistOverlay &&
-      wishlistOverlay.classList.contains('ffwinks-fullscreen--open') &&
+  function isMobileSoulOverlayOpen(overlayEl) {
+    return overlayEl &&
+      overlayEl.classList.contains('ffwinks-fullscreen--open') &&
       window.innerWidth <= 549;
   }
 
-  function getWishlistSnapData() {
-    if (!isMobileWishlistOpen()) return null;
+  function getSoulOverlaySnapData(overlayEl, snapState) {
+    if (!isMobileSoulOverlayOpen(overlayEl)) return null;
 
-    var rows = Array.from(wishlistOverlay.querySelectorAll('.ffwinks-soul-row'));
+    var rows = Array.from(overlayEl.querySelectorAll('.ffwinks-soul-row'));
     if (rows.length < 2) return null;
 
     var firstGapY = (rows[0].getBoundingClientRect().bottom + rows[1].getBoundingClientRect().top) / 2;
-    var anchorY = parseFloat(wishlistOverlay.dataset.wishlistSnapAnchorY || '');
+    var anchorY = parseFloat(overlayEl.dataset[snapState.anchorKey] || '');
 
     if (isNaN(anchorY)) {
-      anchorY = firstGapY + wishlistOverlay.scrollTop;
-      wishlistOverlay.dataset.wishlistSnapAnchorY = String(anchorY);
+      anchorY = firstGapY + overlayEl.scrollTop;
+      overlayEl.dataset[snapState.anchorKey] = String(anchorY);
     }
 
-    var current = wishlistOverlay.scrollTop;
-    var max = Math.max(0, wishlistOverlay.scrollHeight - wishlistOverlay.clientHeight);
+    var current = overlayEl.scrollTop;
+    var max = Math.max(0, overlayEl.scrollHeight - overlayEl.clientHeight);
     var targets = [];
 
     for (var i = 0; i < rows.length - 1; i++) {
@@ -480,42 +493,42 @@
     };
   }
 
-  function scrollWishlistTo(target) {
-    var start = wishlistOverlay.scrollTop;
+  function scrollSoulOverlayTo(overlayEl, snapState, target) {
+    var start = overlayEl.scrollTop;
     var distance = target - start;
-    var duration = WISHLIST_SNAP_DURATION_MS;
+    var duration = SOUL_SNAP_DURATION_MS;
     var startTime = performance.now();
 
     if (Math.abs(distance) < 1) {
-      wishlistOverlay.scrollTop = target;
+      overlayEl.scrollTop = target;
       ffwinksUpdateStar();
       return;
     }
 
-    if (wishlistSnapAnimationFrame) cancelAnimationFrame(wishlistSnapAnimationFrame);
-    if (wishlistSnapSettleTimer) clearTimeout(wishlistSnapSettleTimer);
-    wishlistSnapLockUntil = Date.now() + WISHLIST_SNAP_LOCK_MS;
+    if (snapState.animationFrame) cancelAnimationFrame(snapState.animationFrame);
+    if (snapState.settleTimer) clearTimeout(snapState.settleTimer);
+    snapState.lockUntil = Date.now() + SOUL_SNAP_LOCK_MS;
 
     function step(now) {
       var progress = Math.min((now - startTime) / duration, 1);
       var eased = 1 - Math.pow(1 - progress, 3);
-      wishlistOverlay.scrollTop = start + (distance * eased);
+      overlayEl.scrollTop = start + (distance * eased);
       ffwinksUpdateStar();
 
       if (progress < 1) {
-        wishlistSnapAnimationFrame = requestAnimationFrame(step);
+        snapState.animationFrame = requestAnimationFrame(step);
       } else {
-        wishlistOverlay.scrollTop = target;
-        wishlistSnapAnimationFrame = null;
+        overlayEl.scrollTop = target;
+        snapState.animationFrame = null;
         ffwinksUpdateStar();
       }
     }
 
-    wishlistSnapAnimationFrame = requestAnimationFrame(step);
+    snapState.animationFrame = requestAnimationFrame(step);
   }
 
-  function snapWishlistToNearest() {
-    var data = getWishlistSnapData();
+  function snapSoulOverlayToNearest(overlayEl, snapState) {
+    var data = getSoulOverlaySnapData(overlayEl, snapState);
     if (!data || !data.targets.length) return false;
 
     var target = data.targets.reduce(function(closest, option) {
@@ -523,48 +536,63 @@
     }, data.targets[0]);
 
     if (Math.abs(target - data.current) < 1) return false;
-    scrollWishlistTo(target);
+    scrollSoulOverlayTo(overlayEl, snapState, target);
     return true;
   }
 
-  function queueWishlistSnapToNearest() {
-    if (!isMobileWishlistOpen()) return;
-    if (wishlistTouchActive) return;
-    if (wishlistSnapAnimationFrame || Date.now() < wishlistSnapLockUntil) return;
+  function queueSoulOverlaySnapToNearest(overlayEl, snapState) {
+    if (!isMobileSoulOverlayOpen(overlayEl)) return;
+    if (snapState.touchActive) return;
+    if (snapState.animationFrame || Date.now() < snapState.lockUntil) return;
 
-    clearTimeout(wishlistSnapSettleTimer);
-    wishlistSnapSettleTimer = setTimeout(function() {
-      wishlistSnapSettleTimer = null;
-      if (!wishlistSnapAnimationFrame && Date.now() >= wishlistSnapLockUntil) {
-        snapWishlistToNearest();
+    clearTimeout(snapState.settleTimer);
+    snapState.settleTimer = setTimeout(function() {
+      snapState.settleTimer = null;
+      if (!snapState.animationFrame && Date.now() >= snapState.lockUntil) {
+        snapSoulOverlayToNearest(overlayEl, snapState);
       }
-    }, WISHLIST_SNAP_SETTLE_DELAY_MS);
+    }, SOUL_SNAP_SETTLE_DELAY_MS);
   }
 
-  if (wishlistOverlay) {
-    wishlistOverlay.addEventListener('wheel', function(event) {
-      if (!isMobileWishlistOpen() || event.deltaY === 0) return;
-      queueWishlistSnapToNearest();
+  function resetSoulOverlaySnap(overlayEl, snapState) {
+    if (!overlayEl) return;
+    delete overlayEl.dataset[snapState.anchorKey];
+    clearTimeout(snapState.settleTimer);
+    if (snapState.animationFrame) cancelAnimationFrame(snapState.animationFrame);
+    snapState.animationFrame = null;
+    snapState.lockUntil = 0;
+    snapState.touchActive = false;
+  }
+
+  function bindSoulOverlaySnap(overlayEl, snapState) {
+    if (!overlayEl) return;
+
+    overlayEl.addEventListener('wheel', function(event) {
+      if (!isMobileSoulOverlayOpen(overlayEl) || event.deltaY === 0) return;
+      queueSoulOverlaySnapToNearest(overlayEl, snapState);
     }, { passive: true });
 
-    wishlistOverlay.addEventListener('touchstart', function() {
-      wishlistTouchActive = true;
-      wishlistSnapLockUntil = 0;
-      clearTimeout(wishlistSnapSettleTimer);
-      if (wishlistSnapAnimationFrame) cancelAnimationFrame(wishlistSnapAnimationFrame);
-      wishlistSnapAnimationFrame = null;
+    overlayEl.addEventListener('touchstart', function() {
+      snapState.touchActive = true;
+      snapState.lockUntil = 0;
+      clearTimeout(snapState.settleTimer);
+      if (snapState.animationFrame) cancelAnimationFrame(snapState.animationFrame);
+      snapState.animationFrame = null;
     }, { passive: true });
 
-    wishlistOverlay.addEventListener('touchend', function() {
-      wishlistTouchActive = false;
-      queueWishlistSnapToNearest();
+    overlayEl.addEventListener('touchend', function() {
+      snapState.touchActive = false;
+      queueSoulOverlaySnapToNearest(overlayEl, snapState);
     }, { passive: true });
 
-    wishlistOverlay.addEventListener('touchcancel', function() {
-      wishlistTouchActive = false;
-      queueWishlistSnapToNearest();
+    overlayEl.addEventListener('touchcancel', function() {
+      snapState.touchActive = false;
+      queueSoulOverlaySnapToNearest(overlayEl, snapState);
     }, { passive: true });
   }
+
+  bindSoulOverlaySnap(wishlistOverlay, wishlistSnapState);
+  bindSoulOverlaySnap(cartOverlay, cartSnapState);
   // ==========================================
 
 
@@ -1053,12 +1081,10 @@
   function openFullscreen(el) {
     setOverlayOffset();
     if (el === wishlistOverlay) {
-      delete el.dataset.wishlistSnapAnchorY;
-      clearTimeout(wishlistSnapSettleTimer);
-      if (wishlistSnapAnimationFrame) cancelAnimationFrame(wishlistSnapAnimationFrame);
-      wishlistSnapAnimationFrame = null;
-      wishlistSnapLockUntil = 0;
-      wishlistTouchActive = false;
+      resetSoulOverlaySnap(el, wishlistSnapState);
+    }
+    if (el === cartOverlay) {
+      resetSoulOverlaySnap(el, cartSnapState);
     }
     el.classList.add('ffwinks-fullscreen--open');
     el.setAttribute('aria-hidden', 'false');
@@ -1131,7 +1157,7 @@
     var totalEl = document.getElementById('ffwinks-wishlist-subtotal');
 
     listEl.querySelectorAll('.ffwinks-soul-row').forEach(function (el) { el.remove(); });
-    if (wishlistOverlay) delete wishlistOverlay.dataset.wishlistSnapAnchorY;
+    resetSoulOverlaySnap(wishlistOverlay, wishlistSnapState);
 
     var addAllWrapper = document.querySelector('.ffwinks-soul-addall-wrapper:not(#ffwinks-wishlist-empty)');
 
@@ -1632,6 +1658,7 @@
       writeCartCache(cart);
 
       listEl.querySelectorAll('.ffwinks-soul-row').forEach(function (el) { el.remove(); });
+      resetSoulOverlaySnap(cartOverlay, cartSnapState);
 
       var checkoutWrapper = document.querySelector('.ffwinks-soul-checkout-wrapper:not(#ffwinks-cart-empty)');
 
