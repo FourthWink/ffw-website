@@ -25,8 +25,9 @@
   var wishlistSnapLockUntil = 0;
   var wishlistSnapSettleTimer = null;
   var wishlistTouchActive = false;
-  var WISHLIST_SNAP_DURATION_MS = 1100;
-  var WISHLIST_SNAP_LOCK_MS = 1200;
+  var WISHLIST_SNAP_DURATION_MS = 450;
+  var WISHLIST_SNAP_LOCK_MS = 550;
+  var WISHLIST_SNAP_SETTLE_DELAY_MS = 90;
 
   // Positions the floating soul action inside whichever cart/wishlist list is
   // currently active. The exact pixel constants below are visual tuning values.
@@ -537,7 +538,7 @@
       if (!wishlistSnapAnimationFrame && Date.now() >= wishlistSnapLockUntil) {
         snapWishlistToNearest();
       }
-    }, 140);
+    }, WISHLIST_SNAP_SETTLE_DELAY_MS);
   }
 
   if (wishlistOverlay) {
