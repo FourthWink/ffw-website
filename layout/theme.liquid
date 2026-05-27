@@ -556,7 +556,10 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
 
         var snapLockUntil = 0;
         var snapAnimationFrame = null;
+        var touchStartX = null;
         var touchStartY = null;
+        var HOMEPAGE_SNAP_TOUCH_THRESHOLD = 32;
+        var HOMEPAGE_SNAP_VERTICAL_BIAS = 1.25;
 
         function getScrollElement() {
           var scrollingElement = document.scrollingElement || document.documentElement;
@@ -645,13 +648,17 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         }, { passive: false });
 
         window.addEventListener('touchstart', function(event) {
+          touchStartX = event.touches && event.touches[0] ? event.touches[0].clientX : null;
           touchStartY = event.touches && event.touches[0] ? event.touches[0].clientY : null;
         }, { passive: true });
 
         window.addEventListener('touchmove', function(event) {
           if (hasBlockingOverlay()) return;
           if (touchStartY === null || !event.touches || !event.touches[0]) return;
-          var isScrollingDown = touchStartY - event.touches[0].clientY > 8;
+          var deltaX = touchStartX === null ? 0 : Math.abs(touchStartX - event.touches[0].clientX);
+          var deltaY = touchStartY - event.touches[0].clientY;
+          var isVerticalIntent = Math.abs(deltaY) > deltaX * HOMEPAGE_SNAP_VERTICAL_BIAS;
+          var isScrollingDown = deltaY > HOMEPAGE_SNAP_TOUCH_THRESHOLD && isVerticalIntent;
           if (!isScrollingDown) return;
           if (Date.now() < snapLockUntil) {
             event.preventDefault();
@@ -662,6 +669,11 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
             snapToDreamPicks();
           }
         }, { passive: false });
+
+        window.addEventListener('touchend', function() {
+          touchStartX = null;
+          touchStartY = null;
+        }, { passive: true });
       });
 
       function clearStaleScrollLocks() {
