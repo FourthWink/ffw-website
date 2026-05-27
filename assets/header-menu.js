@@ -216,9 +216,9 @@ class HeaderMenu extends Component {
       }
 
       link.setAttribute('tabindex', '-1');
-      link.style.opacity = '0';
-      link.style.visibility = 'hidden';
-      link.style.pointerEvents = 'none';
+      link.style.setProperty('opacity', '0', 'important');
+      link.style.setProperty('visibility', 'hidden', 'important');
+      link.style.setProperty('pointer-events', 'none', 'important');
     });
   };
 }
