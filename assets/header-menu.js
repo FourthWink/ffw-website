@@ -25,11 +25,15 @@ class HeaderMenu extends Component {
   connectedCallback() {
     super.connectedCallback();
 
+    this.#syncOverflowLinks();
+    requestAnimationFrame(this.#syncOverflowLinks);
+
     this.overflowMenu?.addEventListener('pointerleave', () => this.#debouncedDeactivate(), {
       signal: this.#abortController.signal,
     });
 
     onDocumentLoaded(this.#preloadImages);
+    onDocumentLoaded(this.#syncOverflowLinks);
   }
 
   disconnectedCallback() {
@@ -99,6 +103,7 @@ class HeaderMenu extends Component {
     const isDefaultSlot = event.target.slot === '';
 
     this.dataset.overflowExpanded = (!isDefaultSlot).toString();
+    this.#syncOverflowLinks();
 
     const previouslyActiveItem = this.#state.activeItem;
 
@@ -158,6 +163,7 @@ class HeaderMenu extends Component {
     this.style.setProperty('--submenu-height', '0px');
     this.style.setProperty('--submenu-opacity', '0');
     this.dataset.overflowExpanded = 'false';
+    this.#syncOverflowLinks();
 
     const submenu = findSubmenu(item);
 
@@ -187,6 +193,33 @@ class HeaderMenu extends Component {
   #preloadImages = () => {
     const images = this.querySelectorAll('img[loading="lazy"]');
     images?.forEach((image) => image.removeAttribute('loading'));
+  };
+
+  /**
+   * Keep overflow links out of the tablet layout until the More menu is active.
+   */
+  #syncOverflowLinks = () => {
+    const isExpanded = this.dataset.overflowExpanded === 'true';
+    const links = this.querySelectorAll('.menu-list__list-item[slot="overflow"] > .menu-list__link');
+
+    links.forEach((link) => {
+      if (!(link instanceof HTMLElement)) return;
+
+      link.toggleAttribute('aria-hidden', !isExpanded);
+
+      if (isExpanded) {
+        link.removeAttribute('tabindex');
+        link.style.removeProperty('opacity');
+        link.style.removeProperty('visibility');
+        link.style.removeProperty('pointer-events');
+        return;
+      }
+
+      link.setAttribute('tabindex', '-1');
+      link.style.opacity = '0';
+      link.style.visibility = 'hidden';
+      link.style.pointerEvents = 'none';
+    });
   };
 }
 
