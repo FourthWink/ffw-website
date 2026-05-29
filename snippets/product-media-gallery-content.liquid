@@ -389,6 +389,19 @@
             thumbnail_radius: block_settings.thumbnail_radius
           -%}
         {% endif %}
+
+        <div class="ffw-pdp-media-dots desktop:hidden" data-ffw-pdp-media-dots aria-label="Product media position">
+          {% for media in sorted_media %}
+            <button
+              type="button"
+              class="ffw-pdp-media-dot"
+              data-ffw-pdp-media-dot
+              aria-label="{{ 'accessibility.slide_status' | t: index: forloop.index, length: forloop.length }}"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+              on:click="/select/{{ forloop.index0 }}"
+            ></button>
+          {% endfor %}
+        </div>
       {% endcapture %}
     {% endif %}
 
@@ -593,9 +606,85 @@
       </script>
     {%- endif -%}
   </media-gallery>
+
+  {% if sorted_media.size > 1 %}
+    <script>
+      (function() {
+        function bindProductMediaDots(root) {
+          (root || document).querySelectorAll('media-gallery').forEach(function(gallery) {
+            if (gallery.dataset.ffwPdpMediaDotsBound === 'true') return;
+
+            var slideshow = gallery.querySelector('slideshow-component');
+            var dots = Array.from(gallery.querySelectorAll('[data-ffw-pdp-media-dot]'));
+            if (!slideshow || !dots.length) return;
+
+            gallery.dataset.ffwPdpMediaDotsBound = 'true';
+
+            function setActiveDot(index) {
+              dots.forEach(function(dot, dotIndex) {
+                dot.setAttribute('aria-current', dotIndex === index ? 'true' : 'false');
+              });
+            }
+
+            slideshow.addEventListener('slideshow:select', function(event) {
+              var index = event.detail && typeof event.detail.index === 'number' ? event.detail.index : 0;
+              setActiveDot(index);
+            });
+
+            setActiveDot(slideshow.current || 0);
+          });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function() { bindProductMediaDots(document); }, { once: true });
+        } else {
+          bindProductMediaDots(document);
+        }
+
+        document.addEventListener('shopify:section:load', function(event) {
+          bindProductMediaDots(event.target);
+        });
+      })();
+    </script>
+  {% endif %}
 {% endif %}
 
 {% stylesheet %}
+  .ffw-pdp-media-dots {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    media-gallery .ffw-pdp-media-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      min-height: 18px;
+      margin: 10px 0 8px;
+    }
+
+    media-gallery .ffw-pdp-media-dot {
+      width: 7px;
+      height: 7px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: #e8e8e8;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    media-gallery .ffw-pdp-media-dot[aria-current='true'] {
+      background: #a9a9a9;
+    }
+
+    media-gallery .ffw-pdp-media-dot:focus-visible {
+      outline: 1px solid #777;
+      outline-offset: 3px;
+    }
+  }
+
   .dialog-zoomed-gallery {
     cursor: zoom-out;
   }
