@@ -390,7 +390,7 @@
           -%}
         {% endif %}
 
-        <div class="ffw-pdp-media-dots desktop:hidden" data-ffw-pdp-media-dots aria-label="Product media position">
+        <div class="ffw-pdp-media-dots" data-ffw-pdp-media-dots aria-label="Product media position">
           {% for media in sorted_media %}
             <button
               type="button"
@@ -666,7 +666,9 @@
 
     media-gallery .ffw-pdp-media-dot {
       width: 7px;
+      min-width: 7px;
       height: 7px;
+      flex: 0 0 7px;
       padding: 0;
       border: 0;
       border-radius: 50%;
