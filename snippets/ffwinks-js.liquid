@@ -250,11 +250,7 @@
     }
 
     if (isOverlay && !isCart) {
-      if (isMobile) {
-        activeList.style.setProperty('padding-bottom', '36svh', 'important');
-      } else {
-        activeList.style.removeProperty('padding-bottom');
-      }
+      activeList.style.removeProperty('padding-bottom');
       delete activeList.dataset.bgap;
     }
 
