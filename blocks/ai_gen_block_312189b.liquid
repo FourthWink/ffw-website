@@ -158,8 +158,23 @@
       }
 
       connectedCallback() {
+        this.ensureDefaultSelections();
         this.fetchProductData();
         this.setupEventListeners();
+      }
+
+      ensureDefaultSelections() {
+        const optionContainers = this.querySelectorAll('.ai-variant-picker__option-{{ ai_gen_id }}');
+
+        optionContainers.forEach(container => {
+          const selectedButton = container.querySelector('.ai-variant-picker__value-{{ ai_gen_id }}.selected');
+          if (selectedButton) return;
+
+          const firstButton = container.querySelector('.ai-variant-picker__value-{{ ai_gen_id }}');
+          if (firstButton) {
+            firstButton.classList.add('selected');
+          }
+        });
       }
 
       async fetchProductData() {
@@ -170,6 +185,7 @@
           const response = await fetch(`${productUrl}.js`);
           this.product = await response.json();
           this.currentVariant = this.product.variants.find(v => v.id === parseInt(this.querySelector('select[name="id"]').value));
+          this.updateVariant(false);
           this.updateAvailability();
         } catch (error) {
           console.error('Error fetching product data:', error);
@@ -197,7 +213,7 @@
         this.updateVariant();
       }
 
-      updateVariant() {
+      updateVariant(shouldUpdateURL = true) {
         if (!this.product) return;
 
         const selectedOptions = [];
@@ -221,7 +237,9 @@
           select.dispatchEvent(new Event('change', { bubbles: true }));
 
           this.updateAvailability();
-          this.updateURL(matchingVariant.id);
+          if (shouldUpdateURL) {
+            this.updateURL(matchingVariant.id);
+          }
         }
       }
 
