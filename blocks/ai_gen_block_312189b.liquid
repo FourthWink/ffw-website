@@ -84,6 +84,16 @@
     .ai-variant-picker__values-{{ ai_gen_id }} {
       gap: {{ block.settings.spacing_between_values_mobile }}px;
     }
+
+    .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size'] .ai-variant-picker__values-{{ ai_gen_id }} {
+      gap: 34px;
+    }
+
+    .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size'] .ai-variant-picker__value-{{ ai_gen_id }} {
+      min-width: 12px;
+      text-align: center;
+      line-height: 1;
+    }
   }
 {% endstyle %}
 
@@ -94,7 +104,7 @@
 >
   {% unless product.has_only_default_variant %}
     {% for option in product.options_with_values %}
-      <div class="ai-variant-picker__option-{{ ai_gen_id }}">
+      <div class="ai-variant-picker__option-{{ ai_gen_id }}" data-option-name="{{ option.name | handleize }}">
         <div class="ai-variant-picker__label-{{ ai_gen_id }}">
           {{ option.name }}
         </div>
