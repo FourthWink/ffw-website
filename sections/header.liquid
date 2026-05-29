@@ -777,6 +777,21 @@ header-component  { overflow: visible !important; }
 .header__row--bottom {
   border-bottom: var(--border-bottom-width) solid var(--color-border);
 }
+@media screen and (min-width: 1024px) {
+  .header__column--right {
+    gap: clamp(56px, 5.8vw, 80px) !important;
+  }
+
+  .header__column--right .search-action,
+  .header__column--right header-actions {
+    margin-inline: 0 !important;
+  }
+
+  .header__column--right header-actions {
+    gap: clamp(28px, 2.9vw, 40px) !important;
+  }
+}
+
 @media screen and (max-width: 749px) {
   .header__row--top:not(.divider--page-width),
   .header__row--top.divider--page-width .header__columns {
