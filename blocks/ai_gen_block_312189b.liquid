@@ -150,6 +150,20 @@
 
 <script>
   (function() {
+    function ensureDefaultSelections(root) {
+      const optionContainers = root.querySelectorAll('.ai-variant-picker__option-{{ ai_gen_id }}');
+
+      optionContainers.forEach(container => {
+        const selectedButton = container.querySelector('.ai-variant-picker__value-{{ ai_gen_id }}.selected');
+        if (selectedButton) return;
+
+        const firstButton = container.querySelector('.ai-variant-picker__value-{{ ai_gen_id }}');
+        if (firstButton) {
+          firstButton.classList.add('selected');
+        }
+      });
+    }
+
     class VariantPicker{{ ai_gen_id }} extends HTMLElement {
       constructor() {
         super();
@@ -164,17 +178,7 @@
       }
 
       ensureDefaultSelections() {
-        const optionContainers = this.querySelectorAll('.ai-variant-picker__option-{{ ai_gen_id }}');
-
-        optionContainers.forEach(container => {
-          const selectedButton = container.querySelector('.ai-variant-picker__value-{{ ai_gen_id }}.selected');
-          if (selectedButton) return;
-
-          const firstButton = container.querySelector('.ai-variant-picker__value-{{ ai_gen_id }}');
-          if (firstButton) {
-            firstButton.classList.add('selected');
-          }
-        });
+        ensureDefaultSelections(this);
       }
 
       async fetchProductData() {
@@ -275,6 +279,10 @@
         window.history.replaceState({}, '', url);
       }
     }
+
+    document.querySelectorAll('variant-picker-{{ ai_gen_id }}').forEach(picker => {
+      ensureDefaultSelections(picker);
+    });
 
     customElements.define('variant-picker-{{ ai_gen_id }}', VariantPicker{{ ai_gen_id }});
   })();
