@@ -4,82 +4,11 @@
   Fourth Wink product UI helpers.
 
   This section renders product-page overlays that sit outside the native Shopify
-  product-information section: preorder messaging, the fixed wishlist sparkle,
-  and the mobile Add to Cart bar. The desktop floating ATC is rendered by
-  snippets/ffw-floating-atc.liquid through templates/product.json, while
-  sections/custom-liquid.liquid still owns the delegated cart handler.
+  product-information section: the fixed wishlist sparkle and the mobile Add to
+  Cart bar. The desktop floating ATC is rendered by snippets/ffw-floating-atc.liquid
+  through templates/product.json, while sections/custom-liquid.liquid still owns
+  the delegated cart handler.
 {% endcomment %}
-
-{%- liquid
-  assign product_tags_downcase = product.tags | join: ',' | downcase
-  assign is_preorder = false
-  if product_tags_downcase contains 'preorder'
-    assign is_preorder = true
-  elsif product.metafields.custom.preorder_enabled.value == true
-    assign is_preorder = true
-  endif
-  assign v = product.selected_or_first_available_variant
-  assign deposit_price = v.price
-  assign balance_price = 0
-  if v.compare_at_price > v.price
-    assign balance_price = v.compare_at_price | minus: v.price
-  endif
--%}
-
-{% if is_preorder %}
-<div class="ffw-preorder-note" id="ffw-preorder-note">
-  <p class="ffw-preorder-eyebrow">Preorder Now</p>
-  <p class="ffw-preorder-text"><span>Secure your piece with a 45% deposit of:</span> <strong id="ffw-deposit">{{ deposit_price | money }}</strong></p>
-  {% if balance_price > 0 %}
-  <p class="ffw-preorder-text"><span>The remaining balance of <strong id="ffw-balance">{{ balance_price | money }}</strong> + shipping will be due at a later date.</span></p>
-  {% endif %}
-</div>
-
-<style>
-  .ffw-preorder-note {
-    /* Changed to relative so it naturally pushes the image down instead of overlapping */
-    position: relative;
-    margin-bottom: 20px; /* The small gap below the note */
-    margin-left: var(--ffwinks-master-spacing, 24px);
-    z-index: 50;
-    
-    /* Premium Floating Banner Aesthetics */
-    padding: 10px 10px;
-    border-radius: 8px;
-    background: transparent;
-    font-size: 9px;
-    width: calc(100% - 48px);
-    max-width: 360px; /* Keeps it tight and elegant on desktop */
-  }
-  
-  @media (max-width: 749px) {
-    .ffw-preorder-note {
-      margin-left: 18px;
-      margin-bottom: 15px; /* Slightly smaller gap on mobile */
-      width: calc(100% - 32px);
-    }
-  }
-
-  .ffw-preorder-eyebrow {
-    margin: 0 0 6px;
-    font-size: 10px;
-    font-weight: 600;
-    color: #000;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .ffw-preorder-text {
-    margin: 0 0 4px;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    color: #555;
-  }
-  .ffw-preorder-text strong {
-    color: #000;
-  }
-</style>
-{% endif %}
 
 {%- liquid
   assign product_title     = product.title | escape
