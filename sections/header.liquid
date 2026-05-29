@@ -2216,13 +2216,6 @@ header-actions { overflow: visible !important; }
     top: calc(var(--ffwinks-header-h-mobile) + 40px) !important;
   }
 }
-/* Hide "Contact" link in the left header column on Desktop only */
-@media screen and (min-width: 750px) {
-  .header__column--left header-menu li:has(a[href*="contact"]),
-  .header__column--left header-menu a[href*="contact"] {
-    display: none !important;
-  }
-}
 @media screen and (min-width: 480px) and (max-width: 749px) {
   /* header.liquid — mid-mobile logo & action tweaks */
   .header-logo img, header-logo img { max-height: 24px !important; max-width: 150px !important; }
