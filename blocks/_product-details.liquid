@@ -183,10 +183,10 @@
 
   /* ► FFW: Price + Title + Sparkle row — mobile only */
   .ffw-pdp-header-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 138px minmax(0, 1fr) 38px;
     align-items: center;
-    gap: 50px; /* <-- I INCREASED THIS FROM 10px TO 50px */
-    flex-wrap: nowrap;
+    gap: 0;
   }
 
 .ffw-pdp-price {
@@ -204,8 +204,8 @@
 }
 
   .ffw-pdp-title { 
-    padding-left: 12px;
-    flex: 1;
+    padding-left: 0;
+    min-width: 0;
     font-size: 10px;
     font-weight: 700;
     overflow: hidden;
@@ -217,15 +217,19 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding-right: -5px;
+    width: 38px;
+    height: 38px;
+    padding: 0;
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
+    justify-self: center;
   }
 
   .ffw-pdp-sparkle-img {
-    width: 20px;
-    height: 20px;
+    width: auto;
+    height: 15px;
   }
 
   /* Hide mobile row on desktop */
