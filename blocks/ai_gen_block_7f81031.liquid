@@ -54,9 +54,10 @@
   .ai-picks-box-image-{{ ai_gen_id }} {
     grid-area: 1 / 1;
     width: auto;
-    max-width: 30%;
-    height: 100%;
+    max-width: 54%;
+    height: 118%;
     object-fit: contain;
+    object-position: center;
     pointer-events: none;
     display: block;
     transition: opacity 0.3s ease;
@@ -207,6 +208,11 @@
       height: 70%;
       margin-bottom: 0;
       margin-top: 0;
+    }
+
+    .ai-picks-box-image-{{ ai_gen_id }} {
+      max-width: 82%;
+      height: 100%;
     }
 
     .ai-picks-bottom-{{ ai_gen_id }} {
