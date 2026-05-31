@@ -1329,58 +1329,58 @@ button.ffwinks-submit-btn:hover { color: #000; }
 }
 
 .ffwinks-mobile-menu__glow--vertical {
-  width: clamp(42px, 11vw, 54px);
+  width: clamp(54px, 15vw, 76px);
   height: min(74svh, 620px);
   background:
     linear-gradient(180deg,
       rgba(255, 255, 255, 0) 0%,
-      rgba(235, 185, 150, 0.025) 16%,
-      rgba(220, 146, 95, 0.08) 36%,
-      rgba(220, 146, 95, 0.08) 64%,
-      rgba(235, 185, 150, 0.025) 84%,
+      rgba(235, 185, 150, 0.012) 18%,
+      rgba(220, 146, 95, 0.032) 40%,
+      rgba(220, 146, 95, 0.032) 60%,
+      rgba(235, 185, 150, 0.012) 82%,
       rgba(255, 255, 255, 0) 100%);
-  filter: blur(32px);
+  filter: blur(44px);
 }
 
 .ffwinks-mobile-menu__glow--horizontal {
   width: min(104vw, 700px);
-  height: clamp(42px, 11vw, 54px);
+  height: clamp(54px, 15vw, 76px);
   background:
     linear-gradient(90deg,
       rgba(255, 255, 255, 0) 0%,
-      rgba(235, 185, 150, 0.025) 12%,
-      rgba(220, 146, 95, 0.07) 34%,
-      rgba(220, 146, 95, 0.085) 50%,
-      rgba(220, 146, 95, 0.07) 66%,
-      rgba(235, 185, 150, 0.025) 88%,
+      rgba(235, 185, 150, 0.012) 16%,
+      rgba(220, 146, 95, 0.03) 42%,
+      rgba(220, 146, 95, 0.034) 50%,
+      rgba(220, 146, 95, 0.03) 58%,
+      rgba(235, 185, 150, 0.012) 84%,
       rgba(255, 255, 255, 0) 100%);
-  filter: blur(28px);
+  filter: blur(42px);
 }
 
 .ffwinks-mobile-menu__image-strip {
-  opacity: 0.28;
+  opacity: 0.12;
   background-image:
     var(--ffwinks-mobile-menu-image, linear-gradient(135deg, rgba(244, 177, 125, 0.4) 0%, rgba(249, 222, 203, 0.08) 100%)),
     linear-gradient(135deg, rgba(244, 177, 125, 0.4) 0%, rgba(249, 222, 203, 0.08) 100%);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  mix-blend-mode: multiply;
-  filter: blur(26px) saturate(0.88) brightness(1.08);
+  mix-blend-mode: normal;
+  filter: blur(42px) saturate(0.72) brightness(1.16);
 }
 
 .ffwinks-mobile-menu__image-strip--vertical {
-  width: clamp(26px, 6.8vw, 34px);
+  width: clamp(54px, 15vw, 76px);
   height: min(76svh, 620px);
-  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 10%, black 24%, black 76%, rgba(0, 0, 0, 0.08) 90%, transparent 100%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 10%, black 24%, black 76%, rgba(0, 0, 0, 0.08) 90%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 24%, rgba(0, 0, 0, 0.4) 48%, rgba(0, 0, 0, 0.4) 52%, rgba(0, 0, 0, 0.08) 76%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.08) 24%, rgba(0, 0, 0, 0.4) 48%, rgba(0, 0, 0, 0.4) 52%, rgba(0, 0, 0, 0.08) 76%, transparent 100%);
 }
 
 .ffwinks-mobile-menu__image-strip--horizontal {
   width: min(102vw, 680px);
-  height: clamp(26px, 6.8vw, 34px);
-  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.08) 9%, black 22%, black 78%, rgba(0, 0, 0, 0.08) 91%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.08) 9%, black 22%, black 78%, rgba(0, 0, 0, 0.08) 91%, transparent 100%);
+  height: clamp(54px, 15vw, 76px);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.08) 20%, rgba(0, 0, 0, 0.4) 46%, rgba(0, 0, 0, 0.4) 54%, rgba(0, 0, 0, 0.08) 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.08) 20%, rgba(0, 0, 0, 0.4) 46%, rgba(0, 0, 0, 0.4) 54%, rgba(0, 0, 0, 0.08) 80%, transparent 100%);
 }
 
 /* 1. The Grid Layout (Fully Transparent) */
@@ -1463,7 +1463,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
   display: block;
   mix-blend-mode: normal;
   filter: invert(1);
-  opacity: 1;
+  opacity: 0.72;
 }
 
 .ffwinks-mobile-menu__footer {
