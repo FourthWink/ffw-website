@@ -272,6 +272,12 @@
     width: var(--star-w, 150px);
     mix-blend-mode: difference;
   }
+
+  .center-star-bg.ffw-home-star--locked {
+    position: absolute;
+    top: var(--ffw-home-star-lock-y, 50%);
+  }
+
   .center-star-bg img,
   .center-star-bg svg,
   .center-star-bg * {
@@ -520,31 +526,72 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
             return;
           }
 
-          function applyState() {
-            var rect = target.getBoundingClientRect();
-            var targetMidInViewport = rect.top + rect.height / 2;
-            var viewportMid = window.innerHeight / 2;
+          var locked = false;
+          var frame = null;
 
-            if (targetMidInViewport <= viewportMid) {
-              // Grid center is at or above viewport center — pin star to grid
-              star.style.top = targetMidInViewport + 'px';
-            } else {
-              // Grid center is below viewport center — star follows viewport center
-              star.style.top = '50%';
-            }
+          function getScrollElement() {
+            if (document.body && document.body.scrollHeight > document.body.clientHeight + 1) return document.body;
+            return document.scrollingElement || document.documentElement;
           }
 
-          // Always fixed, always running via requestAnimationFrame
+          function getScrollY() {
+            var scrollElement = getScrollElement();
+            return scrollElement ? scrollElement.scrollTop : window.scrollY;
+          }
+
+          function getDocumentTop(element) {
+            return element.getBoundingClientRect().top + getScrollY();
+          }
+
+          function unlock() {
+            locked = false;
+            star.classList.remove('ffw-home-star--locked');
+            star.style.removeProperty('--ffw-home-star-lock-y');
+            star.style.position = 'fixed';
+            star.style.top = '50%';
+          }
+
+          function applyState() {
+            var rect = target.getBoundingClientRect();
+            var targetCenterY = getDocumentTop(target) + (rect.height / 2);
+            var lockScrollY = targetCenterY - (window.innerHeight / 2);
+            var unlockScrollY = lockScrollY - 12;
+            var scrollY = getScrollY();
+
+            if (locked ? scrollY < unlockScrollY : scrollY < lockScrollY) {
+              unlock();
+              return;
+            }
+
+            locked = true;
+            star.classList.add('ffw-home-star--locked');
+            star.style.position = 'absolute';
+            star.style.setProperty('--ffw-home-star-lock-y', Math.round(targetCenterY) + 'px');
+          }
+
+          // Fixed before Dream Picks, then parked in the document flow.
           star.style.position = 'fixed';
           star.style.left = '50%';
           star.style.transform = 'translate(-50%, -50%)';
 
-          function loop() {
-            applyState();
-            requestAnimationFrame(loop);
+          function queueApplyState() {
+            if (frame) return;
+            frame = requestAnimationFrame(function() {
+              frame = null;
+              applyState();
+            });
           }
 
-          loop();
+          window.addEventListener('scroll', queueApplyState, { passive: true });
+          document.addEventListener('scroll', queueApplyState, { capture: true, passive: true });
+          document.documentElement.addEventListener('scroll', queueApplyState, { passive: true });
+          document.body.addEventListener('scroll', queueApplyState, { passive: true });
+          window.addEventListener('resize', queueApplyState);
+          window.addEventListener('load', queueApplyState);
+
+          queueApplyState();
+          setTimeout(queueApplyState, 250);
+          setTimeout(queueApplyState, 1000);
         }
 
         init();
