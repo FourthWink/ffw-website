@@ -133,8 +133,10 @@
     body.ffwinks-adding #ffwinks-mobile-atc {
       opacity: 0; visibility: hidden; pointer-events: none;
     }
-    /* Push content above the bar */
-    body { padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important; }
+    /* Push product content above the bar without adding empty space after the footer. */
+    .product-information.section {
+      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+    }
   }
 </style>
 
