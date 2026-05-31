@@ -558,7 +558,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
             var unlockScrollY = lockScrollY - 12;
             var scrollY = getScrollY();
 
-            if (locked ? scrollY < unlockScrollY : scrollY < lockScrollY) {
+            if (locked ? scrollY < unlockScrollY : scrollY + 1 < lockScrollY) {
               unlock();
               return;
             }
