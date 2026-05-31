@@ -355,8 +355,17 @@
   data-url="{{ wl_url }}"
 {% assign size_names = prod.metafields.shopify.size.value | map: 'label' | join: ', ' %}
 {% assign color_names = prod.metafields.shopify.color-pattern.value | map: 'label' | join: ', ' %}
-data-available-sizes="{{ size_names }}"
-data-available-colors="{{ color_names }}"
+{% for option in prod.options_with_values %}
+  {% assign option_handle = option.name | handleize %}
+  {% if size_names == blank and option_handle contains 'size' %}
+    {% assign size_names = option.values | join: ', ' %}
+  {% endif %}
+  {% if color_names == blank and option_handle contains 'color' %}
+    {% assign color_names = option.values | join: ', ' %}
+  {% endif %}
+{% endfor %}
+data-available-sizes="{{ size_names | escape }}"
+data-available-colors="{{ color_names | escape }}"
   data-svg-empty="{{ 'sparkle.svg' | asset_url }}"
   data-svg-filled="{{ 'sparkle-icon.svg' | asset_url }}">
             <img src="{{ 'sparkle.svg' | asset_url }}" alt="Wishlist">

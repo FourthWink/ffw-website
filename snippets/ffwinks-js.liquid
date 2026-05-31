@@ -961,7 +961,7 @@
   }
 
   function getProductFromSparkle(sparkleEl) {
-    var card = sparkleEl.closest('.product-card, .shop-product, .newin-product, [data-product-id], .card, .product-item');
+    var card = sparkleEl.closest('.product-card, .shop-product, .newin-product, .ffw-shop-product, .ffw-newin-product, [class^="ai-picks-box-"], [class*=" ai-picks-box-"], [data-product-id], .card, .product-item');
     var rawSizes = (card && card.dataset.availableSizes) ? card.dataset.availableSizes : (sparkleEl.dataset.availableSizes || '');
     var rawColors = (card && card.dataset.availableColors) ? card.dataset.availableColors : (sparkleEl.dataset.availableColors || '');
 
@@ -1019,7 +1019,7 @@
       var vid = sparkle.dataset && sparkle.dataset.variantId ? sparkle.dataset.variantId : null;
       var title = sparkle.dataset && sparkle.dataset.title ? sparkle.dataset.title : '';
 
-      var card = sparkle.closest('.product-card, .shop-product, .newin-product, [data-product-id]');
+      var card = sparkle.closest('.product-card, .shop-product, .newin-product, .ffw-shop-product, .ffw-newin-product, [data-product-id]');
       if (!vid && card) {
         vid = card.dataset.variantId || null;
       }
@@ -1043,19 +1043,82 @@
     });
   }
 
+  function getWishlistItemIndex(list, item) {
+    return list.findIndex(function (i) {
+      return (item.variant_id && i.variant_id === item.variant_id) ||
+             (item.title && i.title === item.title);
+    });
+  }
+
+  function getWishlistCardForSizePicker(sparkleEl) {
+    if (!sparkleEl || !sparkleEl.closest) return null;
+    return sparkleEl.closest('.ffw-shop-product, .ffw-newin-product, .product-card, [class^="ai-picks-box-"], [class*=" ai-picks-box-"]');
+  }
+
+  function getCleanWishlistSizes(item) {
+    return (item.available_sizes || []).map(function (size) {
+      return String(size || '').trim();
+    }).filter(Boolean);
+  }
+
+  function closeWishlistSizePickers(exceptPicker) {
+    document.querySelectorAll('[data-ffw-card-size-picker]').forEach(function (picker) {
+      if (exceptPicker && picker === exceptPicker) return;
+      picker.remove();
+    });
+  }
+
+  function showWishlistSizePicker(sparkleEl, sizes) {
+    var card = getWishlistCardForSizePicker(sparkleEl);
+    if (!card || !sizes.length) return false;
+
+    var existing = card.querySelector('[data-ffw-card-size-picker]');
+    if (existing) {
+      closeWishlistSizePickers(existing);
+      return true;
+    }
+
+    closeWishlistSizePickers();
+
+    var picker = document.createElement('div');
+    picker.className = 'ffw-card-size-picker';
+    picker.setAttribute('data-ffw-card-size-picker', '');
+
+    sizes.forEach(function (size) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ffw-card-size-option';
+      btn.textContent = size;
+      btn.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleWishlistItem(sparkleEl, { selected_size: size });
+        closeWishlistSizePickers();
+      });
+      picker.appendChild(btn);
+    });
+
+    card.appendChild(picker);
+    return true;
+  }
+
   var scheduleSparkleSync = debounce(function () {
     updateAllSparkleStates();
   }, 80);
 
-  function toggleWishlistItem(sparkleEl) {
+  function toggleWishlistItem(sparkleEl, overrides) {
     var item = getProductFromSparkle(sparkleEl);
     if (!item) return;
 
+    overrides = overrides || {};
+    if (overrides.selected_size) item.selected_size = overrides.selected_size;
+    if (overrides.selected_color) item.selected_color = overrides.selected_color;
+    if (!item.selected_color && item.available_colors && item.available_colors.length === 1) {
+      item.selected_color = String(item.available_colors[0] || '').trim();
+    }
+
     var wl  = getWishlist();
-    var idx = wl.findIndex(function (i) {
-      return (item.variant_id && i.variant_id === item.variant_id) ||
-             (item.title && i.title === item.title);
-    });
+    var idx = getWishlistItemIndex(wl, item);
     if (idx !== -1) {
       wl.splice(idx, 1);
     } else {
@@ -1073,12 +1136,30 @@
   }
 
   document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-ffw-card-size-picker]')) return;
+    if (e.target.closest('.product-sparkle-icon, .shop-product-icon, .newin-product-icon, [data-ffwinks-sparkle]')) return;
+    closeWishlistSizePickers();
+  }, false);
+
+  document.addEventListener('click', function (e) {
     var sparkle = e.target.closest(
       '.product-sparkle-icon, .shop-product-icon, .newin-product-icon, [data-ffwinks-sparkle]'
     );
     if (!sparkle) return;
     e.preventDefault();
     e.stopPropagation();
+
+    var item = getProductFromSparkle(sparkle);
+    var sizes = item ? getCleanWishlistSizes(item) : [];
+    var card = getWishlistCardForSizePicker(sparkle);
+    var isAlreadyWishlisted = item && getWishlistItemIndex(getWishlist(), item) !== -1;
+
+    if (card && !isAlreadyWishlisted && sizes.length) {
+      showWishlistSizePicker(sparkle, sizes);
+      return;
+    }
+
+    closeWishlistSizePickers();
     toggleWishlistItem(sparkle);
   }, false);
 
@@ -1147,6 +1228,7 @@
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
+      closeWishlistSizePickers();
       closeMobileMenu();
       closeFullscreen(wishlistOverlay);
       closeFullscreen(cartOverlay);

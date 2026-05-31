@@ -1988,6 +1988,42 @@ button.ffwinks-submit-btn:hover { color: #000; }
 .shop-product-icon.ffwinks-sparkle--pop,
 .newin-product-icon.ffwinks-sparkle--pop { animation: ffwinks-sparkle-pop 0.3s ease forwards; }
 
+.ffw-card-size-picker {
+  position: absolute;
+  top: 36%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(12px, auto));
+  justify-content: center;
+  align-items: center;
+  column-gap: 34px;
+  row-gap: 14px;
+  pointer-events: auto;
+}
+
+.ffw-card-size-option {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 12px;
+  text-align: center;
+  line-height: 1;
+  cursor: pointer;
+  color: #aaa;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 10px;
+  font-weight: 400;
+  transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+.ffw-card-size-option:is(:hover, :focus-visible, :active) {
+  color: #000;
+  font-weight: 700;
+}
+
 /* Header action icon wrapper */
 .header-actions__action { overflow: visible !important; }
 header-actions { overflow: visible !important; }

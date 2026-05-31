@@ -30,11 +30,23 @@
         {%- liquid
           assign primary_image = product.featured_image | default: product.featured_media.preview_image
           assign hover_image = blank
+          assign size_names = product.metafields.shopify.size.value | map: 'label' | join: ', '
+          assign color_names = product.metafields.shopify.color-pattern.value | map: 'label' | join: ', '
 
           for image in product.images
             if primary_image == blank or image.id != primary_image.id
               assign hover_image = image
               break
+            endif
+          endfor
+
+          for option in product.options_with_values
+            assign option_handle = option.name | handleize
+            if size_names == blank and option_handle contains 'size'
+              assign size_names = option.values | join: ', '
+            endif
+            if color_names == blank and option_handle contains 'color'
+              assign color_names = option.values | join: ', '
             endif
           endfor
         -%}
@@ -47,6 +59,8 @@
           data-product-tags="{% for tag in product.tags %}{{ tag | handleize }}{% unless forloop.last %},{% endunless %}{% endfor %}"
           data-product-price="{{ product.price }}"
           data-product-available="{{ product.available }}"
+          data-available-sizes="{{ size_names | escape }}"
+          data-available-colors="{{ color_names | escape }}"
         >
           <div class="ffw-newin-product-image{% if hover_image != blank %} ffw-newin-product-image--has-hover{% endif %}">
             {%- if primary_image -%}
@@ -99,6 +113,8 @@
               data-price-formatted="{{ product.price | money }}"
               data-image="{{ product.featured_media | image_url: width: 300 }}"
               data-url="{{ product.url }}"
+              data-available-sizes="{{ size_names | escape }}"
+              data-available-colors="{{ color_names | escape }}"
               data-svg-empty="{{ 'sparkle.svg' | asset_url }}"
               data-svg-filled="{{ 'sparkle-icon.svg' | asset_url }}"
               type="button"
