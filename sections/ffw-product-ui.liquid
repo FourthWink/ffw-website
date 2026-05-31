@@ -99,8 +99,14 @@
       padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
       background: #fff;
       box-sizing: border-box;
-      transform: translateY(var(--ffw-mobile-atc-footer-shift, 0px));
       transition: opacity 0.2s, visibility 0.2s;
+    }
+
+    #ffwinks-mobile-atc.ffw-mobile-atc--footer-locked {
+      position: absolute;
+      top: var(--ffw-mobile-atc-footer-top);
+      bottom: auto;
+      transform: none;
     }
 
     /* The Smooth Top Fade (Fog) */
@@ -150,6 +156,8 @@
     var mq = window.matchMedia('(max-width: 749px)');
     var footer = null;
     var frame = null;
+    var locked = false;
+    var fixedBottomY = null;
 
     function getFooter() {
       if (footer && document.documentElement.contains(footer)) return footer;
@@ -158,27 +166,62 @@
     }
 
     function getFixedBottomY() {
-      var bottom = parseFloat(window.getComputedStyle(mobileAtc).bottom);
-      if (!Number.isFinite(bottom)) bottom = 0;
-      return window.innerHeight - bottom;
+      if (!locked || fixedBottomY === null) {
+        var bottom = parseFloat(window.getComputedStyle(mobileAtc).bottom);
+        if (!Number.isFinite(bottom)) bottom = 0;
+        fixedBottomY = window.innerHeight - bottom;
+      }
+
+      return fixedBottomY;
+    }
+
+    function getScrollElement() {
+      if (document.body && document.body.scrollHeight > document.body.clientHeight + 1) return document.body;
+      return document.scrollingElement || document.documentElement;
+    }
+
+    function getScrollY() {
+      var scrollElement = getScrollElement();
+      return scrollElement ? scrollElement.scrollTop : window.scrollY;
+    }
+
+    function getDocumentTop(element) {
+      return element.getBoundingClientRect().top + getScrollY();
+    }
+
+    function unlock() {
+      locked = false;
+      mobileAtc.classList.remove('ffw-mobile-atc--footer-locked');
+      mobileAtc.style.removeProperty('--ffw-mobile-atc-footer-top');
     }
 
     function update() {
       frame = null;
 
       if (!mq.matches) {
-        mobileAtc.style.removeProperty('--ffw-mobile-atc-footer-shift');
+        unlock();
         return;
       }
 
       var footerEl = getFooter();
       if (!footerEl) {
-        mobileAtc.style.removeProperty('--ffw-mobile-atc-footer-shift');
+        unlock();
         return;
       }
 
-      var shift = Math.min(0, footerEl.getBoundingClientRect().top - getFixedBottomY());
-      mobileAtc.style.setProperty('--ffw-mobile-atc-footer-shift', Math.round(shift) + 'px');
+      var scrollY = getScrollY();
+      var footerTop = getDocumentTop(footerEl);
+      var lockScrollY = footerTop - getFixedBottomY();
+      var unlockScrollY = lockScrollY - 12;
+
+      if (locked ? scrollY < unlockScrollY : scrollY < lockScrollY) {
+        unlock();
+        return;
+      }
+
+      locked = true;
+      mobileAtc.classList.add('ffw-mobile-atc--footer-locked');
+      mobileAtc.style.setProperty('--ffw-mobile-atc-footer-top', Math.round(footerTop - mobileAtc.getBoundingClientRect().height) + 'px');
     }
 
     function queueUpdate() {
@@ -190,7 +233,10 @@
     document.addEventListener('scroll', queueUpdate, { capture: true, passive: true });
     document.documentElement.addEventListener('scroll', queueUpdate, { passive: true });
     document.body.addEventListener('scroll', queueUpdate, { passive: true });
-    window.addEventListener('resize', queueUpdate);
+    window.addEventListener('resize', function() {
+      fixedBottomY = null;
+      queueUpdate();
+    });
     window.addEventListener('load', queueUpdate);
     if (mq.addEventListener) mq.addEventListener('change', queueUpdate);
 
