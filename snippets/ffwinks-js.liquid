@@ -1085,6 +1085,10 @@
     var picker = document.createElement('div');
     picker.className = 'ffw-card-size-picker';
     picker.setAttribute('data-ffw-card-size-picker', '');
+    picker.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    });
     card.classList.add('ffw-card-size-picker-open');
 
     sizes.forEach(function (size) {
