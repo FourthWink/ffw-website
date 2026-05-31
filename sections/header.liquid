@@ -1946,6 +1946,11 @@ button.ffwinks-submit-btn:hover { color: #000; }
   transition: none !important;
 }
 
+#ffwinks-cart-overlay .ffwinks-checkout-link-wrap .ffwinks-img-label {
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
 /* Custom-liquid cart drawer floating checkout (same classes as soul pill) */
 .cart-overlay__floating-btn .ffwinks-img-label {
   transition: none !important;
@@ -1953,7 +1958,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
 .cart-overlay__floating-btn:hover .ffwinks-img-label,
 .cart-overlay__floating-btn:focus-visible .ffwinks-img-label {
   color: #000 !important;
-  font-weight: 400 !important;
+  font-weight: 700 !important;
   transition: none !important;
 }
 
@@ -2713,40 +2718,6 @@ header-component .header__menu-item:hover,
 .ffwinks-fullscreen:not(.ffwinks-fullscreen--open),
 #ffwinks-search-bar:not(.is-open) {
   content-visibility: hidden;
-}
-/* Mobile close button inside the Cart Overlay */
-.ffwinks-cart__close-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  top: 50px;
-  right: 16px;
-  z-index: 10002;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e0e0e0;
-  border-radius: 50%;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-  transition: background 0.2s, opacity 0.2s, transform 0.2s ease;
-  padding: 0;
-  
-  /* Typography for the letter "x" */
-  color: #000;
-  font-family: 'Montserrat', Arial, sans-serif !important;
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 1;
-  padding-bottom: 2px; /* Slight nudge to visually center the lowercase x */
-}
-
-
-@media screen and (min-width: 750px) {
-  .ffwinks-cart__close-btn.mobile-only {
-    display: none !important;
-  }
 }
 {% endstylesheet %}
 

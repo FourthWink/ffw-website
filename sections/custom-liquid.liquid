@@ -52,7 +52,6 @@
     var subtotalMobile = document.getElementById('cart-subtotal-mobile');
     var taxNoteMobile = document.getElementById('cart-overlay-tax-note-mobile');
     var checkoutWrapMobile = document.getElementById('cart-checkout-wrapper-mobile');
-    var closeBtnMobileOverlay = document.getElementById('cart-close-mobile-overlay');
 
     // Keeps the last rendered cart item scrollable past the fixed checkout UI.
     function updateDynamicPadding() {
@@ -510,7 +509,6 @@
     if (closeBtnDesktop) closeBtnDesktop.addEventListener('click', closeCart);
     if (closeBtnMobile) closeBtnMobile.addEventListener('click', closeCart);
     if (backdrop) backdrop.addEventListener('click', closeCart);
-    if (closeBtnMobileOverlay) closeBtnMobileOverlay.addEventListener('click', closeCart);
     mountDesktopFloatingWrapper();
     
     document.addEventListener('keydown', function (e) {
