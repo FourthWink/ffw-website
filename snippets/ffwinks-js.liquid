@@ -1013,11 +1013,12 @@
 
   function updateAllSparkleStates() {
     var wl    = getWishlist();
-    var ids   = wl.map(function (i) { return i.variant_id; }).filter(Boolean);
+    var ids   = wl.map(function (i) { return i.variant_id ? String(i.variant_id) : ''; }).filter(Boolean);
     var names = wl.map(function (i) { return i.title; });
     document.querySelectorAll('.product-sparkle-icon, .shop-product-icon, .newin-product-icon').forEach(function (sparkle) {
       var vid = sparkle.dataset && sparkle.dataset.variantId ? sparkle.dataset.variantId : null;
       var title = sparkle.dataset && sparkle.dataset.title ? sparkle.dataset.title : '';
+      var strictVariant = sparkle.dataset && sparkle.dataset.ffwProductPageSparkle !== undefined;
 
       var card = sparkle.closest('.product-card, .shop-product, .newin-product, .ffw-shop-product, .ffw-newin-product, [data-product-id]');
       if (!vid && card) {
@@ -1028,13 +1029,18 @@
         title = nameEl ? nameEl.textContent.trim() : '';
       }
 
-      var inList = (vid && ids.indexOf(String(vid)) !== -1) || (title && names.indexOf(title) !== -1);
+      var inList = strictVariant && vid ?
+        ids.indexOf(String(vid)) !== -1 :
+        ((vid && ids.indexOf(String(vid)) !== -1) || (title && names.indexOf(title) !== -1));
       sparkle.classList.toggle('ffwinks-sparkle--active', inList);
     });
     document.querySelectorAll('[data-ffwinks-sparkle]').forEach(function (btn) {
       var vid   = btn.dataset.variantId || null;
       var title = btn.dataset.title     || '';
-      var inList = (vid && ids.indexOf(String(vid)) !== -1) || (title && names.indexOf(title) !== -1);
+      var strictVariant = btn.dataset.ffwProductPageSparkle !== undefined;
+      var inList = strictVariant && vid ?
+        ids.indexOf(String(vid)) !== -1 :
+        ((vid && ids.indexOf(String(vid)) !== -1) || (title && names.indexOf(title) !== -1));
       btn.classList.toggle('ffwinks-sparkle--active', inList);
       var img = btn.querySelector('img');
       if (img) {
@@ -1043,8 +1049,11 @@
     });
   }
 
-  function getWishlistItemIndex(list, item) {
+  function getWishlistItemIndex(list, item, strictVariant) {
     return list.findIndex(function (i) {
+      if (strictVariant && item.variant_id) {
+        return String(i.variant_id || '') === String(item.variant_id);
+      }
       return (item.variant_id && i.variant_id === item.variant_id) ||
              (item.title && i.title === item.title);
     });
@@ -1059,6 +1068,105 @@
     return (item.available_sizes || []).map(function (size) {
       return String(size || '').trim();
     }).filter(Boolean);
+  }
+
+  function getCleanWishlistColors(item) {
+    return (item.available_colors || []).map(function (color) {
+      return String(color || '').trim();
+    }).filter(Boolean);
+  }
+
+  function getWishlistOptionControlValue(control) {
+    if (!control) return '';
+    if (control.dataset && control.dataset.optionValue) return String(control.dataset.optionValue || '').trim();
+    if (control.value) return String(control.value || '').trim();
+    return String(control.textContent || '').trim();
+  }
+
+  function getProductPageSelectedOptionValue(pattern) {
+    var groups = document.querySelectorAll('[data-option-name]');
+
+    for (var i = 0; i < groups.length; i++) {
+      var group = groups[i];
+      var optionName = group.getAttribute('data-option-name') || '';
+      if (!pattern.test(optionName)) continue;
+
+      var selected = group.querySelector('.selected:not([disabled]), [aria-pressed="true"], [aria-checked="true"], input:checked, option:checked');
+      if (selected) return getWishlistOptionControlValue(selected);
+
+      var controls = group.querySelectorAll('button[data-option-value]:not([disabled]), [data-option-value]:not([disabled]), input:not([disabled]), option:not([disabled])');
+      if (controls.length) return getWishlistOptionControlValue(controls[0]);
+    }
+
+    return '';
+  }
+
+  function getProductPageSelectedVariantId() {
+    var selectors = [
+      'variant-picker select[name="id"]',
+      '[class*="ai-variant-picker-"] select[name="id"]',
+      'form[action*="/cart/add"] input[name="id"]',
+      'form[action*="/cart/add"] select[name="id"]',
+      'input[name="id"]',
+      'select[name="id"]'
+    ];
+
+    for (var i = 0; i < selectors.length; i++) {
+      var input = document.querySelector(selectors[i]);
+      if (input && input.value) return input.value;
+    }
+
+    return '';
+  }
+
+  var productWishlistMessageTimer = null;
+
+  function showProductPageWishlistMessage(sparkleEl, message) {
+    var msg = document.querySelector('[data-ffw-product-wishlist-message]');
+    if (!msg) {
+      msg = document.createElement('div');
+      msg.className = 'ffw-product-wishlist-message';
+      msg.setAttribute('data-ffw-product-wishlist-message', '');
+      document.body.appendChild(msg);
+    }
+
+    var rect = sparkleEl.getBoundingClientRect();
+    var left = Math.max(80, Math.min(window.innerWidth - 80, rect.left + (rect.width / 2)));
+    var top = Math.max(20, Math.min(window.innerHeight - 40, rect.bottom + 6));
+
+    msg.textContent = message;
+    msg.style.left = left + 'px';
+    msg.style.top = top + 'px';
+    msg.classList.add('is-visible');
+
+    clearTimeout(productWishlistMessageTimer);
+    productWishlistMessageTimer = setTimeout(function () {
+      msg.classList.remove('is-visible');
+    }, 1800);
+  }
+
+  function getProductPageWishlistOverrides(sparkleEl, item) {
+    if (!sparkleEl.dataset || sparkleEl.dataset.ffwProductPageSparkle === undefined) return null;
+
+    var sizes = item ? getCleanWishlistSizes(item) : [];
+    var colors = item ? getCleanWishlistColors(item) : [];
+    var selectedSize = getProductPageSelectedOptionValue(/size/i);
+    var selectedColor = getProductPageSelectedOptionValue(/colou?r/i);
+
+    if (!selectedSize && sizes.length === 1) selectedSize = sizes[0];
+    if (!selectedColor && colors.length === 1) selectedColor = colors[0];
+
+    if (sizes.length && !selectedSize) {
+      showProductPageWishlistMessage(sparkleEl, 'Please choose a size first.');
+      return false;
+    }
+
+    return {
+      strict_variant: true,
+      variant_id: getProductPageSelectedVariantId() || sparkleEl.dataset.variantId || '',
+      selected_size: selectedSize || (sizes.length ? '' : 'O/S'),
+      selected_color: selectedColor || (colors.length ? '' : 'Default')
+    };
   }
 
   function closeWishlistSizePickers(exceptPicker) {
@@ -1118,6 +1226,7 @@
     if (!item) return;
 
     overrides = overrides || {};
+    if (overrides.variant_id) item.variant_id = String(overrides.variant_id);
     if (overrides.selected_size) item.selected_size = overrides.selected_size;
     if (overrides.selected_color) item.selected_color = overrides.selected_color;
     if (!item.selected_color && item.available_colors && item.available_colors.length === 1) {
@@ -1125,7 +1234,7 @@
     }
 
     var wl  = getWishlist();
-    var idx = getWishlistItemIndex(wl, item);
+    var idx = getWishlistItemIndex(wl, item, overrides.strict_variant);
     if (idx !== -1) {
       wl.splice(idx, 1);
     } else {
@@ -1157,9 +1266,24 @@
     e.stopPropagation();
 
     var item = getProductFromSparkle(sparkle);
+    var productPageOverrides = item ? getProductPageWishlistOverrides(sparkle, item) : null;
+    if (productPageOverrides === false) return;
+
+    var itemForMatch = item;
+    if (item && productPageOverrides && productPageOverrides.variant_id) {
+      itemForMatch = {
+        variant_id: productPageOverrides.variant_id,
+        title: item.title
+      };
+    }
+
     var sizes = item ? getCleanWishlistSizes(item) : [];
     var card = getWishlistCardForSizePicker(sparkle);
-    var isAlreadyWishlisted = item && getWishlistItemIndex(getWishlist(), item) !== -1;
+    var isAlreadyWishlisted = itemForMatch && getWishlistItemIndex(
+      getWishlist(),
+      itemForMatch,
+      productPageOverrides && productPageOverrides.strict_variant
+    ) !== -1;
 
     if (card && !isAlreadyWishlisted && sizes.length) {
       showWishlistSizePicker(sparkle, sizes);
@@ -1167,7 +1291,7 @@
     }
 
     closeWishlistSizePickers();
-    toggleWishlistItem(sparkle);
+    toggleWishlistItem(sparkle, productPageOverrides || undefined);
   }, false);
 
   function openFullscreen(el) {

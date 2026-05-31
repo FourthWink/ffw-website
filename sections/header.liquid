@@ -2038,6 +2038,30 @@ button.ffwinks-submit-btn:hover { color: #000; }
   font-weight: 700;
 }
 
+.ffw-product-wishlist-message {
+  position: fixed;
+  z-index: 10000;
+  transform: translateX(-50%);
+  color: #666;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.ffw-product-wishlist-message.is-visible {
+  opacity: 1;
+}
+
 /* Header action icon wrapper */
 .header-actions__action { overflow: visible !important; }
 header-actions { overflow: visible !important; }
