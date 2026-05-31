@@ -502,11 +502,16 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
       });
 
       // ==========================================================
-      // STAR ANCHOR ENGINE (Continuous rAF Logic)
+      // STAR ANCHOR ENGINE
       // ==========================================================
-      window.addEventListener('DOMContentLoaded', function() {
-        var star = document.querySelector('.center-star-bg');
-        if (!star) return;
+      (function initHomeStarAnchor() {
+        var star = null;
+
+        function start() {
+          star = document.querySelector('.center-star-bg');
+          if (!star) return;
+          init();
+        }
 
         function init() {
           // Find the actual visible grid container to prevent locking onto hidden mobile clones
@@ -594,8 +599,12 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
           setTimeout(queueApplyState, 1000);
         }
 
-        init();
-      });
+        if (document.readyState === 'loading') {
+          window.addEventListener('DOMContentLoaded', start);
+        } else {
+          start();
+        }
+      })();
 
       window.addEventListener('DOMContentLoaded', function() {
         var isHomepage = document.querySelector('main[data-template="index"]');
