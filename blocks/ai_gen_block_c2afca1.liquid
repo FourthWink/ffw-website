@@ -81,8 +81,9 @@
   }
 
   .ai-luxury-footer-brand-name-{{ ai_gen_id }} {
+    display: block;
     font-weight: 700;
-    
+    margin-bottom: 2px;
   }
 
   .ai-luxury-footer-social-{{ ai_gen_id }} {
@@ -157,7 +158,7 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    opacity: 0.7;
+    opacity: 1;
     transition: opacity 0.2s ease;
   }
 
@@ -167,6 +168,7 @@
 
   .ai-luxury-footer-submit-{{ ai_gen_id }} img {
     display: block;
+    filter: brightness(0);
   }
 
   .ai-luxury-footer-message-{{ ai_gen_id }} {
@@ -297,8 +299,10 @@
     <div class="ai-luxury-footer-column-{{ ai_gen_id }} ai-luxury-footer-column-center-{{ ai_gen_id }}">
       {% if block.settings.brand_paragraph != blank %}
         <p class="ai-luxury-footer-paragraph-{{ ai_gen_id }}">
+          {% if block.settings.brand_name != blank %}
+            <span class="ai-luxury-footer-brand-name-{{ ai_gen_id }}">{{ block.settings.brand_name }}</span>
+          {% endif %}
           {{ block.settings.brand_paragraph }}
-          <span class="ai-luxury-footer-brand-name-{{ ai_gen_id }}">{{ block.settings.brand_name }}</span>
         </p>
       {% endif %}
     </div>
