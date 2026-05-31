@@ -2003,6 +2003,16 @@ button.ffwinks-submit-btn:hover { color: #000; }
   pointer-events: auto;
 }
 
+.ffw-card-size-picker-open .ffw-shop-product-image img,
+.ffw-card-size-picker-open .ffw-newin-product-image img,
+.ffw-card-size-picker-open [class*="ai-picks-box-media-"] img,
+.ffw-card-size-picker-open .product-card__image img,
+.ffw-card-size-picker-open .card-gallery img {
+  filter: blur(8px) saturate(0.72) brightness(1.16) !important;
+  opacity: 0.28 !important;
+  transition: filter 0.25s ease, opacity 0.25s ease !important;
+}
+
 .ffw-card-size-option {
   background: none;
   border: none;

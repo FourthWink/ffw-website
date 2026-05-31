@@ -1064,6 +1064,8 @@
   function closeWishlistSizePickers(exceptPicker) {
     document.querySelectorAll('[data-ffw-card-size-picker]').forEach(function (picker) {
       if (exceptPicker && picker === exceptPicker) return;
+      var card = getWishlistCardForSizePicker(picker);
+      if (card) card.classList.remove('ffw-card-size-picker-open');
       picker.remove();
     });
   }
@@ -1083,6 +1085,7 @@
     var picker = document.createElement('div');
     picker.className = 'ffw-card-size-picker';
     picker.setAttribute('data-ffw-card-size-picker', '');
+    card.classList.add('ffw-card-size-picker-open');
 
     sizes.forEach(function (size) {
       var btn = document.createElement('button');
