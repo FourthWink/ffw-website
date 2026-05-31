@@ -99,6 +99,7 @@
       padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
       background: #fff;
       box-sizing: border-box;
+      transform: translateY(var(--ffw-mobile-atc-footer-shift, 0px));
       transition: opacity 0.2s, visibility 0.2s;
     }
 
@@ -138,6 +139,68 @@
 </style>
 
 <script>
+// Keep the mobile ATC bar from covering the footer while preserving its fixed behavior.
+(function () {
+  function initMobileAtcFooterGuard() {
+    var mobileAtc = document.getElementById('ffwinks-mobile-atc');
+    if (!mobileAtc) return;
+
+    var mq = window.matchMedia('(max-width: 749px)');
+    var footer = null;
+    var frame = null;
+
+    function getFooter() {
+      if (footer && document.documentElement.contains(footer)) return footer;
+      footer = document.querySelector('.shopify-section-group-footer-group') || document.querySelector('footer');
+      return footer;
+    }
+
+    function getFixedBottomY() {
+      var bottom = parseFloat(window.getComputedStyle(mobileAtc).bottom);
+      if (!Number.isFinite(bottom)) bottom = 0;
+      return window.innerHeight - bottom;
+    }
+
+    function update() {
+      frame = null;
+
+      if (!mq.matches) {
+        mobileAtc.style.removeProperty('--ffw-mobile-atc-footer-shift');
+        return;
+      }
+
+      var footerEl = getFooter();
+      if (!footerEl) {
+        mobileAtc.style.removeProperty('--ffw-mobile-atc-footer-shift');
+        return;
+      }
+
+      var shift = Math.min(0, footerEl.getBoundingClientRect().top - getFixedBottomY());
+      mobileAtc.style.setProperty('--ffw-mobile-atc-footer-shift', Math.round(shift) + 'px');
+    }
+
+    function queueUpdate() {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    }
+
+    window.addEventListener('scroll', queueUpdate, { passive: true });
+    window.addEventListener('resize', queueUpdate);
+    window.addEventListener('load', queueUpdate);
+    if (mq.addEventListener) mq.addEventListener('change', queueUpdate);
+
+    queueUpdate();
+    setTimeout(queueUpdate, 250);
+    setTimeout(queueUpdate, 1000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileAtcFooterGuard);
+  } else {
+    initMobileAtcFooterGuard();
+  }
+})();
+
 // Deselect all variant options on first load (custom AI variant picker)
 (function () {
   // Only deselect if the user didn't arrive with a ?variant= param
