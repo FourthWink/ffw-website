@@ -1403,31 +1403,8 @@
         wlAutoSave2[idx].selected_color = item.selected_color; saveWishlist(wlAutoSave2);
       }
 
-      var sizeHTML = '<div class="ffwinks-text-options-wrap">';
-      if (item.available_sizes && item.available_sizes.length) {
-        item.available_sizes.forEach(function(s) {
-          var val = s.trim();
-          var activeClass = (item.selected_size === val) ? ' is-active' : '';
-          sizeHTML += '<span class="ffwinks-text-option ffwinks-size-text' + activeClass + '" data-idx="' + idx + '" data-val="' + val + '">' + val + '</span>';
-        });
-      } else {
-        var activeClass = (item.selected_size === 'O/S') ? ' is-active' : '';
-        sizeHTML += '<span class="ffwinks-text-option ffwinks-size-text' + activeClass + '" data-idx="' + idx + '" data-val="O/S">O/S</span>';
-      }
-      sizeHTML += '</div>';
-
-      var colorHTML = '<div class="ffwinks-text-options-wrap">';
-      if (item.available_colors && item.available_colors.length) {
-        item.available_colors.forEach(function(c) {
-          var val = c.trim();
-          var activeClass = (item.selected_color === val) ? ' is-active' : '';
-          colorHTML += '<span class="ffwinks-text-option ffwinks-color-text' + activeClass + '" data-idx="' + idx + '" data-val="' + val + '">' + val + '</span>';
-        });
-      } else {
-        var activeClass = (item.selected_color === 'Default') ? ' is-active' : '';
-        colorHTML += '<span class="ffwinks-text-option ffwinks-color-text' + activeClass + '" data-idx="' + idx + '" data-val="Default">Default</span>';
-      }
-      colorHTML += '</div>';
+      var sizeHTML = item.selected_size || '—';
+      var colorHTML = item.selected_color || '—';
 
       var errorMsg = '<div class="ffwinks-error-msg" id="ffwinks-error-' + idx + '" style="display:none; color: #d9534f; font-size: 9px; grid-column: 1 / -1; margin-top: -5px; margin-bottom: 5px; font-weight: bold; "></div>';
 
@@ -1445,12 +1422,12 @@
             '<span class="ffwinks-soul-label">' + (item.price_formatted || (item.price + (item.currency || '£'))) + '</span>' +
             '<span class="ffwinks-soul-value">'  + item.title + '</span>' +
             '<span class="ffwinks-soul-label">Size</span>'  +
-            '<span class="ffwinks-soul-value">' + sizeHTML + '</span>' +
+            '<span class="ffwinks-soul-value ffwinks-wishlist-selected-option">' + sizeHTML + '</span>' +
             '<span class="ffwinks-soul-label">Color</span>' +
-            '<span class="ffwinks-soul-value">' + colorHTML + '</span>' +
+            '<span class="ffwinks-soul-value ffwinks-wishlist-selected-option">' + colorHTML + '</span>' +
             errorMsg +
-            '<span></span>' +
-            '<button class="ffwinks-soul-action-btn" data-idx="' + idx + '" data-variant="' + (item.variant_id || '') + '">Add to cart</button>' +
+            '<span class="ffwinks-soul-label"></span>' +
+            '<button class="ffwinks-soul-action-btn ffwinks-wishlist-action-btn" data-idx="' + idx + '" data-variant="' + (item.variant_id || '') + '">Add to cart</button>' +
           '</div>' +
         '</div>';
 
@@ -1459,26 +1436,6 @@
 
     var currency = wl[0] && wl[0].currency ? wl[0].currency : '£';
     totalEl.textContent = total.toFixed(0) + currency;
-
-    listEl.querySelectorAll('.ffwinks-size-text').forEach(function(el) {
-      el.addEventListener('click', function() {
-        var list = getWishlist();
-        list[this.dataset.idx].selected_size = this.dataset.val;
-        saveWishlist(list);
-        document.getElementById('ffwinks-error-' + this.dataset.idx).style.display = 'none';
-        renderWishlistOverlay();
-      });
-    });
-
-    listEl.querySelectorAll('.ffwinks-color-text').forEach(function(el) {
-      el.addEventListener('click', function() {
-        var list = getWishlist();
-        list[this.dataset.idx].selected_color = this.dataset.val;
-        saveWishlist(list);
-        document.getElementById('ffwinks-error-' + this.dataset.idx).style.display = 'none';
-        renderWishlistOverlay();
-      });
-    });
 
     listEl.querySelectorAll('.ffwinks-soul-action-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {

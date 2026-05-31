@@ -1812,6 +1812,19 @@ button.ffwinks-submit-btn:hover { color: #000; }
 }
 .ffwinks-soul-action-btn:hover { color: #000; }
 
+#ffwinks-wishlist-overlay .ffwinks-wishlist-selected-option {
+  font-size: var(--soul-font-label);
+  font-weight: 700;
+  color: #222;
+  text-transform: capitalize;
+}
+
+#ffwinks-wishlist-overlay .ffwinks-wishlist-action-btn {
+  grid-column: 2;
+  justify-self: start;
+  color: #666;
+}
+
 /* — Subtotal bar (fixed bottom) — */
 .ffwinks-soul-subtotal-wrapper {
   position: fixed;
@@ -1947,6 +1960,11 @@ button.ffwinks-submit-btn:hover { color: #000; }
 }
 
 #ffwinks-cart-overlay .ffwinks-checkout-link-wrap .ffwinks-img-label {
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
+#ffwinks-wishlist-overlay .ffwinks-soul-addall-wrapper .ffwinks-img-label {
   color: #000 !important;
   font-weight: 700 !important;
 }
