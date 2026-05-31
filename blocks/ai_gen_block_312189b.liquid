@@ -232,6 +232,12 @@
           const selectedButton = container.querySelector('.ai-variant-picker__value-{{ ai_gen_id }}.selected');
           if (selectedButton) {
             selectedOptions.push(selectedButton.dataset.optionValue);
+            return;
+          }
+
+          const buttons = container.querySelectorAll('.ai-variant-picker__value-{{ ai_gen_id }}');
+          if (buttons.length === 1) {
+            selectedOptions.push(buttons[0].dataset.optionValue);
           }
         });
 
