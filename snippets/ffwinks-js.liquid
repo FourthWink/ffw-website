@@ -355,9 +355,13 @@
 
     if (rows.length === 1) {
       if (isMobile) {
-        // ── V2 fix: mobile single-item positions star to right of image ──
+        // Match the same image-gap anchor used when the cart has multiple rows.
         var mobileSingleImg = rows[0].querySelector('.ffwinks-soul-img-box, .cart-item__left');
+        var mobileSingleRow = rows[0].getBoundingClientRect();
+        var mobileListStyles = window.getComputedStyle(activeList);
+        var mobileListGap = parseFloat(mobileListStyles.rowGap || mobileListStyles.gap) || 0;
         var mobileSingleX = '50%';
+        var mobileSingleY = (mobileSingleRow.bottom + (mobileListGap / 2) + nudge_y) + 'px';
 
         if (mobileSingleImg) {
           mobileSingleX = (mobileSingleImg.getBoundingClientRect().right + nudge_x) + 'px';
@@ -366,7 +370,7 @@
         star.style.setProperty('position', 'fixed', 'important');
         star.style.setProperty('z-index', STAR_Z_INDEX, 'important');
         star.style.setProperty('left', mobileSingleX, 'important');
-        star.style.setProperty('top', px_1_item + 'px', 'important');
+        star.style.setProperty('top', mobileSingleY, 'important');
         star.style.setProperty('transform', transformValue, 'important');
       } else if (isCart) {
         // ── V1 desktop cart: image-anchored with correct nudge values ──
