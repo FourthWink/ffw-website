@@ -258,19 +258,33 @@
   if (window.location.search.indexOf('variant=') !== -1) return;
 
   function deselect() {
-    // Remove .selected from all custom picker buttons
-    document.querySelectorAll('[class*="ai-variant-picker__value"]').forEach(function(btn) {
-      btn.classList.remove('selected');
-    });
+    document.querySelectorAll('[class*="ai-variant-picker-"]').forEach(function(picker) {
+      var hasIncompleteSelection = false;
 
-    // Reset the hidden select to no selection
-    var sel = document.querySelector('[class*="ai-variant-picker"] select[name="id"]');
-    if (sel) {
-      sel.value = '';
-      sel.querySelectorAll('option[selected]').forEach(function(opt) {
-        opt.removeAttribute('selected');
+      picker.querySelectorAll('[class*="ai-variant-picker__option"]').forEach(function(optionGroup) {
+        var buttons = optionGroup.querySelectorAll('[class*="ai-variant-picker__value"]');
+
+        if (buttons.length === 1) {
+          buttons[0].classList.add('selected');
+          return;
+        }
+
+        buttons.forEach(function(btn) {
+          btn.classList.remove('selected');
+        });
+        hasIncompleteSelection = true;
       });
-    }
+
+      if (!hasIncompleteSelection) return;
+
+      var sel = picker.querySelector('select[name="id"]');
+      if (sel) {
+        sel.value = '';
+        sel.querySelectorAll('option[selected]').forEach(function(opt) {
+          opt.removeAttribute('selected');
+        });
+      }
+    });
   }
 
   // Run at multiple points to beat any late JS hydration

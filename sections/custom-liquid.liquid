@@ -432,9 +432,12 @@
         var rootUrl = window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/';
         var variantId = new URLSearchParams(window.location.search).get('variant');
         if (!variantId) {
-          var formInput = document.querySelector('form[action*="/cart/add"] [name="id"], select[name="id"], input[name="id"]');
-          if (formInput && formInput.value) {
-            variantId = formInput.value;
+          var formInputs = document.querySelectorAll('form[action*="/cart/add"] [name="id"], select[name="id"], input[name="id"]');
+          for (var inputIndex = 0; inputIndex < formInputs.length; inputIndex++) {
+            if (formInputs[inputIndex].value) {
+              variantId = formInputs[inputIndex].value;
+              break;
+            }
           }
         }
 
