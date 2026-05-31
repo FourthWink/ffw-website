@@ -273,11 +273,6 @@
     mix-blend-mode: difference;
   }
 
-  .center-star-bg.ffw-home-star--locked {
-    position: absolute;
-    top: var(--ffw-home-star-lock-y, 50%);
-  }
-
   .center-star-bg img,
   .center-star-bg svg,
   .center-star-bg * {
@@ -531,50 +526,28 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
             return;
           }
 
-          var locked = false;
           var frame = null;
 
-          function getScrollElement() {
-            if (document.body && document.body.scrollHeight > document.body.clientHeight + 1) return document.body;
-            return document.scrollingElement || document.documentElement;
-          }
-
-          function getScrollY() {
-            var scrollElement = getScrollElement();
-            return scrollElement ? scrollElement.scrollTop : window.scrollY;
-          }
-
-          function getDocumentTop(element) {
-            return element.getBoundingClientRect().top + getScrollY();
-          }
-
           function unlock() {
-            locked = false;
-            star.classList.remove('ffw-home-star--locked');
-            star.style.removeProperty('--ffw-home-star-lock-y');
             star.style.position = 'fixed';
             star.style.top = '50%';
           }
 
           function applyState() {
             var rect = target.getBoundingClientRect();
-            var targetCenterY = getDocumentTop(target) + (rect.height / 2);
-            var lockScrollY = targetCenterY - (window.innerHeight / 2);
-            var unlockScrollY = lockScrollY - 12;
-            var scrollY = getScrollY();
+            var targetMidInViewport = rect.top + (rect.height / 2);
+            var viewportMid = window.innerHeight / 2;
 
-            if (locked ? scrollY < unlockScrollY : scrollY + 1 < lockScrollY) {
+            if (targetMidInViewport > viewportMid + 1) {
               unlock();
               return;
             }
 
-            locked = true;
-            star.classList.add('ffw-home-star--locked');
-            star.style.position = 'absolute';
-            star.style.setProperty('--ffw-home-star-lock-y', Math.round(targetCenterY) + 'px');
+            star.style.position = 'fixed';
+            star.style.top = Math.round(targetMidInViewport) + 'px';
           }
 
-          // Fixed before Dream Picks, then parked in the document flow.
+          // Fixed before Dream Picks, then follows the section center.
           star.style.position = 'fixed';
           star.style.left = '50%';
           star.style.transform = 'translate(-50%, -50%)';
