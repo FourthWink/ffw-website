@@ -185,6 +185,9 @@
     }
 
     window.addEventListener('scroll', queueUpdate, { passive: true });
+    document.addEventListener('scroll', queueUpdate, { capture: true, passive: true });
+    document.documentElement.addEventListener('scroll', queueUpdate, { passive: true });
+    document.body.addEventListener('scroll', queueUpdate, { passive: true });
     window.addEventListener('resize', queueUpdate);
     window.addEventListener('load', queueUpdate);
     if (mq.addEventListener) mq.addEventListener('change', queueUpdate);
