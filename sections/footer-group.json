@@ -102,7 +102,7 @@
       "type": "custom-liquid",
       "name": "t:names.custom_liquid",
       "settings": {
-        "custom_liquid": "{% render 'ffw-footer-mobile-layout' %}",
+        "custom_liquid": "{% render 'ffw-footer-mobile-layout' %}\n",
         "fixed_bottom": false,
         "color_scheme": "",
         "section_width": "page-width",
