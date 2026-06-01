@@ -382,14 +382,6 @@
   JS snippet runs so getElementById() finds them immediately.
   ─────────────────────────────────────────────────────────────
 {% endcomment %}
-<div id="ffw-portrait-lock">
-  <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-    <line x1="12" y1="18" x2="12.01" y2="18"></line>
-  </svg>
-  <p>Please rotate your device to portrait mode.</p>
-</div>
-
 <div id="ffw-checkout-transition">
   <img src="{{ 'lips.svg' | asset_url }}" alt="Loading Checkout..." class="ffw-lips-transition-icon">
 </div>
@@ -2710,50 +2702,7 @@ header-component .header__menu-item:hover,
   }
 }
 
-/* 2. The Portrait Lock Overlay Shell */
-#ffw-portrait-lock {
-  display: none;
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100dvh;
-  background: #ffffff;
-  z-index: 2147483647; /* Maximum possible z-index to cover the entire site */
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: #000000;
-  font-family: 'Montserrat', Arial, sans-serif;
-}
-#ffw-portrait-lock p {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0;
-  margin: 0;
-}
-
-/* 3. Animating the little phone icon */
-#ffw-portrait-lock svg {
-  animation: rotate-phone 2s infinite ease-in-out;
-  margin-bottom: 20px;
-}
-@keyframes rotate-phone {
-  0% { transform: rotate(-90deg); }
-  50% { transform: rotate(0deg); }
-  100% { transform: rotate(-90deg); }
-}
-
-/* 4. Trigger the overlay ONLY on mobile devices turned sideways */
-@media screen and (max-width: 950px) and (max-height: 500px) and (orientation: landscape) {
-  #ffw-portrait-lock {
-    display: flex !important;
-  }
-  body {
-    overflow: hidden !important;
-  }
-}
-/* 5. Huge Desktop Adjustments */
+/* 2. Huge Desktop Adjustments */
 @media screen and (min-width: 1800px),
        screen and (min-width: 1400px) and (min-height: 820px) {
   :root {
