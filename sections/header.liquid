@@ -774,6 +774,11 @@ header-component  { overflow: visible !important; }
     transform: translateY(-2px);
   }
 
+  .header-menu .menu-list__list-item[slot='more'],
+  .header-menu .overflow-menu::part(more) {
+    display: none !important;
+  }
+
   .header__column--right {
     gap: clamp(56px, 5.8vw, 80px) !important;
   }
