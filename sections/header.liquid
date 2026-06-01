@@ -1703,6 +1703,26 @@ button.ffwinks-submit-btn:hover { color: #000; }
   filter: none !important;
   opacity: 1 !important;
 }
+
+#ffwinks-cart-overlay,
+#ffwinks-wishlist-overlay {
+  --ffwinks-soul-img-box-y: 14px;
+}
+
+#ffwinks-cart-overlay .ffwinks-soul-row > .ffwinks-soul-img-box,
+#ffwinks-cart-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:hover,
+#ffwinks-cart-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:focus-visible,
+#ffwinks-cart-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:active,
+#ffwinks-cart-overlay .ffwinks-soul-row:hover > .ffwinks-soul-img-box,
+#ffwinks-cart-overlay .ffwinks-soul-row:focus-within > .ffwinks-soul-img-box,
+#ffwinks-wishlist-overlay .ffwinks-soul-row > .ffwinks-soul-img-box,
+#ffwinks-wishlist-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:hover,
+#ffwinks-wishlist-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:focus-visible,
+#ffwinks-wishlist-overlay .ffwinks-soul-row > .ffwinks-soul-img-box:active,
+#ffwinks-wishlist-overlay .ffwinks-soul-row:hover > .ffwinks-soul-img-box,
+#ffwinks-wishlist-overlay .ffwinks-soul-row:focus-within > .ffwinks-soul-img-box {
+  transform: translateY(var(--ffwinks-soul-img-box-y)) translateZ(0) !important;
+}
 /* — Details box — */
 .ffwinks-soul-details-box {
   flex: 1 1 0%;
