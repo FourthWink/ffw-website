@@ -229,17 +229,18 @@
     height: 100%;
     min-height: 0;
     display: grid;
+    grid-template: "media" minmax(0, 1fr) / minmax(0, 1fr);
     align-items: center;
     justify-items: center;
     padding-top: 10px;
   }
   .ffw-shop-product-image-stack img,
   .ffw-shop-product-image > img {
-    grid-area: 1 / 1;
-    width: 100%;
+    grid-area: media;
+    width: auto;
     max-width: 100%;
     max-height: 100%;
-    height: auto;
+    height: 100%;
     object-fit: contain;
     object-position: center;
     display: block;
@@ -413,7 +414,11 @@
     .ffw-shop-grid { grid-template-columns: 1fr; gap: 12px; }
     .ffw-shop-section { padding: 25px 15px; }
     .ffw-shop-product { border-radius: 80px; padding: 40px 12px 25px; }
-    .ffw-shop-product-image img { width: 96%; }
+    .ffw-shop-product-image img {
+      width: auto;
+      max-width: 96%;
+      height: 100%;
+    }
     .ffw-filter-trigger { margin-bottom: 60px; }
   }
 
