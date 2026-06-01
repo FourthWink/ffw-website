@@ -778,6 +778,10 @@ header-component  { overflow: visible !important; }
   border-bottom: var(--border-bottom-width) solid var(--color-border);
 }
 @media screen and (min-width: 1536px) {
+  .header__row--top .header__columns {
+    transform: translateY(-2px);
+  }
+
   .header__column--right {
     gap: clamp(56px, 5.8vw, 80px) !important;
   }
@@ -1023,14 +1027,6 @@ body.ffw-filter-open #ffwinks-global-overlay {
   max-width: 150px !important;
   object-fit: contain !important;
   display: block !important;
-}
-
-@media screen and (min-width: 1536px) {
-  .header-logo img, header-logo img,
-  .header-logo svg, header-logo svg,
-  .header-logo a img, header-logo a img {
-    transform: translateY(-2px);
-  }
 }
 
 /* ┌─────────────────────────────────────────────────────────────────┐
