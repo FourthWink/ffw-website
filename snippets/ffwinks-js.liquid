@@ -1325,6 +1325,16 @@
     );
   }
 
+  function openCartFullscreen(opts) {
+    opts = opts || {};
+    closeMobileMenu();
+    closeAll();
+    closeFullscreen(wishlistOverlay);
+    openFullscreen(cartOverlay);
+    refreshCartOverlay({ useCache: opts.useCache !== false });
+    setTimeout(ffwinksUpdateStar, 100);
+  }
+
   function clearHeaderActionFocus(el) {
     var activeEl = document.activeElement;
     var selector = el === wishlistOverlay
@@ -2058,6 +2068,7 @@
 
     var cartTrigger = e.target.closest(
       'a[href="/cart"], a[href*="/cart"], [data-cart-nav], ' +
+      'header-actions [data-testid="cart-drawer-trigger"], header-actions button[aria-label*="cart" i], header-actions cart-icon, ' +
       '.eye-basket, .nav-link-cart, .header-actions__action--cart, ' +
       'a:has(img[alt*="basket" i]), a:has(img[alt*="cart" i]), a:has(img[src*="eye-icon"])'
     );
@@ -2071,16 +2082,17 @@
       if (cartOverlay.classList.contains('ffwinks-fullscreen--open')) {
         closeFullscreen(cartOverlay);
       } else {
-        closeAll();
-        closeFullscreen(wishlistOverlay);
-        refreshCartOverlay();
-        openFullscreen(cartOverlay);
-        setTimeout(ffwinksUpdateStar, 100);
+        openCartFullscreen();
       }
       return;
     }
 
   }, true);
+
+  document.addEventListener('ffwinks:open-cart', function (e) {
+    if (e && e.stopImmediatePropagation) e.stopImmediatePropagation();
+    openCartFullscreen({ useCache: false });
+  });
 
   function setViewportHeight() {
     document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
@@ -2280,6 +2292,9 @@
       '.eye-basket',
       'a[href="/cart"]',
       'a[aria-label*="cart" i]',
+      'header-actions [data-testid="cart-drawer-trigger"]',
+      'header-actions button[aria-label*="cart" i]',
+      'header-actions cart-icon',
       '[data-cart-nav]',
       '.nav-link-cart',
       '.header-actions__action--cart',
