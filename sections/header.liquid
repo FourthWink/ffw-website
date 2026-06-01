@@ -774,6 +774,16 @@ header-component  { overflow: visible !important; }
     transform: translateY(-2px);
   }
 
+  .header__columns header-menu.header-menu,
+  .header__columns header-menu.header-menu.hidden {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .header__drawer {
+    display: none !important;
+  }
+
   .header-menu .menu-list__list-item[slot='more'],
   .header-menu .overflow-menu::part(more) {
     display: none !important;
