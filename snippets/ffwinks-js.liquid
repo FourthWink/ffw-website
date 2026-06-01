@@ -1454,6 +1454,7 @@
         var list = getWishlist();
         var item = list[btnIdx];
         var errorEl = document.getElementById('ffwinks-error-' + btnIdx);
+        var clickedBtn = this;
 
         if (!item.selected_size || !item.selected_color) {
           errorEl.textContent = 'Please choose ' + item.title + ' size/color';
@@ -1462,6 +1463,7 @@
         }
 
         if (variantId) {
+          clickedBtn.disabled = true;
           fetch('/cart/add.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1470,18 +1472,32 @@
               quantity: 1,
               properties: {
                 'Size': item.selected_size,
-                'Color': item.selected_color,
-                '_available_sizes': (item.available_sizes || []).join(', '),
-                '_available_colors': (item.available_colors || []).join(', ')
+                'Color': item.selected_color
               }
             })
           }).then(function () {
-            list.splice(btnIdx, 1);
-            saveWishlist(list);
+            var updatedList = getWishlist();
+            var removeIdx = updatedList.findIndex(function (wishlistItem) {
+              return String(wishlistItem.variant_id || '') === String(variantId);
+            });
+            if (removeIdx === -1 && updatedList[btnIdx]) removeIdx = btnIdx;
+            var shouldOpenCart = updatedList.length === 1;
+
+            if (removeIdx !== -1) {
+              updatedList.splice(removeIdx, 1);
+              saveWishlist(updatedList);
+            }
+
             updateAllSparkleStates();
             renderWishlistOverlay();
-            refreshCartOverlay();
-          }).catch(function () {});
+            if (shouldOpenCart) {
+              openCartFullscreen({ useCache: false });
+            } else {
+              refreshCartOverlay({ useCache: false });
+            }
+          }).catch(function () {
+            clickedBtn.disabled = false;
+          });
         }
       });
     });
