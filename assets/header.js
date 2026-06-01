@@ -38,7 +38,7 @@ class HeaderComponent extends Component {
    * Keep this in sync with sections/header.liquid.
    * @type {number}
    */
-  #desktopBreakpoint = 1366;
+  #desktopBreakpoint = 1280;
 
   /**
    * Whether the header has been scrolled offscreen, when sticky behavior is 'scroll-up'
