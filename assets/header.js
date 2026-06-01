@@ -34,13 +34,6 @@ class HeaderComponent extends Component {
   #intersectionObserver = null;
 
   /**
-   * Width where the custom Fourth Wink header switches back to desktop nav.
-   * Keep this in sync with sections/header.liquid.
-   * @type {number}
-   */
-  #desktopBreakpoint = 1280;
-
-  /**
    * Whether the header has been scrolled offscreen, when sticky behavior is 'scroll-up'
    * @type {boolean}
    */
@@ -120,18 +113,7 @@ class HeaderComponent extends Component {
    * @param {OverflowMinimumEvent} event
    */
   #handleOverflowMinimum = (event) => {
-    if (window.innerWidth >= this.#desktopBreakpoint) {
-      this.#updateMenuVisibility(false);
-      return;
-    }
-
     this.#updateMenuVisibility(event.detail.minimumReached);
-  };
-
-  #handleWindowResize = () => {
-    if (window.innerWidth >= this.#desktopBreakpoint) {
-      this.#updateMenuVisibility(false);
-    }
   };
 
   /**
@@ -220,7 +202,6 @@ class HeaderComponent extends Component {
     super.connectedCallback();
     this.#resizeObserver.observe(this);
     this.addEventListener('overflowMinimum', this.#handleOverflowMinimum);
-    window.addEventListener('resize', this.#handleWindowResize);
 
     const stickyMode = this.getAttribute('sticky');
     if (stickyMode) {
@@ -237,7 +218,6 @@ class HeaderComponent extends Component {
     this.#resizeObserver.disconnect();
     this.#intersectionObserver?.disconnect();
     this.removeEventListener('overflowMinimum', this.#handleOverflowMinimum);
-    window.removeEventListener('resize', this.#handleWindowResize);
     document.removeEventListener('scroll', this.#handleWindowScroll);
     if (this.#scrollRafId !== null) {
       cancelAnimationFrame(this.#scrollRafId);
