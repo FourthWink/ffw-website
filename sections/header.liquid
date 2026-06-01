@@ -1643,6 +1643,8 @@ button.ffwinks-submit-btn:hover { color: #000; }
 .ffwinks-soul-img-box img {
   width: auto;
   height: 60%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain; /* Optimization: Ensures varying product image ratios never distort */
   object-position: center;
   pointer-events: none;
@@ -2012,7 +2014,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
 
 .ffw-card-size-picker {
   position: absolute;
-  top: 36%;
+  top: var(--ffw-card-size-picker-top, 36%);
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 6;

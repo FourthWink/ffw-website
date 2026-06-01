@@ -1197,6 +1197,40 @@
     });
   }
 
+  function getWishlistCardImageAnchor(card) {
+    if (!card) return null;
+
+    var images = card.querySelectorAll('img');
+    for (var i = 0; i < images.length; i++) {
+      var image = images[i];
+      var className = image.className || '';
+      if (/icon|sparkle/i.test(className)) continue;
+
+      var style = window.getComputedStyle(image);
+      if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity || '1') === 0) continue;
+
+      var rect = image.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) return image;
+    }
+
+    return null;
+  }
+
+  function positionWishlistSizePicker(card, picker) {
+    var image = getWishlistCardImageAnchor(card);
+    if (!image || !picker) return;
+
+    var cardRect = card.getBoundingClientRect();
+    var imageRect = image.getBoundingClientRect();
+    if (!cardRect.height) return;
+
+    var imageCenter = imageRect.top + (imageRect.height / 2);
+    var topPercent = ((imageCenter - cardRect.top) / cardRect.height) * 100;
+    topPercent = Math.max(28, Math.min(48, topPercent));
+
+    picker.style.setProperty('--ffw-card-size-picker-top', topPercent.toFixed(2) + '%');
+  }
+
   function showWishlistSizePicker(sparkleEl, sizes) {
     var card = getWishlistCardForSizePicker(sparkleEl);
     if (!card || !sizes.length) return false;
@@ -1233,6 +1267,7 @@
     });
 
     card.appendChild(picker);
+    positionWishlistSizePicker(card, picker);
     return true;
   }
 
