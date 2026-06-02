@@ -266,6 +266,83 @@
     }
   }
 
+  @media screen and (min-width: 990px) {
+    .product-information__grid.product-information--media-left .product-details {
+      padding-left: 0 !important;
+    }
+
+    .product-details > .group-block {
+      padding-block-start: 128px !important;
+      padding-inline-start: 5px !important;
+      padding-inline-end: 40px !important;
+    }
+
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) > .group-block-content {
+      gap: 115px !important;
+      align-items: flex-start !important;
+    }
+
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) product-price,
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) [class*="__title"] {
+      transform: translateY(26px);
+    }
+
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) product-price,
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) product-price *,
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) [class*="__title"],
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) [class*="__title"] * {
+      font-family: var(--font-body--family) !important;
+      font-size: 10px !important;
+      line-height: 1.2 !important;
+      letter-spacing: 0 !important;
+    }
+
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) product-price,
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) product-price * {
+      font-weight: 400 !important;
+    }
+
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) [class*="__title"],
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price) [class*="__title"] * {
+      font-weight: 700 !important;
+    }
+
+    .product-details [class*="ai-variant-picker__label-"] {
+      min-width: 130px !important;
+      font-size: 10px !important;
+      line-height: 1.2 !important;
+    }
+
+    .product-details [class*="ai-variant-picker__option-"] {
+      gap: 40px !important;
+      margin-bottom: 22px !important;
+    }
+
+    .product-details [class*="ai-variant-picker__value-"] {
+      font-size: 10px !important;
+      line-height: 1.2 !important;
+    }
+
+    .product-details [class^="ai-product-tabs-"]:not([class*="container"]):not([class*="layout"]):not([class*="nav"]):not([class*="button"]):not([class*="content"]):not([class*="panels"]) {
+      padding-top: 134px !important;
+    }
+
+    .product-details [class*="ai-product-tabs-nav-"] {
+      min-width: 150px !important;
+      gap: 22px !important;
+    }
+
+    .product-details [class*="ai-product-tabs-button-"] {
+      font-size: 10px !important;
+      line-height: 1.2 !important;
+    }
+
+    .product-details [class*="ai-product-tabs-content-"] {
+      font-size: 9px !important;
+      line-height: 2 !important;
+    }
+  }
+
   /* Hide desktop price + title (header_group) on mobile.
      Shopify renders group blocks with a class like group-gap-mobile-{blockid}.
      The header_group block id becomes 'group-gap-mobile-headergroup' */
