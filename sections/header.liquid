@@ -2444,12 +2444,14 @@ header-actions { overflow: visible !important; }
   }
   #ffwinks-mobile-menu {
     display: flex !important;
-    padding-inline: clamp(42px, 7vw, 86px);
+    --ffwinks-menu-tablet-pad: clamp(42px, 7vw, 86px);
+    padding-inline: var(--ffwinks-menu-tablet-pad);
     --ffwinks-menu-label-x: clamp(54px, 8vw, 78px);
     --ffwinks-menu-label-top-offset: clamp(132px, 15svh, 170px);
     --ffwinks-menu-label-bottom-offset: clamp(170px, 19svh, 220px);
   }
   .ffwinks-mobile-menu__layout {
+    margin-inline-start: calc(var(--ffwinks-menu-tablet-pad) * -1);
     min-height: clamp(600px, 72svh, 780px);
   }
   .ffwinks-mobile-menu__ambient {
@@ -2464,6 +2466,7 @@ header-actions { overflow: visible !important; }
   }
   .ffwinks-mobile-menu__link {
     max-width: none;
+    padding-left: 0;
     font-size: 10px !important;
   }
   .header-logo,
