@@ -434,6 +434,8 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         {% render 'ffw-privacy-policy-content' %}
       {% elsif request.path == '/policies/terms-of-service' %}
         {% render 'ffw-terms-policy-content' %}
+      {% elsif request.path == '/policies/refund-policy' %}
+        {% render 'ffw-return-exchange-policy-content' %}
       {% else %}
         {{ content_for_layout }}
       {% endif %}
