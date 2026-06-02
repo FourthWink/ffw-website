@@ -788,6 +788,12 @@ header-component  { overflow: visible !important; }
   }
 }
 
+@media screen and (min-width: 1280px) and (max-width: 1535px) {
+  header-component .header-menu .menu-list__list-item + .menu-list__list-item {
+    margin-left: clamp(56px, 4vw, 64px) !important;
+  }
+}
+
 @media screen and (max-width: 749px) {
   .header__row--top:not(.divider--page-width),
   .header__row--top.divider--page-width .header__columns {
