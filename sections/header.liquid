@@ -791,6 +791,11 @@ header-component  { overflow: visible !important; }
   .header__column--right header-actions {
     gap: clamp(28px, 2.9vw, 40px) !important;
   }
+
+  .header__column--right .action__cart,
+  .header__column--right [data-testid='cart-drawer-trigger'] {
+    transform: translateX(-11px) !important;
+  }
 }
 
 @media screen and (min-width: 1280px) and (max-width: 1535px) {
