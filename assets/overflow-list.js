@@ -39,6 +39,8 @@ export class OverflowList extends DeclarativeShadowElement {
    */
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'disabled') {
+      if (!this.#refs) return;
+
       if (newValue === 'true') {
         this.#reset();
       } else {
@@ -105,6 +107,11 @@ export class OverflowList extends DeclarativeShadowElement {
       list,
       placeholder,
     };
+
+    if (this.getAttribute('disabled') === 'true') {
+      this.#reset();
+      return;
+    }
 
     // Add event listener for reflow requests
     this.addEventListener(
