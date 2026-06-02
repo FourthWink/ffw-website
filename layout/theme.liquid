@@ -430,7 +430,11 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
       data-product-transition="{{ settings.transition_to_main_product }}"
       data-template="{{ template }}"
     >
-      {{ content_for_layout }}
+      {% if request.path == '/policies/privacy-policy' %}
+        {% render 'ffw-privacy-policy-content' %}
+      {% else %}
+        {{ content_for_layout }}
+      {% endif %}
     </main>
 
     {% sections 'footer-group' %}
