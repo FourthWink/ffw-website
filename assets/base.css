@@ -4668,19 +4668,73 @@ body :is(
 }
 
 
-/* ========================================= */
-/* FORCE POLICY PAGES TO BE FULL WIDTH       */
-/* ========================================= */
-.shopify-policy__container {
-  padding-top: 27px;
-  max-width: 100% !important;
-  width: 100% !important;
-  padding-inline: 60px !important; /* Keeps the text from touching the literal edges of the monitor */
+/* Shopify policy pages */
+.ffw-policy-page .shopify-policy__container {
+  box-sizing: border-box;
+  width: min(100%, 820px) !important;
+  max-width: 820px !important;
+  margin-inline: auto;
+  padding: clamp(76px, 8vw, 112px) clamp(24px, 5vw, 56px) clamp(64px, 8vw, 96px) !important;
+  color: #111;
+  font-family: 'Montserrat', Arial, sans-serif;
 }
 
-/* Mobile adjustments */
+.ffw-policy-page .shopify-policy__title {
+  margin: 0 0 28px;
+  text-align: left;
+}
+
+.ffw-policy-page .shopify-policy__title h1 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.ffw-policy-page .shopify-policy__body,
+.ffw-policy-page .shopify-policy__body .rte,
+.ffw-policy-page .shopify-policy__body :is(p, li) {
+  font-size: 10px !important;
+  font-weight: 400;
+  line-height: 1.9;
+  letter-spacing: 0;
+}
+
+.ffw-policy-page .shopify-policy__body :is(h1, h2, h3, h4, h5, h6),
+.ffw-policy-page .shopify-policy__body b,
+.ffw-policy-page .shopify-policy__body strong {
+  font-weight: 700;
+}
+
+.ffw-policy-page .shopify-policy__body :is(h1, h2, h3, h4, h5, h6) {
+  margin: 28px 0 10px;
+  font-size: 11px !important;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.ffw-policy-page .shopify-policy__body p {
+  margin: 0 0 14px;
+}
+
+.ffw-policy-page .shopify-policy__body :is(ul, ol) {
+  margin: 0 0 18px;
+  padding-inline-start: 1.25em;
+}
+
+.ffw-policy-page .shopify-policy__body a {
+  color: currentColor;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 @media screen and (max-width: 749px) {
-  .shopify-policy__container {
-    padding-inline: 24px !important; 
+  .ffw-policy-page .shopify-policy__container {
+    padding: 72px 24px 72px !important;
+  }
+
+  .ffw-policy-page .shopify-policy__title {
+    margin-bottom: 24px;
   }
 }
