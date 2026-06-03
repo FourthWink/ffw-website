@@ -282,6 +282,11 @@
       align-items: flex-start !important;
     }
 
+    .product-details > .group-block > .group-block-content > .group-block:has(product-price),
+    .product-details [class^="ai-variant-picker-"]:not([class*="__"]) {
+      transform: translateY(-60px);
+    }
+
     .product-details > .group-block > .group-block-content > .group-block:has(product-price) product-price,
     .product-details > .group-block > .group-block-content > .group-block:has(product-price) [class^="ffw-hide-title-mobile-"][class*="__title"] {
       transform: translateY(26px);
