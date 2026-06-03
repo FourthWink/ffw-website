@@ -61,6 +61,12 @@
     Make sure this menu works perfectly for both desktop and mobile automatically.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% liquid
+  assign tab1_content = block.settings.tab1_content
+  if block.settings.use_product_description_for_tab1 and product.description != blank
+    assign tab1_content = product.description
+  endif
+%}
 
 {% style %}
   .ai-product-tabs-{{ ai_gen_id }} {
@@ -227,7 +233,7 @@ selector .details-content > *:first-child {
           data-tab="tab1"
           role="tabpanel"
         >
-          {{ block.settings.tab1_content }}
+          {{ tab1_content }}
         </div>
         <div
           id="content-tab2-{{ ai_gen_id }}"
@@ -303,13 +309,19 @@ selector .details-content > *:first-child {
       "type": "text",
       "id": "tab1_title",
       "label": "Title",
-      "default": "The 44th Wink"
+      "default": "The Fourth Wink"
     },
     {
       "type": "richtext",
       "id": "tab1_content",
       "label": "Content",
       "default": "<p>Discover the essence of luxury with our carefully crafted product. Each detail has been thoughtfully designed to bring you an exceptional experience that combines elegance with functionality.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_product_description_for_tab1",
+      "label": "Use product description for content",
+      "default": false
     },
     {
       "type": "header",
