@@ -116,10 +116,16 @@
         "padding-block-start": 32,
         "padding-block-end": 84
       }
+    },
+    "contact_info": {
+      "type": "ffw-contact-info",
+      "name": "Contact Email Rows",
+      "settings": {}
     }
   },
   "order": [
     "main",
-    "form"
+    "form",
+    "contact_info"
   ]
 }

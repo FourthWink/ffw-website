@@ -1,0 +1,125 @@
+<section class="ffw-contact-info">
+  <div class="ffw-contact-info__rows" aria-label="Contact email addresses">
+    <article class="ffw-contact-info__row">
+      <h2>Orders</h2>
+      <a href="mailto:orders@fourthwink.com">orders@fourthwink.com</a>
+      <p>For order updates, payment questions, delivery issues, and address changes.</p>
+    </article>
+
+    <article class="ffw-contact-info__row">
+      <h2>Press</h2>
+      <a href="mailto:press@fourthwink.com">press@fourthwink.com</a>
+      <p>For media requests, editorials, interviews, and press features.</p>
+    </article>
+
+    <article class="ffw-contact-info__row">
+      <h2>Customer Care</h2>
+      <a href="mailto:care@fourthwink.com">care@fourthwink.com</a>
+      <p>For general questions, sizing help, returns, exchanges, and customer support.</p>
+    </article>
+
+    <article class="ffw-contact-info__row">
+      <h2>Studio</h2>
+      <a href="mailto:studio@fourthwink.com">studio@fourthwink.com</a>
+      <p>For creative requests, styling, collaborations, shoots, and production inquiries.</p>
+    </article>
+  </div>
+
+  <img src="{{ 'Clouds.png' | asset_url }}" alt="Clouds" class="ffw-about-body-image ffw-contact-info__clouds" loading="lazy">
+</section>
+
+{% stylesheet %}
+  .ffw-contact-info {
+    width: 100%;
+    padding: clamp(44px, 6vw, 84px) 0 0;
+    background: #ffffff;
+  }
+
+  .ffw-contact-info__rows {
+    width: min(100%, 1040px);
+    max-width: calc(100vw - 40px);
+    margin: 0 auto;
+  }
+
+  .ffw-contact-info__row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: clamp(28px, 4vw, 44px) 20px;
+    text-align: center;
+    border-top: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .ffw-contact-info__row:last-child {
+    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .ffw-contact-info__row h2,
+  .ffw-contact-info__row p {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.7;
+    color: #444;
+  }
+
+  .ffw-contact-info__row h2 {
+    font-weight: 700;
+  }
+
+  .ffw-contact-info__row a {
+    display: inline-block;
+    min-width: 190px;
+    font-size: 10px;
+    line-height: 1.7;
+    font-weight: 400;
+    color: #666666 !important;
+    text-align: center;
+    text-decoration: underline;
+    text-decoration-thickness: 0.5px;
+    text-underline-offset: 3px;
+    transition: color 0.25s ease, font-weight 0.25s ease;
+  }
+
+  .ffw-contact-info__row a:hover,
+  .ffw-contact-info__row a:focus-visible {
+    color: #000000 !important;
+    font-weight: 700;
+  }
+
+  .ffw-contact-info__clouds {
+    width: 100vw;
+    max-width: 100%;
+    display: block;
+    margin: clamp(56px, 8vw, 110px) 0 0;
+    position: relative;
+    z-index: 5;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ffw-contact-info {
+      padding-top: 36px;
+    }
+
+    .ffw-contact-info__rows {
+      max-width: calc(100vw - 32px);
+    }
+
+    .ffw-contact-info__row {
+      padding-inline: 0;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "FFW Contact Info",
+  "tag": "section",
+  "settings": [],
+  "presets": [
+    {
+      "name": "FFW Contact Info"
+    }
+  ]
+}
+{% endschema %}
