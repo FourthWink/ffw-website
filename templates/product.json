@@ -209,7 +209,7 @@
                 "tab1_title": "Description",
                 "tab1_content": "{{ product.description }}",
                 "tab2_title": "Size Guide",
-                "tab2_content": "<p><strong>S: </strong>Body Length: <strong>23.75 CM </strong>____ Chest: <strong>22.5 CM</strong> ____ Sleeve: <strong>19 CM</strong></p><p><strong>M: </strong>Body Length: <strong>23.75 CM </strong>____ Chest: <strong>22.5 CM</strong> ____ Sleeve: <strong>19 CM<br/></strong></p><p><strong>L: </strong>Body Length: <strong>23.75 CM </strong>____ Chest: <strong>22.5 CM</strong> ____ Sleeve: <strong>19 CM</strong></p>",
+                "tab2_content": "<p><strong>S:</strong></p><p>Body Length: <strong>23.75 CM </strong>____ Chest: <strong>22.5 CM</strong> ____ Sleeve: <strong>19 CM</strong></p><p><strong>M:</strong></p><p>Body Length: <strong>23.75 CM </strong>____ Chest: <strong>22.5 CM</strong> ____ Sleeve: <strong>19 CM<br/></strong></p><p><strong>L:</strong></p><p>Body Length: <strong>23.75 CM </strong>____ Chest: <strong>22.5 CM</strong> ____ Sleeve: <strong>19 CM</strong></p>",
                 "tab3_title": "Shipping & Returns",
                 "tab3_content": "<p>Complimentary shipping on all orders.</p>",
                 "active_tab_color": "#000000",
