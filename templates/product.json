@@ -206,10 +206,10 @@
             "custom_tabs": {
               "type": "ai_gen_block_efdbf6b",
               "settings": {
-                "tab1_title": "The Fourth Wink",
+                "tab1_title": "Description",
                 "tab1_content": "{{ product.description }}",
-                "tab2_title": "Details",
-                "tab2_content": "<p>Premium materials and expert craftsmanship.</p>",
+                "tab2_title": "Size Guide",
+                "tab2_content": "<p><strong>S:</strong></p><p>Body Length (HPS edge): 23.75\" </p><p>Chest: 22.5<strong>\"</strong></p><p>Sleeve: 19<strong>\"</strong></p><p><strong>M:</strong></p><p>Body Length (HPS edge): 24.25\" </p><p>Chest: 23.25<strong>\"</strong></p><p>Sleeve: 19.5<strong>\"</strong></p><p><strong>L:</strong></p><p>Body Length (HPS edge): 24.75\" </p><p>Chest: 24<strong>\"</strong></p><p>Sleeve: 20<strong>\"</strong></p><p><strong>XL:</strong></p><p>Body Length (HPS edge): 25.25\" </p><p>Chest: 24.75<strong>\"</strong></p><p>Sleeve: 20.5<strong>\"</strong></p><p><strong>XXL:</strong></p><p>Body Length (HPS edge): 25.75\" </p><p>Chest: 25.5<strong>\"</strong></p><p></p>",
                 "tab3_title": "Shipping & Returns",
                 "tab3_content": "<p>Complimentary shipping on all orders.</p>",
                 "active_tab_color": "#000000",
