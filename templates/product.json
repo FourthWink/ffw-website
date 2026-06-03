@@ -204,11 +204,10 @@
               "blocks": {}
             },
             "custom_tabs": {
-              "type": "ffw-product-tabs",
+              "type": "ai_gen_block_efdbf6b",
               "settings": {
                 "tab1_title": "The Fourth Wink",
-                "tab1_content": "<p>A shirt with a secret. Buttons down the side, a kiss hiding on the inside of the cuff. Just between you and whoever finds it.</p>",
-                "use_product_description_for_tab1": false,
+                "tab1_content": "{{ product.description }}",
                 "tab2_title": "Details",
                 "tab2_content": "<p>Premium materials and expert craftsmanship.</p>",
                 "tab3_title": "Shipping & Returns",

@@ -61,12 +61,6 @@
     Make sure this menu works perfectly for both desktop and mobile automatically.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
-{% liquid
-  assign tab1_content = block.settings.tab1_content
-  if block.settings.use_product_description_for_tab1 and product.description != blank
-    assign tab1_content = product.description
-  endif
-%}
 
 {% style %}
   .ai-product-tabs-{{ ai_gen_id }} {
@@ -193,18 +187,12 @@ selector .details-content > *:first-child {
 }
 {% endstyle %}
 
-<div
-  id="ffw-product-tabs-legacy-{{ ai_gen_id }}"
-  class="ai-product-tabs-{{ ai_gen_id }} ffw-product-tabs"
-  {{ block.shopify_attributes }}
->
+<product-tabs-{{ ai_gen_id }} class="ai-product-tabs-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-product-tabs-container-{{ ai_gen_id }}">
     <div class="ai-product-tabs-layout-{{ ai_gen_id }}">
       <nav class="ai-product-tabs-nav-{{ ai_gen_id }}" role="tablist">
         <button
-          type="button"
           class="ai-product-tabs-button-{{ ai_gen_id }} active"
-          data-ffw-tab-button
           data-tab="tab1"
           role="tab"
           aria-selected="true"
@@ -213,9 +201,7 @@ selector .details-content > *:first-child {
           {{ block.settings.tab1_title }}
         </button>
         <button
-          type="button"
           class="ai-product-tabs-button-{{ ai_gen_id }}"
-          data-ffw-tab-button
           data-tab="tab2"
           role="tab"
           aria-selected="false"
@@ -224,9 +210,7 @@ selector .details-content > *:first-child {
           {{ block.settings.tab2_title }}
         </button>
         <button
-          type="button"
           class="ai-product-tabs-button-{{ ai_gen_id }}"
-          data-ffw-tab-button
           data-tab="tab3"
           role="tab"
           aria-selected="false"
@@ -240,16 +224,14 @@ selector .details-content > *:first-child {
         <div
           id="content-tab1-{{ ai_gen_id }}"
           class="ai-product-tabs-content-{{ ai_gen_id }} active"
-          data-ffw-tab-content
           data-tab="tab1"
           role="tabpanel"
         >
-          {{ tab1_content }}
+          {{ block.settings.tab1_content }}
         </div>
         <div
           id="content-tab2-{{ ai_gen_id }}"
           class="ai-product-tabs-content-{{ ai_gen_id }}"
-          data-ffw-tab-content
           data-tab="tab2"
           role="tabpanel"
         >
@@ -258,7 +240,6 @@ selector .details-content > *:first-child {
         <div
           id="content-tab3-{{ ai_gen_id }}"
           class="ai-product-tabs-content-{{ ai_gen_id }}"
-          data-ffw-tab-content
           data-tab="tab3"
           role="tabpanel"
         >
@@ -267,30 +248,45 @@ selector .details-content > *:first-child {
       </div>
     </div>
   </div>
-</div>
+</product-tabs-{{ ai_gen_id }}>
 
 <script>
   (function() {
-    var root = document.getElementById('ffw-product-tabs-legacy-{{ ai_gen_id }}');
-    if (!root || root.dataset.ffwTabsBound === 'true') return;
+    class ProductTabs{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
 
-    root.dataset.ffwTabsBound = 'true';
+      connectedCallback() {
+        this.buttons = this.querySelectorAll('.ai-product-tabs-button-{{ ai_gen_id }}');
+        this.contents = this.querySelectorAll('.ai-product-tabs-content-{{ ai_gen_id }}');
+        this.setupEventListeners();
+      }
 
-    root.querySelectorAll('[data-ffw-tab-button]').forEach(function(button) {
-      button.addEventListener('click', function() {
-        var targetTab = button.getAttribute('data-tab');
+      setupEventListeners() {
+        this.buttons.forEach((button) => {
+          button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+            this.switchTab(targetTab);
+          });
+        });
+      }
 
-        root.querySelectorAll('[data-ffw-tab-button]').forEach(function(tabButton) {
-          var isActive = tabButton.getAttribute('data-tab') === targetTab;
-          tabButton.classList.toggle('active', isActive);
-          tabButton.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      switchTab(targetTab) {
+        this.buttons.forEach((btn) => {
+          const isActive = btn.getAttribute('data-tab') === targetTab;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-selected', isActive);
         });
 
-        root.querySelectorAll('[data-ffw-tab-content]').forEach(function(content) {
-          content.classList.toggle('active', content.getAttribute('data-tab') === targetTab);
+        this.contents.forEach((content) => {
+          const isActive = content.getAttribute('data-tab') === targetTab;
+          content.classList.toggle('active', isActive);
         });
-      });
-    });
+      }
+    }
+
+    customElements.define('product-tabs-{{ ai_gen_id }}', ProductTabs{{ ai_gen_id }});
   })();
 </script>
 
@@ -307,19 +303,13 @@ selector .details-content > *:first-child {
       "type": "text",
       "id": "tab1_title",
       "label": "Title",
-      "default": "The Fourth Wink"
+      "default": "The 44th Wink"
     },
     {
       "type": "richtext",
       "id": "tab1_content",
       "label": "Content",
       "default": "<p>Discover the essence of luxury with our carefully crafted product. Each detail has been thoughtfully designed to bring you an exceptional experience that combines elegance with functionality.</p>"
-    },
-    {
-      "type": "checkbox",
-      "id": "use_product_description_for_tab1",
-      "label": "Use product description for content",
-      "default": false
     },
     {
       "type": "header",
