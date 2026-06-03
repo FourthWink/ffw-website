@@ -1,28 +1,36 @@
 <section class="ffw-contact-info">
   <div class="ffw-contact-info__rows" aria-label="Contact email addresses">
-    <article class="ffw-contact-info__row">
-      <h2>Orders</h2>
-      <a href="mailto:orders@fourthwink.com">orders@fourthwink.com</a>
-      <p>For order updates, payment questions, delivery issues, and address changes.</p>
-    </article>
+    <a class="ffw-contact-info__card" href="mailto:orders@fourthwink.com" aria-label="Email Fourth Wink orders">
+      <article class="ffw-contact-info__row">
+        <h2>Orders</h2>
+        <span class="ffw-contact-info__email">orders@fourthwink.com</span>
+        <p>For order updates, payment questions, delivery issues, and address changes.</p>
+      </article>
+    </a>
 
-    <article class="ffw-contact-info__row">
-      <h2>Press</h2>
-      <a href="mailto:press@fourthwink.com">press@fourthwink.com</a>
-      <p>For media requests, editorials, interviews, and press features.</p>
-    </article>
+    <a class="ffw-contact-info__card" href="mailto:press@fourthwink.com" aria-label="Email Fourth Wink press">
+      <article class="ffw-contact-info__row">
+        <h2>Press</h2>
+        <span class="ffw-contact-info__email">press@fourthwink.com</span>
+        <p>For media requests, editorials, interviews, and press features.</p>
+      </article>
+    </a>
 
-    <article class="ffw-contact-info__row">
-      <h2>Customer Care</h2>
-      <a href="mailto:care@fourthwink.com">care@fourthwink.com</a>
-      <p>For general questions, sizing help, returns, exchanges, and customer support.</p>
-    </article>
+    <a class="ffw-contact-info__card" href="mailto:care@fourthwink.com" aria-label="Email Fourth Wink customer care">
+      <article class="ffw-contact-info__row">
+        <h2>Customer Care</h2>
+        <span class="ffw-contact-info__email">care@fourthwink.com</span>
+        <p>For general questions, sizing help, returns, exchanges, and customer support.</p>
+      </article>
+    </a>
 
-    <article class="ffw-contact-info__row">
-      <h2>Studio</h2>
-      <a href="mailto:studio@fourthwink.com">studio@fourthwink.com</a>
-      <p>For creative requests, styling, collaborations, shoots, and production inquiries.</p>
-    </article>
+    <a class="ffw-contact-info__card" href="mailto:studio@fourthwink.com" aria-label="Email Fourth Wink studio">
+      <article class="ffw-contact-info__row">
+        <h2>Studio</h2>
+        <span class="ffw-contact-info__email">studio@fourthwink.com</span>
+        <p>For creative requests, styling, collaborations, shoots, and production inquiries.</p>
+      </article>
+    </a>
   </div>
 
   <img src="{{ 'Clouds.png' | asset_url }}" alt="Clouds" class="ffw-about-body-image ffw-contact-info__clouds" loading="lazy">
@@ -31,7 +39,7 @@
 {% stylesheet %}
   .ffw-contact-info {
     width: 100%;
-    padding: clamp(44px, 6vw, 84px) 0 0;
+    padding: clamp(36px, 5vw, 68px) 0 0;
     background: #ffffff;
   }
 
@@ -39,6 +47,27 @@
     width: min(100%, 1040px);
     max-width: calc(100vw - 40px);
     margin: 0 auto;
+    display: grid;
+    gap: clamp(18px, 3vw, 34px);
+  }
+
+  .ffw-contact-info__card {
+    display: block;
+    color: inherit !important;
+    text-decoration: none;
+    background: #ffffff;
+    border-radius: clamp(46px, 6vw, 86px);
+    box-shadow:
+      inset 0 0 14px rgb(var(--color-foreground-rgb) / 0.075),
+      0 8px 22px rgb(var(--color-foreground-rgb) / 0.035);
+    transition: box-shadow 0.25s ease;
+  }
+
+  .ffw-contact-info__card:hover,
+  .ffw-contact-info__card:focus-visible {
+    box-shadow:
+      inset 0 0 16px rgb(var(--color-foreground-rgb) / 0.1),
+      0 8px 24px rgb(var(--color-foreground-rgb) / 0.045);
   }
 
   .ffw-contact-info__row {
@@ -48,15 +77,11 @@
     gap: 12px;
     padding: clamp(28px, 4vw, 44px) 20px;
     text-align: center;
-    border-top: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
-  }
-
-  .ffw-contact-info__row:last-child {
-    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
   }
 
   .ffw-contact-info__row h2,
-  .ffw-contact-info__row p {
+  .ffw-contact-info__row p,
+  .ffw-contact-info__email {
     margin: 0;
     font-size: 10px;
     line-height: 1.7;
@@ -67,11 +92,9 @@
     font-weight: 700;
   }
 
-  .ffw-contact-info__row a {
+  .ffw-contact-info__email {
     display: inline-block;
     min-width: 190px;
-    font-size: 10px;
-    line-height: 1.7;
     font-weight: 400;
     color: #666666 !important;
     text-align: center;
@@ -81,24 +104,27 @@
     transition: color 0.25s ease, font-weight 0.25s ease;
   }
 
-  .ffw-contact-info__row a:hover,
-  .ffw-contact-info__row a:focus-visible {
+  .ffw-contact-info__card:hover .ffw-contact-info__email,
+  .ffw-contact-info__card:focus-visible .ffw-contact-info__email {
     color: #000000 !important;
     font-weight: 700;
   }
 
   .ffw-contact-info__clouds {
+    --ffw-contact-cloud-shift: clamp(28px, 5vw, 72px);
     width: 100vw;
     max-width: 100%;
     display: block;
-    margin: clamp(56px, 8vw, 110px) 0 0;
+    margin: clamp(8px, 2vw, 24px) 0 0;
     position: relative;
     z-index: 5;
+    transform: translateY(calc(-1 * var(--ffw-contact-cloud-shift)));
+    margin-bottom: calc(-1 * var(--ffw-contact-cloud-shift));
   }
 
   @media screen and (max-width: 749px) {
     .ffw-contact-info {
-      padding-top: 36px;
+      padding-top: 28px;
     }
 
     .ffw-contact-info__rows {
@@ -106,7 +132,16 @@
     }
 
     .ffw-contact-info__row {
-      padding-inline: 0;
+      padding: 30px 20px;
+    }
+
+    .ffw-contact-info__card {
+      border-radius: 54px;
+    }
+
+    .ffw-contact-info__clouds {
+      --ffw-contact-cloud-shift: 48px;
+      margin-top: 0;
     }
   }
 {% endstylesheet %}
