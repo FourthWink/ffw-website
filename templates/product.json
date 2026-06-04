@@ -23,7 +23,7 @@
           "settings": {
             "media_presentation": "grid",
             "media_columns": "one",
-            "image_gap": 4,
+            "image_gap": 100,
             "large_first_image": false,
             "icons_style": "arrow",
             "slideshow_controls_style": "dots",
