@@ -109,7 +109,7 @@ body.vi-video-active {
   border: 1px solid {{ section.settings.skip_color | default: '#ffffff' }};
   padding: {{ section.settings.skip_padding | default: '8px 16px' }};
   border-radius: {{ section.settings.skip_border_radius | default: 20 }}px;
-  font-size: {{ section.settings.skip_font_size | default: 14 }}px;
+  font-size: 10px;
   cursor: pointer;
   z-index: 10001;
   transition: all 0.3s ease;
@@ -138,7 +138,7 @@ body.vi-video-active {
     top: {{ section.settings.skip_top_mobile | default: 12 }}px;
     right: {{ section.settings.skip_right_mobile | default: 12 }}px;
     padding: {{ section.settings.skip_padding_mobile | default: '6px 12px' }};
-    font-size: {{ section.settings.skip_font_size_mobile | default: 13 }}px;
+    font-size: 10px;
   }
 }
 </style>

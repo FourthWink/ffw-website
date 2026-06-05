@@ -829,7 +829,7 @@ body,
 }
 
 .paragraph > small {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 /* Typography presets */
@@ -1151,7 +1151,7 @@ ul[product-grid-view='zoom-out'] .card-gallery > img {
 }
 
 .product-grid-view-zoom-out--details span {
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .product-grid-view-zoom-out--details .h4 {
@@ -2207,7 +2207,7 @@ deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__p
 }
 
 .tax-note.tax-note.tax-note {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: var(--font-paragraph--weight);
   color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
 }
@@ -2524,7 +2524,7 @@ product-price.text-block:is(.h1, .h2, .h3, .h4, .h5, .h6) > *:not(.tax-note) {
     padding-inline-start: 0.8em;
     border-inline-start: 1.5px solid rgb(var(--color-foreground-rgb) / var(--opacity-25));
     font-style: italic;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .rte-table-wrapper {
@@ -2540,7 +2540,7 @@ product-price.text-block:is(.h1, .h2, .h3, .h4, .h5, .h6) > *:not(.tax-note) {
   tr:not(:has(td)),
   thead {
     background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
-    font-weight: bold;
+    font-weight: 700;
     
   }
 
@@ -4041,7 +4041,7 @@ text-component {
   .h6.h6 input,
   .h6.h6 textarea,
   .h6.h6 select {
-    font-size: 100%;
+    font-size: 10px;
   }
 }
 
@@ -4097,7 +4097,7 @@ text-component {
 
 .ffw-name-block {
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .ffw-icon-block {
@@ -4119,7 +4119,7 @@ text-component {
 }
 
 .ffw-label {
-  font-size: 9px;
+  font-size: 10px;
   
   
   color: #a0a0a0;
@@ -4135,17 +4135,17 @@ text-component {
 }
 
 .ffw-value-active {
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .ffw-value-muted {
-  font-size: 9px;
+  font-size: 10px;
   color: #d0d0d0;
 }
 
 /* Specs table */
 .ffw-specs {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffw-spec-row {
@@ -4176,7 +4176,7 @@ text-component {
 }
 
 .ffw-details-text {
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.7;
   max-width: 480px;
 }
@@ -4283,7 +4283,7 @@ text-component {
 
 .ffw-name-block {
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .ffw-icon-block {
@@ -4305,7 +4305,7 @@ text-component {
 }
 
 .ffw-label {
-  font-size: 9px;
+  font-size: 10px;
   
   
   color: #a0a0a0;
@@ -4321,17 +4321,17 @@ text-component {
 }
 
 .ffw-value-active {
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .ffw-value-muted {
-  font-size: 9px;
+  font-size: 10px;
   color: #d0d0d0;
 }
 
 /* Specs table */
 .ffw-specs {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffw-spec-row {
@@ -4362,7 +4362,7 @@ text-component {
 }
 
 .ffw-details-text {
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.7;
   max-width: 480px;
 }
@@ -4431,7 +4431,7 @@ text-component {
 
 .ffw-name {
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* VARIANTS STACKED */
@@ -4446,7 +4446,7 @@ text-component {
 }
 
 .ffw-label {
-  font-size: 9px;
+  font-size: 10px;
   
   
   color: #a0a0a0;
@@ -4478,7 +4478,7 @@ text-component {
 }
 
 .ffw-menus-text {
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.7;
   max-width: 480px;
 }
@@ -4600,7 +4600,7 @@ video::media-controls {
 }
 
 .ffw-label {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffw-value {
@@ -4608,12 +4608,12 @@ video::media-controls {
 }
 
 .ffw-value-muted {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffw-specs,
 .ffw-spec-row {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffw-details-menu,
@@ -4623,7 +4623,7 @@ video::media-controls {
 }
 
 .ffw-details-text {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffw-add-cart {
@@ -4655,7 +4655,7 @@ body :is(
   .country-filter__input,
   .country-filter .field__label
 ) {
-  font-size: 9px !important;
+  font-size: 10px !important;
 }
 
 
@@ -4677,7 +4677,7 @@ body :is(
 
 .ffw-policy-page .shopify-policy__title h1 {
   margin: 0;
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1.4;
   letter-spacing: 0;
@@ -4700,7 +4700,7 @@ body :is(
 
 .ffw-policy-page .shopify-policy__body :is(h1, h2, h3, h4, h5, h6) {
   margin: 28px 0 10px;
-  font-size: 11px !important;
+  font-size: 10px !important;
   line-height: 1.5;
   letter-spacing: 0;
 }

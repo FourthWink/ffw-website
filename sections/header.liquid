@@ -286,7 +286,7 @@
 {% endcapture %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet">
 <script type="application/ld+json">
   {
     "@context": "http://schema.org",
@@ -476,11 +476,11 @@
   --soul-subtotal-gap:   120px;
   --soul-img-radius:      20px;
   --soul-img-radius-pill: 70px;
-  --soul-font-base:      11px;
+  --soul-font-base:      10px;
   --soul-font-label:     10px;
-  --soul-font-remove:    20px;
-  --soul-font-qty:       15px;
-  --soul-font-action:    9px;
+  --soul-font-remove:    18px;
+  --soul-font-qty:       10px;
+  --soul-font-action:    10px;
   --soul-font-subtotal:  10px;
   --soul-qty-gap:        16px;
   --soul-qty-btn-w:      26px;
@@ -544,7 +544,7 @@ header-component .header__menu-item {
 /* 3. HOVER STATE: LINKS GET BOLDER */
 header-component .list-menu__item:hover,
 header-component .header__menu-item:hover {
-  font-weight: bold !important; 
+  font-weight: 700 !important;
   color: #000000 !important; 
   background-color: transparent !important;
 }
@@ -891,11 +891,11 @@ header-component  { overflow: visible !important; }
 .header__column--right         { padding-inline-end: 12px !important; }
 
 .header__columns .menu-list__link {
-  font-size: 11px;
+  font-size: 10px;
   
   color: #444;
   text-transform: capitalize;
-  font-weight: 500;
+  font-weight: 400;
   transition: all 0.2s ease;
 }
 .header__columns .menu-list__link:hover { font-weight: 700; }
@@ -1140,7 +1140,7 @@ body.ffw-filter-open #ffwinks-global-overlay {
   font-weight: 400;
   font-family: 'Montserrat', Arial, sans-serif !important;
 }
-.ffwinks-main-input::placeholder { color: #aaa; font-size: inherit;  font-weight: 300; }
+.ffwinks-main-input::placeholder { color: #aaa; font-size: inherit;  font-weight: 200; }
 .ffwinks-main-input::-webkit-search-cancel-button,
 .ffwinks-main-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
 
@@ -1155,8 +1155,8 @@ body.ffw-filter-open #ffwinks-global-overlay {
   flex-wrap: wrap;
 }
 .ffwinks-suggestions-label {
-  font-size: 9px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 400;
   color: #222;
   
   text-transform: capitalize;
@@ -1164,8 +1164,8 @@ body.ffw-filter-open #ffwinks-global-overlay {
 }
 .ffwinks-suggestions-list { display: flex; flex-direction: row; gap: 25px; flex-wrap: wrap; }
 .ffwinks-suggestion-link {
-  font-size: 9px;
-  font-weight: 500;
+  font-size: 10px;
+  font-weight: 400;
   color: #666;
   text-decoration: none;
   transition: color 0.3s;
@@ -1436,7 +1436,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
   /* Typography Updates */
   color: #ffffff !important; 
   font-size: 10px !important; 
-  font-weight: normal !important; 
+  font-weight: 400 !important;
 }
 
 .ffwinks-mobile-menu__link span {
@@ -1597,10 +1597,10 @@ button.ffwinks-submit-btn:hover { color: #000; }
   flex-shrink: 0;
 }
 .ffwinks-empty-msg {
-  font-size: 9px;
+  font-size: 10px;
   color: #ccc;
   margin: 60px 0;
-  font-weight: 300;
+  font-weight: 200;
   text-align: center;
   font-family: 'Montserrat', Arial, sans-serif !important;
 }
@@ -1619,7 +1619,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
 
 /* — Remove button — */
 .ffwinks-soul-remove {
-  font-size: 16px;
+  font-size: 18px;
   color: #666;
   background: transparent;
   border: none;
@@ -1753,6 +1753,9 @@ button.ffwinks-submit-btn:hover { color: #000; }
   color: #999;
   text-align: left;
 }
+.ffwinks-soul-price {
+  font-size: 9px;
+}
 .ffwinks-soul-value {
   font-weight: 700;
   color: #222;
@@ -1768,7 +1771,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
 }
 .ffwinks-text-option {
   font-size: var(--soul-font-label);
-  font-weight: 300;
+  font-weight: 200;
   color: #999;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1776,14 +1779,14 @@ button.ffwinks-submit-btn:hover { color: #000; }
   text-transform: capitalize;
 }
 .ffwinks-text-option:hover { color: #333; }
-.ffwinks-text-option.is-active { color: #000; font-weight: 600; }
+.ffwinks-text-option.is-active { color: #000; font-weight: 400; }
 
 /* — Quantity controls — */
 .ffwinks-soul-qty {
   display: flex;
   gap: var(--soul-qty-gap);
   align-items: center;
-  font-weight: bold;
+  font-weight: 700;
   color: #333;
   user-select: none;
 }
@@ -1821,7 +1824,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
 .ffwinks-soul-action-btn {
   grid-column: 1 / -1;
   justify-self: end;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   font-size: var(--soul-font-action);
   color: #666;
@@ -1891,18 +1894,18 @@ button.ffwinks-submit-btn:hover { color: #000; }
 .ffwinks-soul-subtotal-label {
   font-size: var(--soul-font-subtotal);
   color: #333;
-  font-weight: bold;
+  font-weight: 700;
   text-transform: capitalize;
   font-family: 'Montserrat', Arial, sans-serif !important;
 }
 .ffwinks-soul-subtotal-price {
-  font-size: var(--soul-font-subtotal);
+  font-size: 9px;
   color: #333;
-  font-weight: normal;
+  font-weight: 400;
   font-family: 'Montserrat', Arial, sans-serif !important;
 }
 .ffwinks-soul-subtotal-info {
-  font-size: 9px;
+  font-size: 10px;
   color: #bbb;
   margin: 0;
   font-style: normal;
@@ -2332,12 +2335,12 @@ header-actions { overflow: visible !important; }
     --soul-subtotal-gap:         38px;
     --soul-img-radius:           70px;
     --soul-img-radius-pill:      70px;
-    --soul-font-base:            11px;
-    --soul-font-label:           9px;
+    --soul-font-base:            10px;
+    --soul-font-label:           10px;
     --soul-font-remove:          18px;
-    --soul-font-qty:             14.5px;
-    --soul-font-action:          8px;
-    --soul-font-subtotal:        9px;
+    --soul-font-qty:             10px;
+    --soul-font-action:          10px;
+    --soul-font-subtotal:        10px;
     --soul-qty-gap:              10px;
     --soul-qty-btn-w:            21px;
     --soul-qty-btn-h:            29px;
@@ -2373,7 +2376,7 @@ header-actions { overflow: visible !important; }
   /* header.liquid — mid-mobile logo & action tweaks */
   .header-logo img, header-logo img { max-height: 24px !important; max-width: 150px !important; }
   header-actions .header-actions__action { width: 40px !important; flex: 0 0 40px !important; }
-  .ffwinks-mobile-menu__link { font-size: 9px; }
+  .ffwinks-mobile-menu__link { font-size: 10px; }
 }
 
 @media screen and (min-width: 750px) and (max-width: 1279px) {
@@ -2599,9 +2602,9 @@ header-actions { overflow: visible !important; }
 /* Final typography + hover pass */
 :root {
   --menu-localization-font-size: 10px;
-  --soul-font-base: 9px;
-  --soul-font-label: 9px;
-  --soul-font-remove: 10px;
+  --soul-font-base: 10px;
+  --soul-font-label: 10px;
+  --soul-font-remove: 18px;
   --soul-font-qty: 10px;
   --soul-font-action: 10px;
   --soul-font-subtotal: 10px;
@@ -2620,7 +2623,7 @@ header-component .header__menu-item {
 .ffwinks-suggestions-label,
 .ffwinks-suggestion-link,
 .ffwinks-empty-msg {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffwinks-bottom-label,
@@ -2629,15 +2632,15 @@ header-component .header__menu-item {
 }
 
 .ffwinks-mobile-menu__link {
-  font-size: 9px !important;
+  font-size: 10px !important;
 }
 
 .ffwinks-soul-grid {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffwinks-soul-label {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffwinks-soul-value {
@@ -2646,7 +2649,7 @@ header-component .header__menu-item {
 
 .ffwinks-soul-qty__num,
 .ffwinks-soul-subtotal-info {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ffwinks-soul-subtotal-label,
@@ -2736,7 +2739,7 @@ header-component .header__menu-item:hover,
     height: auto !important;
   }
   .ffwinks-search-star-wrap button.ffwinks-submit-btn {
-    font-size: 8px !important; /* shrink text slightly */
+    font-size: 10px !important; /* shrink text slightly */
   }
   .ffwinks-mobile-menu__ambient {
     width: 140px !important; /* shrink the menu fog */

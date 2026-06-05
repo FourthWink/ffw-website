@@ -54,7 +54,7 @@
     {%- if typography_type == 'display' or typography_type == 'heading' -%}
       --font-size: 10px;
     {%- elsif typography_type != blank or settings.font_size != blank -%}
-      --font-size: 9px;
+      --font-size: 10px;
     {%- endif -%}
     {%- if settings.weight != blank -%}
       --font-weight: {{ settings.weight }};

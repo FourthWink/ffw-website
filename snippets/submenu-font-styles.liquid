@@ -31,15 +31,15 @@ var(--font-
 {% if settings.type_case_primary_link == 'uppercase' %}uppercase{% else %}none{% endif %};
 {% case settings.menu_font_style %}
   {% when 'regular' %}
-    --menu-child-font-size: 9px; --menu-child-font-line-height: 1.2;
+    --menu-child-font-size: 10px; --menu-child-font-line-height: 1.2;
     --menu-child-font-color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
     --menu-child-active-font-color: var(--color-foreground);
   {% when 'inverse' %}
-    --menu-child-font-size: 9px; --menu-child-font-line-height: 1.2;
+    --menu-child-font-size: 10px; --menu-child-font-line-height: 1.2;
     --menu-child-font-color: var(--color-foreground); --menu-child-active-font-color: rgb(var(--color-foreground-rgb) /
     var(--opacity-subdued-text));
   {% when 'inverse_large' %}
-    --menu-child-font-size: 9px; --menu-child-font-line-height: 1.2;
+    --menu-child-font-size: 10px; --menu-child-font-line-height: 1.2;
     --menu-child-font-color: var(--color-foreground); --menu-child-active-font-color: rgb(var(--color-foreground-rgb) /
     var(--opacity-subdued-text));
 {% endcase %}

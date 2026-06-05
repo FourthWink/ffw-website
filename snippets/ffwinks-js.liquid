@@ -1470,7 +1470,7 @@
       var sizeHTML = item.selected_size || '—';
       var colorHTML = item.selected_color || '—';
 
-      var errorMsg = '<div class="ffwinks-error-msg" id="ffwinks-error-' + idx + '" style="display:none; color: #d9534f; font-size: 9px; grid-column: 1 / -1; margin-top: -5px; margin-bottom: 5px; font-weight: bold; "></div>';
+      var errorMsg = '<div class="ffwinks-error-msg" id="ffwinks-error-' + idx + '" style="display:none; color: #d9534f; font-size: 10px; grid-column: 1 / -1; margin-top: -5px; margin-bottom: 5px; font-weight: 700; "></div>';
 
       var itemUrl = item.url || item.product_url || '#';
 
@@ -1483,7 +1483,7 @@
         '</a>' +
         '<div class="ffwinks-soul-details-box">' +
           '<div class="ffwinks-soul-grid">' +
-            '<span class="ffwinks-soul-label">' + (item.price_formatted || (item.price + (item.currency || '£'))) + '</span>' +
+            '<span class="ffwinks-soul-label ffwinks-soul-price">' + (item.price_formatted || (item.price + (item.currency || '£'))) + '</span>' +
             '<span class="ffwinks-soul-value">'  + item.title + '</span>' +
             '<span class="ffwinks-soul-label">Size</span>'  +
             '<span class="ffwinks-soul-value ffwinks-wishlist-selected-option">' + sizeHTML + '</span>' +
@@ -1975,7 +1975,7 @@
           '</a>' +
           '<div class="ffwinks-soul-details-box">' +
             '<div class="ffwinks-soul-grid">' +
-              '<span class="ffwinks-soul-label">' + (item.price / 100).toFixed(2) + ' ' + cart.currency + '</span>' +
+              '<span class="ffwinks-soul-label ffwinks-soul-price">' + (item.price / 100).toFixed(2) + ' ' + cart.currency + '</span>' +
               '<span class="ffwinks-soul-value">'  + (item.product_title || item.title) + '</span>' +
               '<span class="ffwinks-soul-label">Size</span>'  +
               '<span class="ffwinks-soul-value">' + sizeHTML + '</span>' +
