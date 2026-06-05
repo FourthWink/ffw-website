@@ -33,6 +33,15 @@
     </a>
   </div>
 
+  <div class="ffw-contact-location" aria-label="Fourth Wink location and customer care">
+    <p class="ffw-contact-location__place">Based in Cairo, Egypt</p>
+    <p>For orders and customer care, contact us at</p>
+    <div class="ffw-contact-location__links">
+      <a href="mailto:support@fourthwink.com">support@fourthwink.com</a>
+      <a href="tel:+201222242132">+20 1222242132</a>
+    </div>
+  </div>
+
   <img src="{{ 'Clouds.png' | asset_url }}" alt="Clouds" class="ffw-about-body-image ffw-contact-info__clouds" loading="lazy">
 </section>
 
@@ -110,6 +119,50 @@
     font-weight: 700;
   }
 
+  .ffw-contact-location {
+    width: min(100%, 1040px);
+    max-width: calc(100vw - 40px);
+    margin: clamp(28px, 4vw, 52px) auto clamp(64px, 7vw, 96px);
+    color: #444444;
+    text-align: center;
+  }
+
+  .ffw-contact-location p {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.7;
+  }
+
+  .ffw-contact-location__place {
+    margin-bottom: 12px !important;
+    font-weight: 700;
+  }
+
+  .ffw-contact-location__links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .ffw-contact-location__links a {
+    color: #666666 !important;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.7;
+    text-decoration: underline;
+    text-decoration-thickness: 0.5px;
+    text-underline-offset: 3px;
+    transition: color 0.25s ease, font-weight 0.25s ease;
+  }
+
+  .ffw-contact-location__links a:hover,
+  .ffw-contact-location__links a:focus-visible {
+    color: #000000 !important;
+    font-weight: 700;
+  }
+
   .ffw-contact-info__clouds {
     --ffw-contact-cloud-shift: clamp(28px, 5vw, 72px);
     width: 100vw;
@@ -133,6 +186,11 @@
 
     .ffw-contact-info__row {
       padding: 30px 20px;
+    }
+
+    .ffw-contact-location {
+      max-width: calc(100vw - 32px);
+      margin: 30px auto 62px;
     }
 
     .ffw-contact-info__clouds {
