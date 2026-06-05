@@ -209,7 +209,7 @@
                 "tab1_title": "Description",
                 "tab1_content": "{{ product.description }}",
                 "tab2_title": "Size Guide",
-                "tab2_content": "<p><strong>S:</strong></p><p>Body Length: <strong>40.5 CM </strong>____ Chest Width: <strong>48.5 CM</strong> ____ Sleeve: <strong>58 CM</strong></p><p><strong>.</strong></p><p><strong>M:</strong></p><p>Body Length: <strong>42.5 CM </strong>____ Chest Width: <strong>50 CM</strong> ____ Sleeve: <strong>60 CM<br/></strong></p><p><strong>.</strong></p><p></p><p><strong>L:</strong></p><p>Body Length: <strong>44 CM </strong>____ Chest Width: <strong>53 CM</strong> ____ Sleeve: <strong>61 CM</strong></p>",
+                "tab2_content": "<p><strong>S:</strong></p><p>Body Length: <strong>40.5 CM </strong>____ Chest Width: <strong>48.5 CM</strong> ____ Sleeve: <strong>58 CM</strong></p><p></p><p><strong>M:</strong></p><p>Body Length: <strong>42.5 CM </strong>____ Chest Width: <strong>50 CM</strong> ____ Sleeve: <strong>60 CM<br/></strong></p><p></p><p></p><p><strong>L:</strong></p><p>Body Length: <strong>44 CM </strong>____ Chest Width: <strong>53 CM</strong> ____ Sleeve: <strong>61 CM</strong></p>",
                 "tab3_title": "Shipping",
                 "tab3_content": "<p>Orders are processed within <strong>3–4 business days</strong> after payment confirmation.</p><p>Shipping fees are calculated at checkout and may vary depending on your location. Once your order is confirmed, you will receive the delivery details.</p><p>Fourth Wink currently ships within Egypt. International shipping will be available soon.</p>",
                 "active_tab_color": "#000000",
