@@ -50,6 +50,11 @@
         "padding-block-end": 0
       }
     },
+    "contact_location": {
+      "type": "ffw-contact-location",
+      "name": "Contact Location",
+      "settings": {}
+    },
     "form": {
       "type": "section",
       "blocks": {
@@ -125,6 +130,7 @@
   },
   "order": [
     "main",
+    "contact_location",
     "form",
     "contact_info"
   ]
