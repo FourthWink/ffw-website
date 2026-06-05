@@ -190,7 +190,8 @@
     white-space: nowrap;
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 768px),
+    screen and (orientation: landscape) and (max-height: 600px) and (hover: none) and (pointer: coarse) {
     .ai-picks-grid-{{ ai_gen_id }} {
       width: 100%;
     }
@@ -270,6 +271,17 @@
 
     .ai-picks-label-{{ ai_gen_id }} {
       font-size: 10px;
+    }
+  }
+
+  @media screen and (orientation: landscape) and (max-height: 600px) and (hover: none) and (pointer: coarse) {
+    .ai-picks-grid-{{ ai_gen_id }} {
+      margin-top: 24px;
+    }
+
+    .ai-picks-box-{{ ai_gen_id }} {
+      height: clamp(220px, 74svh, 290px);
+      border-radius: 56px;
     }
   }
 {% endstyle %}

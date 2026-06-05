@@ -334,6 +334,35 @@
     overflow: visible !important;
     scroll-snap-type: none !important;
   }
+
+  /* Homepage phone landscape: keep the mobile-scale fog and menu proportions. */
+  @media screen and (orientation: landscape) and (max-height: 600px) and (hover: none) and (pointer: coarse) {
+    body:has(main[data-template="index"]) .ffw-global-top-blur {
+      height: 55px !important;
+    }
+
+    body:has(main[data-template="index"]) .ffw-global-bottom-blur {
+      height: 35px !important;
+    }
+
+    body:has(main[data-template="index"]) #ffwinks-mobile-menu {
+      padding-block: 8px calc(8px + env(safe-area-inset-bottom, 0px));
+    }
+
+    body:has(main[data-template="index"]) .ffwinks-mobile-menu__inner {
+      min-height: 100%;
+    }
+
+    body:has(main[data-template="index"]) .ffwinks-mobile-menu__layout {
+      height: calc(100dvh - 50px);
+      min-height: 0;
+    }
+
+    body:has(main[data-template="index"]) .ffwinks-mobile-menu__link.pos-tl span,
+    body:has(main[data-template="index"]) .ffwinks-mobile-menu__link.pos-tr span {
+      transform: translateY(12px);
+    }
+  }
   /* Hides all floating buttons when ANY Fourth Wink overlay is open */
   body.ffwinks-body-lock .floating-atc,
   body.ffwinks-body-lock #ffwinks-mobile-atc,
