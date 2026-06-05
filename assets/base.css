@@ -1,12 +1,3 @@
-@font-face {
-  font-family: 'AvenirCustom';
-  src: url('{{ "Avenir-Black.woff2" | file_url }}') format('woff2'),
-       url('{{ "Avenir-Black.woff"  | file_url }}') format('woff');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 body,
 input,
 button,
@@ -14,15 +5,15 @@ select,
 textarea,
 p,
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'AvenirCustom', sans-serif !important;
+  font-family: 'Montserrat', Arial, sans-serif !important;
 }
 
 h1,
 .product__title,
 .product-title,
 .product-single__title {
-  font-family: "AvenirBlack", system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
-  font-weight: 900;
+  font-family: 'Montserrat', Arial, sans-serif !important;
+  font-weight: 700;
 }
 
 * {
