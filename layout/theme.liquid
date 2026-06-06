@@ -489,10 +489,11 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
           if (overlay) overlay.style.display = 'none';
         } else if (eye) {
           if (overlay) overlay.style.display = 'flex';
-          // =========================================================
-          // INTRO OVERLAY REQUIRES CLICK ON THE EYE TO ENTER
-          // =========================================================
-          eye.addEventListener('click', function() {
+          var introEntered = false;
+
+          function enterIntro() {
+            if (introEntered) return;
+            introEntered = true;
             if(text) text.style.opacity = '0';
             if(eye) eye.style.transform = 'scale(2)';
             setTimeout(function() {
@@ -500,7 +501,10 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
               setTimeout(function() { if (overlay) overlay.style.display = 'none'; }, 800);
             }, 1000);
             setCookie('intro_seen', '1', 120);
-          });
+          }
+
+          eye.addEventListener('click', enterIntro);
+          setTimeout(enterIntro, 1000);
         }
       });
 
