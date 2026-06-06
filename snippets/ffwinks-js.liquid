@@ -1880,7 +1880,7 @@
 
     writeCartCache(nextCart);
     if (nextQty > 0 && patchCartQuantityState(nextCart)) return true;
-    refreshCartOverlay();
+    refreshCartOverlay({ cacheOnly: true });
     return true;
   }
 
@@ -2054,6 +2054,11 @@
       if (cachedCart) {
         try { renderCart(cachedCart); } catch (_) {}
       }
+    }
+
+    if (opts.cacheOnly) {
+      cartRenderInFlight = false;
+      return;
     }
 
     fetchCartJson(opts.useCache === false ? 0 : undefined)
