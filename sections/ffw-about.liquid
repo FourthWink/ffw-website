@@ -130,6 +130,17 @@
     text-align: left !important;
   }
 
+  @media screen and (min-width: 769px) and (max-width: 1279px) {
+    .ffw-snapper-wrapper {
+      scroll-snap-type: y proximity;
+    }
+
+    .ffw-snap-block:last-child {
+      scroll-snap-align: none;
+      scroll-snap-stop: normal;
+    }
+  }
+
   @media screen and (max-width: 768px) {
     .ffw-snapper-eye { height: 150px; }
     .ffw-about-text, .ffw-about-subtitle, .ffw-about-vision-title { font-size: 10px; }
