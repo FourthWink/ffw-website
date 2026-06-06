@@ -2335,7 +2335,7 @@ header-actions { overflow: visible !important; }
     --soul-grid-row-gap:         7px;
     --soul-grid-row3-mt:         13px;
     --soul-action-btn-mt:        10px;
-    --soul-list-pt:              calc(50dvh - var(--header-overlay-offset, 60px) - var(--soul-img-h));
+    --soul-list-pt:              calc(50dvh - var(--header-overlay-offset, 60px) - var(--soul-img-h) - (var(--soul-list-gap) / 2) - 2.5px);
     --soul-list-pb:              6.2svh;
     --soul-list-gap:             14px;
     --soul-subtotal-pt-cart:     48px;
@@ -2359,7 +2359,7 @@ header-actions { overflow: visible !important; }
   #ffwinks-wishlist-overlay {
     --soul-img-h:                36vh;
     --soul-row-min-h:            var(--soul-img-h);
-    --soul-list-pt:              calc(50dvh - var(--header-overlay-offset, 60px) - var(--soul-img-h));
+    --soul-list-pt:              calc(50dvh - var(--header-overlay-offset, 60px) - var(--soul-img-h) - (var(--soul-list-gap) / 2) - 2.5px);
     --soul-list-pb:              36svh;
     overscroll-behavior: contain;
     touch-action: pan-y;
@@ -2367,7 +2367,7 @@ header-actions { overflow: visible !important; }
   #ffwinks-cart-overlay {
     --soul-img-h:                36vh;
     --soul-row-min-h:            var(--soul-img-h);
-    --soul-list-pt:              calc(50dvh - var(--header-overlay-offset, 60px) - var(--soul-img-h));
+    --soul-list-pt:              calc(50dvh - var(--header-overlay-offset, 60px) - var(--soul-img-h) - (var(--soul-list-gap) / 2) - 2.5px);
     touch-action: pan-y;
   }
   /* Pushes product text down to clear the wishlist share button */
