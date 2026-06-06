@@ -106,7 +106,7 @@
     var WISH_MOB_NUDGE_DOWN = 1;         
     var WISH_MOB_2_ITEM_NUDGE = 1;         
     
-    var isMobile = window.innerWidth <= 549;
+    var isMobile = window.innerWidth <= 749;
     var isShortScreen = !isMobile && window.innerHeight < 600; 
     var isHugeScreen = window.innerWidth >= 1800;
     var isTallCardLayout = !isMobile && (isHugeScreen || (window.innerWidth >= 1400 && window.innerHeight >= 820));
@@ -374,13 +374,11 @@
 
     if (rows.length === 1) {
       if (isMobile) {
-        // Match the same image-gap anchor used when the cart has multiple rows.
+        // Connect the single image edge directly to the action-star curve.
         var mobileSingleImg = rows[0].querySelector('.ffwinks-soul-img-box, .cart-item__left');
         var mobileSingleRow = rows[0].getBoundingClientRect();
-        var mobileListStyles = window.getComputedStyle(activeList);
-        var mobileListGap = parseFloat(mobileListStyles.rowGap || mobileListStyles.gap) || 0;
         var mobileSingleX = '50%';
-        var mobileSingleY = (mobileSingleRow.bottom + (mobileListGap / 2) + nudge_y) + 'px';
+        var mobileSingleY = (mobileSingleRow.bottom + nudge_y) + 'px';
 
         if (mobileSingleImg) {
           mobileSingleX = (mobileSingleImg.getBoundingClientRect().right + nudge_x) + 'px';
@@ -476,7 +474,7 @@
   function isMobileSoulOverlayOpen(overlayEl) {
     return overlayEl &&
       overlayEl.classList.contains('ffwinks-fullscreen--open') &&
-      window.innerWidth <= 549;
+      window.innerWidth <= 749;
   }
 
   function getSoulOverlaySnapData(overlayEl, snapState) {
