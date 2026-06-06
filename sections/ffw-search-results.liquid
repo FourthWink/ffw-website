@@ -300,10 +300,8 @@
 
     <div class="ffw-search-results-grid">
       {%- for result in search.results -%}
-        {%- if result.object_type == 'product' -%}
-          {%- assign product_count = product_count | plus: 1 -%}
-          {%- render 'ffw-search-product-card', product: result -%}
-        {%- endif -%}
+        {%- assign product_count = product_count | plus: 1 -%}
+        {%- render 'ffw-search-product-card', product: result -%}
       {%- endfor -%}
     </div>
 
