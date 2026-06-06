@@ -380,16 +380,73 @@
       return newQty;
     }
 
+    var qtyMutationVersions = {};
+
+    function patchQuantityState(cart) {
+      if (!cart || !cart.items || !cart.items.length || !itemsWrapDesktop) return false;
+
+      var desktopRows = Array.from(itemsWrapDesktop.querySelectorAll('.cart-item'));
+      if (desktopRows.length !== cart.items.length) return false;
+
+      var desktopRowsByKey = {};
+      desktopRows.forEach(function(row) {
+        desktopRowsByKey[row.dataset.key] = row;
+      });
+
+      var mobileRowsByKey = {};
+      if (itemsWrapMobile) {
+        Array.from(itemsWrapMobile.querySelectorAll('.ffwinks-soul-row')).forEach(function(row) {
+          mobileRowsByKey[row.dataset.key] = row;
+        });
+      }
+
+      for (var i = 0; i < cart.items.length; i++) {
+        var item = cart.items[i];
+        var desktopRow = desktopRowsByKey[item.key];
+        if (!desktopRow) return false;
+
+        var desktopQty = desktopRow.querySelector('.cart-item__qty-num');
+        var desktopPrice = desktopRow.querySelector('.cart-item__price');
+        if (!desktopQty || !desktopPrice) return false;
+
+        desktopQty.textContent = item.quantity;
+        desktopPrice.textContent = formatMoney(item.final_line_price);
+        desktopRow.style.opacity = '';
+
+        var mobileRow = mobileRowsByKey[item.key];
+        if (mobileRow) {
+          var mobileQty = mobileRow.querySelector('.cart-item__qty-num, .ffwinks-soul-qty__num');
+          if (mobileQty) mobileQty.textContent = item.quantity;
+          mobileRow.style.opacity = '';
+        }
+      }
+
+      var priceStr = formatMoney(cart.total_price);
+      if (subtotalDesktop) subtotalDesktop.textContent = priceStr;
+      if (subtotalMobile) subtotalMobile.textContent = priceStr;
+      updateCartBubble(cart.item_count);
+      updateCartTaxNote(cart);
+      return true;
+    }
+
     function updateQty(key, delta) {
       var newQty = applyQtyOptimistically(key, delta);
+      var mutationVersion = (qtyMutationVersions[key] || 0) + 1;
+      qtyMutationVersions[key] = mutationVersion;
+
       fetch('/cart/change.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: key, quantity: newQty })
       })
       .then(function(r) { return r.json(); })
-      .then(function(cart) { renderCart(cart); })
+      .then(function(cart) {
+        if (qtyMutationVersions[key] !== mutationVersion) return;
+        if (newQty > 0 && patchQuantityState(cart)) return;
+        renderCart(cart);
+      })
       .catch(function() {
+        if (qtyMutationVersions[key] !== mutationVersion) return;
         fetchOverlayCartJson().then(function (cart) { renderCart(cart); });
       });
     }
