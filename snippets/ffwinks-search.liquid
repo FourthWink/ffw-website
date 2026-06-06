@@ -24,12 +24,11 @@
             />
           </form>
         </div>
-        <div class="ffwinks-suggestions-row">
-          <span class="ffwinks-suggestions-label">Suggestions</span>
-          <div class="ffwinks-suggestions-list">
-            <a href="{{ routes.collections_url }}" class="ffwinks-suggestion-link">New In</a>
-            <a href="{{ routes.all_products_collection_url }}" class="ffwinks-suggestion-link">Shop</a>
-            <a href="/pages/about" class="ffwinks-suggestion-link">About</a>
+        <div class="ffwinks-suggestions-row" id="ffwinks-search-suggestions">
+          <span class="ffwinks-suggestions-label" id="ffwinks-search-suggestions-label">Explore</span>
+          <div class="ffwinks-suggestions-list" id="ffwinks-search-suggestions-list">
+            <a href="{{ routes.collections_url }}/new-in" class="ffwinks-suggestion-link">New In</a>
+            <a href="{{ routes.collections_url }}/shop" class="ffwinks-suggestion-link">Shop</a>
           </div>
         </div>
       </div>

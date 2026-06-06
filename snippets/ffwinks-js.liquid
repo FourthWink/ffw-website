@@ -18,6 +18,12 @@
   var searchBar   = document.getElementById('ffwinks-search-bar');
   var accountBar  = document.getElementById('ffwinks-account-bar');
   var searchInput = document.getElementById('ffwinks-search-input');
+  var searchSuggestions = document.getElementById('ffwinks-search-suggestions');
+  var searchSuggestionsLabel = document.getElementById('ffwinks-search-suggestions-label');
+  var searchSuggestionsList = document.getElementById('ffwinks-search-suggestions-list');
+  var searchDefaultSuggestions = searchSuggestionsList ? searchSuggestionsList.innerHTML : '';
+  var searchSuggestionsTimer = null;
+  var searchSuggestionsRequest = null;
 
   var wishlistOverlay = document.getElementById('ffwinks-wishlist-overlay');
   var cartOverlay     = document.getElementById('ffwinks-cart-overlay');
@@ -38,6 +44,107 @@
     touchActive: false,
     anchorKey: 'cartSnapAnchorY'
   };
+
+  function resetSearchSuggestions() {
+    if (!searchSuggestions || !searchSuggestionsLabel || !searchSuggestionsList) return;
+    searchSuggestions.classList.remove('ffwinks-suggestions-row--results');
+    searchSuggestionsLabel.textContent = 'Explore';
+    searchSuggestionsList.classList.remove('ffwinks-suggestions-list--products');
+    searchSuggestionsList.innerHTML = searchDefaultSuggestions;
+  }
+
+  function formatSearchSuggestionPrice(price) {
+    var amount = Number(price || 0);
+    var formatted = amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var currency = window.Shopify && window.Shopify.currency ? window.Shopify.currency.active : '';
+    return currency === 'EGP' ? 'LE ' + formatted : formatted + (currency ? ' ' + currency : '');
+  }
+
+  function appendSearchSuggestionProduct(product) {
+    var link = document.createElement('a');
+    link.className = 'ffwinks-search-product';
+    link.href = product.url || '#';
+
+    if (product.image) {
+      var image = document.createElement('img');
+      image.className = 'ffwinks-search-product__image';
+      image.src = product.image;
+      image.alt = product.title || '';
+      image.loading = 'lazy';
+      link.appendChild(image);
+    }
+
+    var info = document.createElement('span');
+    info.className = 'ffwinks-search-product__info';
+
+    var title = document.createElement('span');
+    title.className = 'ffwinks-search-product__title';
+    title.textContent = product.title || '';
+    info.appendChild(title);
+
+    var price = document.createElement('span');
+    price.className = 'ffwinks-search-product__price';
+    price.textContent = formatSearchSuggestionPrice(product.price);
+    info.appendChild(price);
+
+    link.appendChild(info);
+    searchSuggestionsList.appendChild(link);
+  }
+
+  function renderSearchSuggestions(term, products) {
+    if (!searchSuggestions || !searchSuggestionsLabel || !searchSuggestionsList) return;
+    searchSuggestions.classList.add('ffwinks-suggestions-row--results');
+    searchSuggestionsLabel.textContent = products.length ? 'Results' : 'No results';
+    searchSuggestionsList.classList.add('ffwinks-suggestions-list--products');
+    searchSuggestionsList.innerHTML = '';
+
+    products.forEach(appendSearchSuggestionProduct);
+
+    if (products.length) {
+      var viewAll = document.createElement('a');
+      viewAll.className = 'ffwinks-suggestion-link ffwinks-search-view-all';
+      viewAll.href = '/search?q=' + encodeURIComponent(term) + '&type=product';
+      viewAll.textContent = 'View all results';
+      searchSuggestionsList.appendChild(viewAll);
+    }
+  }
+
+  function fetchSearchSuggestions(term) {
+    if (searchSuggestionsRequest) searchSuggestionsRequest.abort();
+    searchSuggestionsRequest = new AbortController();
+
+    var root = window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/';
+    var url = root + 'search/suggest.json?q=' + encodeURIComponent(term) +
+      '&resources[type]=product&resources[limit]=4&resources[options][unavailable_products]=hide';
+
+    fetch(url, { signal: searchSuggestionsRequest.signal })
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        var products = data && data.resources && data.resources.results
+          ? data.resources.results.products || []
+          : [];
+        renderSearchSuggestions(term, products);
+      })
+      .catch(function(error) {
+        if (error && error.name === 'AbortError') return;
+        resetSearchSuggestions();
+      });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      var term = searchInput.value.trim();
+      clearTimeout(searchSuggestionsTimer);
+      if (!term) {
+        if (searchSuggestionsRequest) searchSuggestionsRequest.abort();
+        resetSearchSuggestions();
+        return;
+      }
+      searchSuggestionsTimer = setTimeout(function() {
+        fetchSearchSuggestions(term);
+      }, 200);
+    });
+  }
 
   // Positions the floating soul action inside whichever cart/wishlist list is
   // currently active. The exact pixel constants below are visual tuning values.
