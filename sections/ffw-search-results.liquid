@@ -295,22 +295,18 @@
 </style>
 
 <div class="ffw-search-results-section">
-  {% paginate search.results by 24 %}
-    {%- assign product_count = 0 -%}
+  {%- assign product_count = 0 -%}
 
-    <div class="ffw-search-results-grid">
-      {%- for result in search.results -%}
-        {%- assign product_count = product_count | plus: 1 -%}
-        {%- render 'ffw-search-product-card', product: result -%}
-      {%- endfor -%}
-    </div>
+  <div class="ffw-search-results-grid">
+    {%- for result in search.results -%}
+      {%- assign product_count = product_count | plus: 1 -%}
+      {%- render 'ffw-search-product-card', product: result -%}
+    {%- endfor -%}
+  </div>
 
-    {%- if product_count == 0 -%}
-      <p class="ffw-search-empty">No products found.</p>
-    {%- endif -%}
-
-    {% render 'pagination-controls', paginate: paginate %}
-  {% endpaginate %}
+  {%- if product_count == 0 -%}
+    <p class="ffw-search-empty">No products found.</p>
+  {%- endif -%}
 </div>
 
 {% schema %}
