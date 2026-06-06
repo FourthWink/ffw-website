@@ -91,7 +91,7 @@
     searchSuggestionsList.appendChild(link);
   }
 
-  function renderSearchSuggestions(term, products) {
+  function renderSearchSuggestions(products) {
     if (!searchSuggestions || !searchSuggestionsLabel || !searchSuggestionsList) return;
     searchSuggestions.classList.add('ffwinks-suggestions-row--results');
     searchSuggestionsLabel.textContent = products.length ? 'Results' : 'No results';
@@ -99,14 +99,6 @@
     searchSuggestionsList.innerHTML = '';
 
     products.forEach(appendSearchSuggestionProduct);
-
-    if (products.length) {
-      var viewAll = document.createElement('a');
-      viewAll.className = 'ffwinks-suggestion-link ffwinks-search-view-all';
-      viewAll.href = '/search?q=' + encodeURIComponent(term) + '&type=product';
-      viewAll.textContent = 'View all results';
-      searchSuggestionsList.appendChild(viewAll);
-    }
   }
 
   function fetchSearchSuggestions(term) {
@@ -123,7 +115,7 @@
         var products = data && data.resources && data.resources.results
           ? data.resources.results.products || []
           : [];
-        renderSearchSuggestions(term, products);
+        renderSearchSuggestions(products);
       })
       .catch(function(error) {
         if (error && error.name === 'AbortError') return;
