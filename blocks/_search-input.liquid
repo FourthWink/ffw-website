@@ -17,6 +17,7 @@
   method="get"
   role="search"
   class="search-page-input__parent"
+  data-ffw-prefix-search
 >
   <search-page-input-component
     style="{% render 'size-style', settings: block_settings %}{% render 'spacing-style', settings: block_settings %}"
@@ -37,18 +38,13 @@
       type="hidden"
     >
     <input
-      name="options[prefix]"
-      value="last"
-      type="hidden"
-    >
-    <input
       class="search-page-input{{ color_scheme }}"
       id="SearchPageInput--{{ block.id }}"
       type="search"
       name="q"
       ref="searchPageInput"
       on:keydown="/handleKeyDown"
-      value="{{ search.terms | escape }}"
+      value="{{ search.terms | remove_last: '*' | escape }}"
       placeholder="{{ 'content.search_input_placeholder' | t }}"
     >
     <a

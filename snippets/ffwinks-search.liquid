@@ -13,9 +13,8 @@
     <div class="ffwinks-island">
       <div class="ffwinks-container">
         <div class="ffwinks-input-row">
-          <form id="ffwinks-search-form" action="{{ routes.search_url }}" method="get">
+          <form id="ffwinks-search-form" action="{{ routes.search_url }}" method="get" data-ffw-prefix-search>
             <input type="hidden" name="type" value="product">
-            <input type="hidden" name="options[prefix]" value="last">
             <input
               type="search"
               name="q"

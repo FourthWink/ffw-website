@@ -138,6 +138,19 @@
     });
   }
 
+  document.addEventListener('submit', function(event) {
+    var form = event.target.closest('form[data-ffw-prefix-search]');
+    if (!form) return;
+
+    var input = form.querySelector('input[name="q"]');
+    if (!input) return;
+
+    var term = input.value.trim();
+    if (!term || term.endsWith('*')) return;
+
+    input.value = term + '*';
+  });
+
   // Positions the floating soul action inside whichever cart/wishlist list is
   // currently active. The exact pixel constants below are visual tuning values.
   function ffwinksUpdateStar() {
