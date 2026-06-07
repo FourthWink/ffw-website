@@ -1,0 +1,93 @@
+{% # theme-check-disable ValidScopedCSSClass %}
+
+<style>
+  html:not(.ffw-policy-page) body :where(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    a,
+    button,
+    input,
+    textarea,
+    select,
+    option,
+    label,
+    small,
+    strong,
+    em,
+    b,
+    i,
+    li,
+    dt,
+    dd,
+    figcaption,
+    summary,
+    blockquote,
+    caption,
+    td,
+    th,
+    .paragraph,
+    .rte,
+    .text-block,
+    .field__label,
+    .filter-count-bubble__text,
+    .localization-form__list,
+    .country-filter__input,
+    .country-filter .field__label
+  ) {
+    font-size: 11px !important;
+  }
+
+  html:not(.ffw-policy-page) body :where(
+    product-price,
+    product-price *,
+    .money,
+    .money *,
+    [class*="price"],
+    [class*="price"] *,
+    [data-price],
+    [data-price] *
+  ) {
+    font-size: 10px !important;
+  }
+
+  html:not(.ffw-policy-page) body :where(
+    [class*="ai-luxury-footer-link-"],
+    [class*="ai-luxury-footer-link-"] *
+  ) {
+    font-size: 9px !important;
+  }
+
+  html:not(.ffw-policy-page) body :where(
+    .ffwinks-badge,
+    .ffwinks-badge *,
+    cart-count,
+    cart-count *,
+    .cart-count,
+    .cart-count *,
+    .cart-count-bubble,
+    .cart-count-bubble *,
+    [class*="CartCount"],
+    [class*="CartCount"] *,
+    [class*="cart_count"],
+    [class*="cart_count"] *
+  ) {
+    font-size: 7px !important;
+  }
+
+  html:not(.ffw-policy-page) body :where(
+    .ffwinks-soul-remove,
+    .ffwinks-soul-remove *,
+    .cart-item__remove-btn-desktop,
+    .cart-item__remove-btn-desktop *
+  ) {
+    font-size: 18px !important;
+  }
+</style>
+
+{% # theme-check-enable ValidScopedCSSClass %}
