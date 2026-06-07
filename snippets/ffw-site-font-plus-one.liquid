@@ -1,7 +1,7 @@
 {% # theme-check-disable ValidScopedCSSClass %}
 
 <style>
-  html:not(.ffw-policy-page) body :where(
+  html:not(.ffw-policy-page):root body :where(
     h1,
     h2,
     h3,
@@ -38,12 +38,30 @@
     .filter-count-bubble__text,
     .localization-form__list,
     .country-filter__input,
-    .country-filter .field__label
+    .country-filter .field__label,
+    .ffwinks-suggestions-label,
+    .ffwinks-suggestion-link,
+    .ffwinks-empty-msg,
+    .ffwinks-bottom-label,
+    .ffwinks-mobile-menu__link,
+    .ffwinks-soul-grid,
+    .ffwinks-soul-label,
+    .ffwinks-soul-value,
+    .ffwinks-soul-qty__num,
+    .ffwinks-soul-subtotal-info,
+    .ffwinks-soul-subtotal-label,
+    .ffwinks-share-btn,
+    .ffw-card-size-option,
+    [class*="ai-picks-box-title-"],
+    [class*="ai-picks-label-"],
+    [class*="ai-luxury-footer-paragraph-"],
+    [class*="ai-luxury-footer-brand-name-"],
+    [class*="ai-luxury-footer-email-"]
   ) {
     font-size: 11px !important;
   }
 
-  html:not(.ffw-policy-page) body :where(
+  html:not(.ffw-policy-page):root body :where(
     product-price,
     product-price *,
     .money,
@@ -56,14 +74,14 @@
     font-size: 10px !important;
   }
 
-  html:not(.ffw-policy-page) body :where(
+  html:not(.ffw-policy-page):root body :where(
     [class*="ai-luxury-footer-link-"],
     [class*="ai-luxury-footer-link-"] *
   ) {
     font-size: 9px !important;
   }
 
-  html:not(.ffw-policy-page) body :where(
+  html:not(.ffw-policy-page):root body :where(
     .ffwinks-badge,
     .ffwinks-badge *,
     cart-count,
@@ -80,7 +98,7 @@
     font-size: 7px !important;
   }
 
-  html:not(.ffw-policy-page) body :where(
+  html:not(.ffw-policy-page):root body :where(
     .ffwinks-soul-remove,
     .ffwinks-soul-remove *,
     .cart-item__remove-btn-desktop,
