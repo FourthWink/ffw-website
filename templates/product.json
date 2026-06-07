@@ -198,7 +198,7 @@
                 "value_font_weight": "400",
                 "selected_font_weight": "700",
                 "selected_color": "#000000",
-                "unselected_color": "#cccccc",
+                "unselected_color": "#BBBBBB",
                 "hover_color": "#666666"
               },
               "blocks": {}
@@ -213,7 +213,7 @@
                 "tab3_title": "Shipping",
                 "tab3_content": "<p>Orders are processed within <strong>3–5 business days</strong> after payment confirmation.</p><p>Shipping fees are calculated at checkout and may vary depending on your location. Once your order is confirmed, you will receive the delivery details.</p><p>Fourth Wink currently ships <strong>within Cairo only</strong>. More locations will be available soon.</p><p>If your order has not arrived within this timeframe, please contact us at <a><strong>support@fourthwink.com </strong></a>with your order number, and we’ll look into it.</p>",
                 "active_tab_color": "#000000",
-                "inactive_tab_color": "#b3b3b3",
+                "inactive_tab_color": "#BBBBBB",
                 "content_color": "#000000",
                 "divider_color": "#e6e6e6",
                 "tab_font_size_mobile": 10,
