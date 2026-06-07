@@ -378,6 +378,10 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
 }
 </style>
 
+{% if template == 'index' %}
+  {% render 'ffw-home-font-plus-one' %}
+{% endif %}
+
 <script>
   (function () {
     if (window.location.pathname.indexOf('/policies/') === 0) {
