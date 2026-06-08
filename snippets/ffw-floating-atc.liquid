@@ -70,10 +70,21 @@
   }
 
   @media (min-width: 990px) {
+    .floating-atc .floating-atc-text::before,
     .floating-atc .floating-atc-text::after {
       content: attr(data-shimmer-text);
       position: absolute;
       inset: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .floating-atc .floating-atc-text::before {
+      color: #b8b8b8;
+      -webkit-text-fill-color: #b8b8b8;
+    }
+
+    .floating-atc .floating-atc-text::after {
       color: transparent;
       background-image:
         linear-gradient(
@@ -81,17 +92,18 @@
           transparent 32%,
           #000000 50%,
           transparent 68%
-        ),
-        linear-gradient(#b8b8b8, #b8b8b8);
-      background-position: 125% center, 0 0;
-      background-repeat: no-repeat, padding-box;
-      background-size: 275% 100%, auto;
+        );
+      background-position: 125% center;
+      background-repeat: no-repeat;
+      background-size: 275% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.25));
-      opacity: 0;
-      pointer-events: none;
+    }
+
+    .floating-atc.ffw-atc-shimmer-active .floating-atc-text::before {
+      animation: ffw-atc-text-shimmer-base 1.35s linear 4;
     }
 
     .floating-atc.ffw-atc-shimmer-active .floating-atc-text::after {
@@ -100,17 +112,23 @@
 
     @keyframes ffw-atc-text-shimmer {
       0% {
-        background-position: 125% center, 0 0;
+        background-position: 125% center;
         opacity: 0;
       }
       12%, 88% { opacity: 1; }
       100% {
-        background-position: -125% center, 0 0;
+        background-position: -125% center;
         opacity: 0;
       }
     }
 
+    @keyframes ffw-atc-text-shimmer-base {
+      0%, 100% { opacity: 0; }
+      12%, 88% { opacity: 1; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
+      .floating-atc .floating-atc-text::before,
       .floating-atc .floating-atc-text::after {
         animation: none;
         display: none;
