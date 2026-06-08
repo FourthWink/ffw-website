@@ -12,6 +12,7 @@
       <div class="ffwinks-img-btn-wrap">
         <img src="{{ 'soul.svg' | asset_url }}" alt="Star" class="ffwinks-action-img inverted-star">
         <span class="ffwinks-img-label floating-atc-text">Add to cart</span>
+        <canvas class="ffw-metallic-atc-canvas" aria-hidden="true"></canvas>
       </div>
     </button>
   </div>
@@ -69,6 +70,27 @@
     font-weight: 700 !important;
   }
 
+  .ffw-metallic-atc-canvas {
+    display: none;
+  }
+
+  @media (min-width: 990px) {
+    .floating-atc-text {
+      z-index: 1;
+    }
+
+    .ffw-metallic-atc-canvas {
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+  }
+
   @media(max-width:900px) {
     .floating-atc {
       display: flex;
@@ -76,3 +98,5 @@
     }
   }
 </style>
+
+<script src="{{ 'ffw-metallic-atc.js' | asset_url }}" defer></script>
