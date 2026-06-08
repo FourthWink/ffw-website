@@ -40,6 +40,45 @@
     display: none;
   }
 
+  .ffw-about-scroll-cue {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    z-index: 110;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    transform: translateX(-50%);
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    animation: ffw-about-scroll-bounce 0.7s ease-in-out 3;
+  }
+
+  .ffw-about-scroll-cue img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ffw-about-scroll-cue.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  @keyframes ffw-about-scroll-bounce {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, 7px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ffw-about-scroll-cue {
+      animation: none;
+    }
+  }
+
   /* 4. The Background Eye - locked perfectly to the center of the screen */
   .ffw-snapper-eye {
     position: fixed;
@@ -150,6 +189,9 @@
 
 <div class="ffw-snapper-wrapper">
   <img src="{{ 'about.png' | asset_url }}" alt="Glass Eye" class="ffw-snapper-eye">
+  <button class="ffw-about-scroll-cue" type="button" aria-label="Scroll to the next section">
+    <img src="{{ 'ffw-scroll-arrow.svg' | asset_url }}" alt="" width="30" height="30">
+  </button>
 
   <div class="ffw-snap-block">
     <div class="ffw-about-vision-title">THE VISION</div>
@@ -187,8 +229,20 @@
 <script>
   window.addEventListener('DOMContentLoaded', function() {
     var footerGroup = document.querySelector('.shopify-section-group-footer-group') || document.querySelector('footer');
+    var snapper = document.querySelector('.ffw-snapper-wrapper');
+    var scrollCue = document.querySelector('.ffw-about-scroll-cue');
     var snapBlocks = document.querySelectorAll('.ffw-snap-block');
     var finalBlock = snapBlocks[snapBlocks.length - 1];
+
+    if (snapper && scrollCue && snapBlocks.length > 1) {
+      scrollCue.addEventListener('click', function() {
+        snapBlocks[1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      snapper.addEventListener('scroll', function() {
+        scrollCue.classList.toggle('is-hidden', snapper.scrollTop > 20);
+      }, { passive: true });
+    }
     
     if (finalBlock && footerGroup) {
       // 1. Let the footer flow naturally
