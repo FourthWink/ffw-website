@@ -280,47 +280,6 @@
   }
 })();
 
-// Deselect all variant options on first load (custom AI variant picker)
-(function () {
-  // Only deselect if the user didn't arrive with a ?variant= param
-  if (window.location.search.indexOf('variant=') !== -1) return;
-
-  function deselect() {
-    document.querySelectorAll('[class*="ai-variant-picker-"]').forEach(function(picker) {
-      var hasIncompleteSelection = false;
-
-      picker.querySelectorAll('[class*="ai-variant-picker__option"]').forEach(function(optionGroup) {
-        var buttons = optionGroup.querySelectorAll('[class*="ai-variant-picker__value"]');
-
-        if (buttons.length === 1) {
-          buttons[0].classList.add('selected');
-          return;
-        }
-
-        buttons.forEach(function(btn) {
-          btn.classList.remove('selected');
-        });
-        hasIncompleteSelection = true;
-      });
-
-      if (!hasIncompleteSelection) return;
-
-      var sel = picker.querySelector('select[name="id"]');
-      if (sel) {
-        sel.value = '';
-        sel.querySelectorAll('option[selected]').forEach(function(opt) {
-          opt.removeAttribute('selected');
-        });
-      }
-    });
-  }
-
-  // Run at multiple points to beat any late JS hydration
-  deselect();
-  document.addEventListener('DOMContentLoaded', deselect);
-  setTimeout(deselect, 100);
-  setTimeout(deselect, 400);
-})();
 </script>
 
 {%- endif -%}

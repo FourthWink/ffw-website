@@ -1341,7 +1341,40 @@
     picker.style.setProperty('--ffw-card-size-picker-top', topPercent.toFixed(2) + '%');
   }
 
-  function showWishlistSizePicker(sparkleEl, sizes) {
+  function updateWishlistSizePickerAvailability(picker, item) {
+    if (!picker || !item || !item.url) return;
+
+    var productUrl = item.url.split('?')[0].replace(/\.js$/, '') + '.js';
+    fetch(productUrl)
+      .then(function (response) {
+        if (!response.ok) throw new Error('Unable to load product availability');
+        return response.json();
+      })
+      .then(function (product) {
+        var sizeIndex = (product.options || []).findIndex(function (option) {
+          var optionName = typeof option === 'string' ? option : option.name;
+          return /size/i.test(optionName || '');
+        });
+        if (sizeIndex === -1) return;
+
+        var availableSizes = (product.variants || []).filter(function (variant) {
+          return variant.available;
+        }).map(function (variant) {
+          return String((variant.options || [])[sizeIndex] || '').trim();
+        });
+
+        picker.querySelectorAll('.ffw-card-size-option').forEach(function (button) {
+          button.disabled = availableSizes.indexOf(button.textContent.trim()) === -1;
+        });
+      })
+      .catch(function () {
+        picker.querySelectorAll('.ffw-card-size-option').forEach(function (button) {
+          button.disabled = false;
+        });
+      });
+  }
+
+  function showWishlistSizePicker(sparkleEl, sizes, item) {
     var card = getWishlistCardForSizePicker(sparkleEl);
     if (!card || !sizes.length) return false;
 
@@ -1367,6 +1400,7 @@
       btn.type = 'button';
       btn.className = 'ffw-card-size-option';
       btn.textContent = size;
+      btn.disabled = Boolean(item && item.url);
       btn.addEventListener('click', function (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -1378,6 +1412,7 @@
 
     card.appendChild(picker);
     positionWishlistSizePicker(card, picker);
+    updateWishlistSizePickerAvailability(picker, item);
     return true;
   }
 
@@ -1450,7 +1485,7 @@
     ) !== -1;
 
     if (card && !isAlreadyWishlisted && sizes.length) {
-      showWishlistSizePicker(sparkle, sizes);
+      showWishlistSizePicker(sparkle, sizes, item);
       return;
     }
 
