@@ -70,7 +70,6 @@
   }
 
   @media (min-width: 990px) {
-    .floating-atc .floating-atc-text::before,
     .floating-atc .floating-atc-text::after {
       content: attr(data-shimmer-text);
       position: absolute;
@@ -79,35 +78,22 @@
       pointer-events: none;
     }
 
-    .floating-atc .floating-atc-text::before {
-      color: #b8b8b8;
-      -webkit-text-fill-color: #b8b8b8;
-    }
-
     .floating-atc .floating-atc-text::after {
       color: transparent;
       background-image:
         linear-gradient(
           90deg,
-          transparent 32%,
-          #000000 50%,
-          transparent 68%
+          transparent 25%,
+          #ffffff 50%,
+          transparent 75%
         );
       background-position: 125% center;
       background-repeat: no-repeat;
-      background-size: 275% 100%;
+      background-size: 220% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.25));
-    }
-
-    .floating-atc.ffw-atc-shimmer-active .floating-atc-text::before {
-      animation: ffw-atc-text-shimmer-base 1.35s linear 4;
-    }
-
-    .floating-atc.ffw-atc-shimmer-active .floating-atc-text {
-      color: transparent !important;
+      filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.8));
     }
 
     .floating-atc.ffw-atc-shimmer-active .floating-atc-text::after {
@@ -126,13 +112,7 @@
       }
     }
 
-    @keyframes ffw-atc-text-shimmer-base {
-      0%, 100% { opacity: 0; }
-      12%, 88% { opacity: 1; }
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      .floating-atc .floating-atc-text::before,
       .floating-atc .floating-atc-text::after {
         animation: none;
         display: none;
