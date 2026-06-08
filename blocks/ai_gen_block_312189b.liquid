@@ -71,6 +71,31 @@
     cursor: not-allowed;
   }
 
+  .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size'] .ai-variant-picker__values-{{ ai_gen_id }} {
+    gap: {{ block.settings.spacing_between_values | times: 1.25 }}px;
+  }
+
+  .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size'] .ai-variant-picker__value-{{ ai_gen_id }} {
+    color: #000000;
+    font-weight: 400;
+    text-decoration: none;
+  }
+
+  .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size'] .ai-variant-picker__value-{{ ai_gen_id }}.selected,
+  .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size']:not(:has(.ai-variant-picker__value-{{ ai_gen_id }}.selected)) .ai-variant-picker__value-{{ ai_gen_id }}:first-child {
+    color: #000000;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size'] .ai-variant-picker__value-{{ ai_gen_id }}:disabled {
+    color: #BBBBBB;
+    font-weight: 400;
+    text-decoration: none;
+    opacity: 1;
+  }
+
   @media screen and (max-width: 749px) {
     .ai-variant-picker__label-{{ ai_gen_id }} {
       min-width: {{ block.settings.label_width_mobile }}px;
@@ -91,7 +116,7 @@
     }
 
     .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size'] .ai-variant-picker__values-{{ ai_gen_id }} {
-      gap: 34px;
+      gap: 43px;
     }
 
     .ai-variant-picker__option-{{ ai_gen_id }}[data-option-name='size'] .ai-variant-picker__value-{{ ai_gen_id }} {

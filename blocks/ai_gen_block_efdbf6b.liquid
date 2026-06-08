@@ -94,32 +94,27 @@
     padding: {{ block.settings.tab_padding_mobile }}px 0;
     font-size: 10px;
     font-weight: 400;
-    color: #BBBBBB;
+    color: #000000;
     cursor: pointer;
     position: relative;
     transition: color 0.3s ease, font-weight 0.3s ease;
+    text-decoration: none;
     white-space: nowrap;
   }
 
   .ai-product-tabs-button-{{ ai_gen_id }}.active {
-    color: {{ block.settings.active_tab_color }};
+    color: #000000;
     font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   .ai-product-tabs-button-{{ ai_gen_id }}::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: {{ block.settings.active_tab_color }};
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    display: none;
   }
 
   .ai-product-tabs-button-{{ ai_gen_id }}.active::after {
-    opacity: 1;
+    display: none;
   }
 
   .ai-product-tabs-content-{{ ai_gen_id }} {
