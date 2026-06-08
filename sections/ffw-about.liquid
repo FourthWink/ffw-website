@@ -43,17 +43,21 @@
   .ffw-about-scroll-cue {
     position: fixed;
     left: 50%;
-    bottom: 18px;
+    bottom: max(48px, calc(env(safe-area-inset-bottom) + 36px));
     z-index: 110;
-    width: 30px;
-    height: 30px;
+    width: 56px;
+    height: 56px;
     padding: 0;
     border: 0;
     background: transparent;
     cursor: pointer;
     transform: translateX(-50%);
     transition: opacity 0.25s ease, visibility 0.25s ease;
-    animation: ffw-about-scroll-bounce 0.7s ease-in-out 3;
+    will-change: transform;
+  }
+
+  .ffw-about-scroll-cue.is-bouncing {
+    animation: ffw-about-scroll-bounce 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
   }
 
   .ffw-about-scroll-cue img {
@@ -69,12 +73,16 @@
   }
 
   @keyframes ffw-about-scroll-bounce {
-    0%, 100% { transform: translate(-50%, 0); }
-    50% { transform: translate(-50%, 7px); }
+    0%, 12%, 100% { transform: translate(-50%, 0); }
+    32% { transform: translate(-50%, -10px); }
+    50% { transform: translate(-50%, 0); }
+    65% { transform: translate(-50%, -5px); }
+    78% { transform: translate(-50%, 0); }
+    88% { transform: translate(-50%, -2px); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ffw-about-scroll-cue {
+    .ffw-about-scroll-cue.is-bouncing {
       animation: none;
     }
   }
@@ -190,7 +198,7 @@
 <div class="ffw-snapper-wrapper">
   <img src="{{ 'about.png' | asset_url }}" alt="Glass Eye" class="ffw-snapper-eye">
   <button class="ffw-about-scroll-cue" type="button" aria-label="Scroll to the next section">
-    <img src="{{ 'ffw-scroll-arrow.svg' | asset_url }}" alt="" width="30" height="30">
+    <img src="{{ 'ffw-scroll-arrow.svg' | asset_url }}" alt="" width="56" height="56">
   </button>
 
   <div class="ffw-snap-block">
@@ -235,6 +243,10 @@
     var finalBlock = snapBlocks[snapBlocks.length - 1];
 
     if (snapper && scrollCue && snapBlocks.length > 1) {
+      window.setTimeout(function() {
+        scrollCue.classList.add('is-bouncing');
+      }, 150);
+
       scrollCue.addEventListener('click', function() {
         snapBlocks[1].scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
