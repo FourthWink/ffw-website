@@ -11,7 +11,7 @@
     <button type="button" class="ffwinks-soul-action-bottom floating-atc-btn">
       <div class="ffwinks-img-btn-wrap">
         <img src="{{ 'soul.svg' | asset_url }}" alt="Star" class="ffwinks-action-img inverted-star">
-        <span class="ffwinks-img-label floating-atc-text">Add to cart</span>
+        <span class="ffwinks-img-label floating-atc-text" data-shimmer-text="Add to cart">Add to cart</span>
       </div>
     </button>
   </div>
@@ -70,41 +70,38 @@
   }
 
   @media (min-width: 990px) {
-    .floating-atc .floating-atc-text {
-      --ffw-atc-shimmer-base: #666666;
-      --ffw-atc-shimmer-highlight: #000000;
+    .floating-atc .floating-atc-text::after {
+      content: attr(data-shimmer-text);
+      position: absolute;
+      inset: 0;
       --ffw-atc-shimmer-spread: 22px;
-      color: transparent !important;
+      color: transparent;
       background-image:
         linear-gradient(
           90deg,
           transparent calc(50% - var(--ffw-atc-shimmer-spread)),
-          var(--ffw-atc-shimmer-highlight),
+          #000000,
           transparent calc(50% + var(--ffw-atc-shimmer-spread))
-        ),
-        linear-gradient(var(--ffw-atc-shimmer-base), var(--ffw-atc-shimmer-base));
-      background-position: 100% center, 0 0;
-      background-repeat: no-repeat, padding-box;
-      background-size: 250% 100%, auto;
+        );
+      background-position: 100% center;
+      background-repeat: no-repeat;
+      background-size: 250% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: ffw-atc-text-shimmer 1.15s linear 0.45s 4;
-    }
-
-    .floating-atc-btn:is(:hover, :focus-visible, :active) .floating-atc-text {
-      --ffw-atc-shimmer-base: #000000;
-      --ffw-atc-shimmer-highlight: #000000;
+      pointer-events: none;
     }
 
     @keyframes ffw-atc-text-shimmer {
-      from { background-position: 100% center, 0 0; }
-      to { background-position: 0% center, 0 0; }
+      from { background-position: 100% center; }
+      to { background-position: 0% center; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .floating-atc .floating-atc-text {
+      .floating-atc .floating-atc-text::after {
         animation: none;
+        display: none;
       }
     }
   }
