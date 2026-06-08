@@ -84,20 +84,8 @@
     }
 
     .floating-atc .floating-atc-text::after {
-      color: transparent;
-      background-image:
-        linear-gradient(
-          90deg,
-          transparent 25%,
-          #ffffff 50%,
-          transparent 75%
-        );
-      background-position: 125% center;
-      background-repeat: no-repeat;
-      background-size: 220% 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #d0d0d0;
+      -webkit-text-fill-color: #d0d0d0;
       filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.8));
     }
 
@@ -107,12 +95,12 @@
 
     @keyframes ffw-atc-text-shimmer {
       0% {
-        background-position: 125% center;
+        clip-path: inset(0 100% 0 0);
         opacity: 0;
       }
       12%, 88% { opacity: 1; }
       100% {
-        background-position: -125% center;
+        clip-path: inset(0 0 0 100%);
         opacity: 0;
       }
     }
