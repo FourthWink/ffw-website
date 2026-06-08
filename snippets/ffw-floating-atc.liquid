@@ -99,7 +99,15 @@
         clip-path: inset(0 100% 0 0);
         opacity: 0;
       }
-      12%, 88% { opacity: 1; }
+      12% {
+        clip-path: inset(0 70% 0 0);
+        opacity: 1;
+      }
+      50% { clip-path: inset(0 35% 0 35%); }
+      88% {
+        clip-path: inset(0 0 0 70%);
+        opacity: 1;
+      }
       100% {
         clip-path: inset(0 0 0 100%);
         opacity: 0;
