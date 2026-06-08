@@ -11,7 +11,7 @@
     <button type="button" class="ffwinks-soul-action-bottom floating-atc-btn">
       <div class="ffwinks-img-btn-wrap">
         <img src="{{ 'soul.svg' | asset_url }}" alt="Star" class="ffwinks-action-img inverted-star">
-        <span class="ffwinks-img-label floating-atc-text" data-shine-text="Add to cart">Add to cart</span>
+        <span class="ffwinks-img-label floating-atc-text">Add to cart</span>
       </div>
     </button>
   </div>
@@ -67,80 +67,6 @@
   .floating-atc-btn:hover .floating-atc-text {
     color: #000 !important;
     font-weight: 700 !important;
-  }
-
-  @media (min-width: 990px) {
-    .floating-atc-text::before,
-    .floating-atc-text::after {
-      position: absolute;
-      pointer-events: none;
-    }
-
-    .floating-atc-text::before {
-      content: attr(data-shine-text);
-      inset: 0;
-      color: transparent;
-      background: linear-gradient(
-        105deg,
-        transparent 32%,
-        rgba(255, 255, 255, 0.25) 41%,
-        #ffffff 48%,
-        #222222 52%,
-        rgba(255, 255, 255, 0.35) 58%,
-        transparent 68%
-      );
-      background-size: 260% 100%;
-      background-position: 160% 0;
-      -webkit-background-clip: text;
-      background-clip: text;
-      filter: drop-shadow(0 0 2px rgba(68, 69, 69, 0.28));
-      animation: ffw-atc-text-shine 1.15s ease-in-out 0.45s 4 both;
-    }
-
-    .floating-atc-text::after {
-      content: '';
-      top: -7px;
-      right: -12px;
-      width: 12px;
-      height: 12px;
-      background:
-        linear-gradient(to right, transparent 43%, #ffffff 48% 52%, transparent 57%),
-        linear-gradient(to bottom, transparent 43%, #ffffff 48% 52%, transparent 57%);
-      filter: drop-shadow(0 0 2px rgba(68, 69, 69, 0.65));
-      opacity: 0;
-      transform: scale(0.25) rotate(45deg);
-      animation: ffw-atc-text-sparkle 1.15s ease-in-out 0.45s 4 both;
-    }
-
-    @keyframes ffw-atc-text-shine {
-      0% { background-position: 160% 0; opacity: 0; }
-      16% { opacity: 1; }
-      76% { opacity: 1; }
-      100% { background-position: -160% 0; opacity: 0; }
-    }
-
-    @keyframes ffw-atc-text-sparkle {
-      0%, 34%, 100% {
-        opacity: 0;
-        transform: scale(0.25) rotate(45deg);
-      }
-      48% {
-        opacity: 0.95;
-        transform: scale(1) rotate(45deg);
-      }
-      64% {
-        opacity: 0;
-        transform: scale(0.4) rotate(45deg);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .floating-atc-text::before,
-      .floating-atc-text::after {
-        animation: none;
-        display: none;
-      }
-    }
   }
 
   @media(max-width:900px) {
