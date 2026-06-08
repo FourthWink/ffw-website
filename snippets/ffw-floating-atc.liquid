@@ -74,28 +74,41 @@
       content: attr(data-shimmer-text);
       position: absolute;
       inset: 0;
-      --ffw-atc-shimmer-spread: 22px;
       color: transparent;
       background-image:
         linear-gradient(
           90deg,
-          transparent calc(50% - var(--ffw-atc-shimmer-spread)),
-          #000000,
-          transparent calc(50% + var(--ffw-atc-shimmer-spread))
+          transparent 25%,
+          rgba(255, 255, 255, 0.95) 42%,
+          #000000 50%,
+          rgba(255, 255, 255, 0.95) 58%,
+          transparent 75%
         );
-      background-position: 100% center;
+      background-position: 125% center;
       background-repeat: no-repeat;
-      background-size: 250% 100%;
+      background-size: 300% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: ffw-atc-text-shimmer 1.15s linear 0.45s 4;
+      filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.25));
+      opacity: 0;
       pointer-events: none;
     }
 
+    .floating-atc.ffw-atc-shimmer-active .floating-atc-text::after {
+      animation: ffw-atc-text-shimmer 1.35s linear 4;
+    }
+
     @keyframes ffw-atc-text-shimmer {
-      from { background-position: 100% center; }
-      to { background-position: 0% center; }
+      0% {
+        background-position: 125% center;
+        opacity: 0;
+      }
+      12%, 88% { opacity: 1; }
+      100% {
+        background-position: -125% center;
+        opacity: 0;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -113,3 +126,26 @@
     }
   }
 </style>
+
+<script>
+  (function() {
+    function startDesktopAtcShimmer() {
+      if (!window.matchMedia('(min-width: 990px)').matches) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var floatingAtc = document.querySelector('.floating-atc');
+      if (!floatingAtc || floatingAtc.dataset.ffwShimmerStarted) return;
+
+      floatingAtc.dataset.ffwShimmerStarted = 'true';
+      window.setTimeout(function() {
+        floatingAtc.classList.add('ffw-atc-shimmer-active');
+      }, 900);
+    }
+
+    if (document.readyState === 'complete') {
+      startDesktopAtcShimmer();
+    } else {
+      window.addEventListener('load', startDesktopAtcShimmer, { once: true });
+    }
+  })();
+</script>
