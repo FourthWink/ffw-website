@@ -106,6 +106,10 @@
       animation: ffw-atc-text-shimmer-base 1.35s linear 4;
     }
 
+    .floating-atc.ffw-atc-shimmer-active .floating-atc-text {
+      color: transparent !important;
+    }
+
     .floating-atc.ffw-atc-shimmer-active .floating-atc-text::after {
       animation: ffw-atc-text-shimmer 1.35s linear 4;
     }
@@ -156,6 +160,9 @@
       floatingAtc.dataset.ffwShimmerStarted = 'true';
       window.setTimeout(function() {
         floatingAtc.classList.add('ffw-atc-shimmer-active');
+        window.setTimeout(function() {
+          floatingAtc.classList.remove('ffw-atc-shimmer-active');
+        }, 5400);
       }, 900);
     }
 
