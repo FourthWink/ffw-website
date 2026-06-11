@@ -11,7 +11,7 @@
     --cart-pad-x: 30px; 
     --cart-img-h: clamp(150px, calc(50vh - var(--cart-header-h)), 800px);
     --cart-box-curve-gap: clamp(0px, calc((100vh - 800px) * 0.05), 10px);
-    --cart-box-top-trim: 10px;
+    --cart-box-top-trim: calc(var(--cart-img-h) * 0.15);
     --cart-items-padding-bottom: 32vh;
   }
 
@@ -89,7 +89,7 @@
     .cart-item__remove-btn-desktop:hover { color: #000; }
     
     .cart-item__left { width: calc(100% - 24px); height: calc(var(--cart-img-h) - var(--cart-box-curve-gap) - var(--cart-box-top-trim)); margin-top: var(--cart-box-top-trim); margin-left: 6px; margin-bottom: var(--cart-box-curve-gap); background: #f4f4f4; border-radius: var(--soul-img-radius-pill, 70px); display: flex; justify-content: center; align-items: center; overflow: hidden; transform: translateZ(0); filter: none; opacity: 1; }
-    .cart-item__left img { width: calc(50% + 12px); height: calc(100% + var(--cart-box-top-trim)); max-width: 100%; max-height: calc(100% + var(--cart-box-top-trim)); object-fit: contain; object-position: center; pointer-events: none; transition: none; will-change: auto; filter: none; opacity: 1; }
+    .cart-item__left img { width: calc(50% + 12px); height: 85%; max-width: 100%; max-height: 85%; object-fit: contain; object-position: center; pointer-events: none; transition: none; will-change: auto; filter: none; opacity: 1; }
     
     .cart-item__right { display: flex; flex-direction: column; width: calc(100% - 28px); margin-left: 28px; padding: 84px 10px 10px 20px; gap: 16px; font-family: 'Montserrat', Arial, sans-serif !important; font-size: 10px; color: #000000; }
     .cart-item__row { display: flex; justify-content: space-between; align-items: center; font-size: 10px; margin-bottom: 10px; }
