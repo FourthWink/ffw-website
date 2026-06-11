@@ -47,13 +47,13 @@
   }
 
   .floating-atc .ffwinks-img-label {
-    color: #666666;
+    color: #000000;
     transition: color 0.3s ease;
     font-weight: 700 !important;
   }
 
   .floating-atc-text {
-    color: #666666;
+    color: #000000;
     font-weight: 700 !important;
   }
 
@@ -80,38 +80,29 @@
       line-height: 1em;
       transform: translateY(-50%);
       z-index: 1;
-      opacity: 0;
+      color: rgba(255, 255, 255, 0.85);
+      -webkit-text-fill-color: rgba(255, 255, 255, 0.85);
+      filter: blur(0.6px) drop-shadow(0 0 1px rgba(255, 255, 255, 0.65));
+      animation: ffw-atc-text-shimmer 4s ease-in-out infinite;
       pointer-events: none;
-    }
-
-    .floating-atc .floating-atc-text::after {
-      color: #d0d0d0;
-      -webkit-text-fill-color: #d0d0d0;
-      filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.8));
-    }
-
-    .floating-atc.ffw-atc-shimmer-active .floating-atc-text::after {
-      animation: ffw-atc-text-shimmer 1.35s linear 4;
     }
 
     @keyframes ffw-atc-text-shimmer {
       0% {
-        clip-path: inset(0 100% 0 0);
+        clip-path: polygon(-45% 0, -15% 0, -45% 100%, -75% 100%);
         opacity: 0;
       }
-      12% {
-        clip-path: inset(0 70% 0 0);
+      4% {
         opacity: 1;
       }
-      50% { clip-path: inset(0 35% 0 35%); }
-      88% {
-        clip-path: inset(0 0 0 70%);
+      24% {
         opacity: 1;
       }
-      100% {
-        clip-path: inset(0 0 0 100%);
+      28% {
+        clip-path: polygon(175% 0, 205% 0, 175% 100%, 145% 100%);
         opacity: 0;
       }
+      100% { opacity: 0; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -129,29 +120,3 @@
     }
   }
 </style>
-
-<script>
-  (function() {
-    function startDesktopAtcShimmer() {
-      if (!window.matchMedia('(min-width: 990px)').matches) return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-      var floatingAtc = document.querySelector('.floating-atc');
-      if (!floatingAtc || floatingAtc.dataset.ffwShimmerStarted) return;
-
-      floatingAtc.dataset.ffwShimmerStarted = 'true';
-      window.setTimeout(function() {
-        floatingAtc.classList.add('ffw-atc-shimmer-active');
-        window.setTimeout(function() {
-          floatingAtc.classList.remove('ffw-atc-shimmer-active');
-        }, 5400);
-      }, 900);
-    }
-
-    if (document.readyState === 'complete') {
-      startDesktopAtcShimmer();
-    } else {
-      window.addEventListener('load', startDesktopAtcShimmer, { once: true });
-    }
-  })();
-</script>
