@@ -672,7 +672,8 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         }
 
         function hasBlockingOverlay() {
-          return document.body.classList.contains('ffwinks-open') ||
+          return document.body.classList.contains('cart-overlay-open') ||
+            document.body.classList.contains('ffwinks-open') ||
             document.body.classList.contains('ffwinks-body-lock') ||
             document.querySelector('.ffwinks-fullscreen.ffwinks-fullscreen--open');
         }
