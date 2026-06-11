@@ -194,7 +194,7 @@
   }
 
   html:not([scroll-lock]) { overflow-y: auto !important; }
-  body:not(.ffwinks-open):not(.ffwinks-body-lock):not(.vi-video-active) { overflow-y: auto !important; }
+  body:not(.ffwinks-open):not(.ffwinks-body-lock):not(.vi-video-active):not(.cart-overlay-open) { overflow-y: auto !important; }
   body.ffwinks-open:not(:has(#ffwinks-search-bar.is-open, #ffwinks-account-bar.is-open)) { overflow-y: auto !important; }
   body.ffwinks-body-lock:not(:has(.ffwinks-fullscreen.ffwinks-fullscreen--open[aria-hidden='false'])) { overflow-y: auto !important; }
   body.vi-video-active:not(:has(.vi-intro-window.show)) { overflow-y: auto !important; }
