@@ -130,7 +130,7 @@
       var lastRect = lastImg.getBoundingClientRect();
 
       var fixedY = window.innerHeight * 0.5;
-      var targetY = Math.min(fixedY, lastRect.bottom);
+      var targetY = fixedY;
 
       star.style.setProperty('position', 'fixed', 'important');
       star.style.setProperty('z-index', '505', 'important');
@@ -276,12 +276,20 @@
         var desktopVariantHtml = '';
         if (item.variant_title && item.variant_title !== 'Default Title') {
           var desktopVariants = item.variant_title.split(' / ');
-          if (desktopVariants[0]) desktopVariantHtml += '<div class="cart-item__variant-row"><span class="cart-item__variant-label">Size</span><span>' + desktopVariants[0].trim() + '</span></div>';
-          if (desktopVariants[1]) desktopVariantHtml += '<div class="cart-item__variant-row"><span class="cart-item__variant-label">Color</span><span>' + desktopVariants[1].trim() + '</span></div>';
+          var desktopV1 = desktopVariants[0] ? desktopVariants[0].trim() : '';
+          var desktopV2 = desktopVariants[1] ? desktopVariants[1].trim() : '';
+          var isDesktopV2Size = ['XS','S','M','L','XL','XXL'].includes(desktopV2.toUpperCase());
+          if (isDesktopV2Size) {
+            desktopVariantHtml += '<div class="cart-item__variant-row"><span class="cart-item__variant-label">Size</span><span class="cart-item__variant-value">' + desktopV2 + '</span></div>';
+            desktopVariantHtml += '<div class="cart-item__variant-row"><span class="cart-item__variant-label">Color</span><span class="cart-item__variant-value">' + desktopV1 + '</span></div>';
+          } else {
+            if (desktopV1) desktopVariantHtml += '<div class="cart-item__variant-row"><span class="cart-item__variant-label">Size</span><span class="cart-item__variant-value">' + desktopV1 + '</span></div>';
+            if (desktopV2) desktopVariantHtml += '<div class="cart-item__variant-row"><span class="cart-item__variant-label">Color</span><span class="cart-item__variant-value">' + desktopV2 + '</span></div>';
+          }
         }
 
         desktopHtml += '<div class="cart-item desktop-item" style="animation-delay:' + (i * 0.05) + 's" data-key="' + item.key + '">'
-          + '<button class="cart-item__remove-btn-desktop cart-item__qty-btn" data-action="remove" data-key="' + item.key + '" aria-label="Remove">x</button>'
+          + '<button class="cart-item__remove-btn-desktop cart-item__qty-btn" data-action="remove" data-key="' + item.key + '" aria-label="Remove">&times;</button>'
           + '<a class="cart-item__left" href="' + itemUrl + '" aria-label="View ' + item.product_title + '">'
           + (item.image ? '<img src="' + item.image + '" alt="' + item.product_title + '" loading="lazy">' : '')
           + '</a>'
