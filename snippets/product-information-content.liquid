@@ -429,7 +429,7 @@
       }
 
       function forwardFixedLayerWheel(event) {
-        if (!mq.matches || event.ctrlKey || event.metaKey) return;
+        if (!mq.matches || event.ctrlKey || event.metaKey || document.body.classList.contains('cart-overlay-open')) return;
 
         var target = event.target;
         var isFixedLayer = target && target.closest && target.closest('.product-details, .floating-atc, .floating-atc-slot');
