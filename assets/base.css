@@ -1777,8 +1777,8 @@ zoom-dialog dialog {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #bbbbbb;
-  font-weight: 400;
+  color: #bbbbbb !important;
+  font-weight: 400 !important;
 
   /* For the outline radius */
   border-radius: 50%;
@@ -1882,15 +1882,15 @@ zoom-dialog dialog {
 }
 
 .drawer__close {
-  color: #bbbbbb;
-  font-weight: 400;
+  color: #bbbbbb !important;
+  font-weight: 400 !important;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .close-button:hover,
   .drawer__close:hover {
-    color: #000000;
-    font-weight: 400;
+    color: #000000 !important;
+    font-weight: 400 !important;
     background-color: transparent;
     opacity: 1;
   }
