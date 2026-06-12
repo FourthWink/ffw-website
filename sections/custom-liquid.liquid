@@ -289,7 +289,7 @@
         }
 
         desktopHtml += '<div class="cart-item desktop-item" style="animation-delay:' + (i * 0.05) + 's" data-key="' + item.key + '">'
-          + '<button class="cart-item__remove-btn-desktop cart-item__qty-btn" data-action="close-overlay" aria-label="Close cart">&times;</button>'
+          + '<button class="cart-item__remove-btn-desktop cart-item__qty-btn" data-action="remove" data-key="' + item.key + '" aria-label="Remove">&times;</button>'
           + '<a class="cart-item__left" href="' + itemUrl + '" aria-label="View ' + item.product_title + '">'
           + (item.image ? '<img src="' + item.image + '" alt="' + item.product_title + '" loading="lazy">' : '')
           + '</a>'
@@ -502,9 +502,7 @@
         var action = actionBtn.dataset.action;
         var key = actionBtn.dataset.key;
         
-        if (action === 'close-overlay') {
-          closeCart();
-        } else if (action === 'remove') {
+        if (action === 'remove') {
           updateQty(key, -999);
         } else {
           updateQty(key, action === 'increase' ? 1 : -1);
