@@ -178,6 +178,9 @@
     }
 
     function fetchOverlayCartJson() {
+      if (window.ffwinksCartApi && typeof window.ffwinksCartApi.fetchJson === 'function') {
+        return window.ffwinksCartApi.fetchJson();
+      }
       return fetch('/cart.js').then(function(r) { return r.json(); });
     }
 
