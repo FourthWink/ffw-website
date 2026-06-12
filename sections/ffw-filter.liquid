@@ -233,15 +233,18 @@
     justify-content: center;
     align-items: center;
     font-size: 10px;
-    color: #666666;
+    color: #BBBBBB;
     background: transparent;
     border: none;
     cursor: pointer;
     z-index: 2002;
     padding: 0;
     line-height: 1;
+    font-weight: 400;
   }
-  .ffw-filter-close:hover { color: #000000; font-weight: 700; }
+  @media (hover: hover) and (pointer: fine) {
+    .ffw-filter-close:hover { color: #000000; font-weight: 400; }
+  }
 
   /* Container */
   .ffw-filter-container {

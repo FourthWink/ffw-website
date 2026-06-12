@@ -1604,7 +1604,8 @@ button.ffwinks-submit-btn:hover { color: #000; }
   background: none;
   border: none;
   cursor: pointer;
-  color: #666666;
+  color: #BBBBBB;
+  font-weight: 400;
   transition: color 0.2s ease, transform 0.2s ease;
   padding: 0;
 }
@@ -1686,7 +1687,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
 /* — Remove button — */
 .ffwinks-soul-remove {
   font-size: 18px;
-  color: #666666;
+  color: #BBBBBB;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -1705,7 +1706,13 @@ button.ffwinks-submit-btn:hover { color: #000; }
   align-self: flex-start; /* Pulls the entire button to the top of the product row */
   transition: color 0.2s, font-weight 0.1s;
 }
-.ffwinks-soul-remove:hover { color: #000; }
+@media (hover: hover) and (pointer: fine) {
+  .ffwinks-mobile-menu__close-btn:hover,
+  .ffwinks-soul-remove:hover {
+    color: #000000;
+    font-weight: 400;
+  }
+}
 
 /* — Image box — locked height, percentage width shrinks with overlay — */
 /* — Image box — locked height, percentage width shrinks with overlay — */

@@ -1777,6 +1777,8 @@ zoom-dialog dialog {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #bbbbbb;
+  font-weight: 400;
 
   /* For the outline radius */
   border-radius: 50%;
@@ -1874,14 +1876,24 @@ zoom-dialog dialog {
   }
 }
 
-.close-button:hover {
-  background-color: transparent;
-  opacity: 0.8;
-}
-
 .close-button svg {
   width: var(--icon-size-xs);
   height: var(--icon-size-xs);
+}
+
+.drawer__close {
+  color: #bbbbbb;
+  font-weight: 400;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .close-button:hover,
+  .drawer__close:hover {
+    color: #000000;
+    font-weight: 400;
+    background-color: transparent;
+    opacity: 1;
+  }
 }
 
 /* Product media */
