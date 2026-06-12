@@ -10,7 +10,7 @@
   from the script below so it can float near the active cart item.
 {% endcomment %}
 <div class="cart-overlay__floating-wrapper desktop-only" id="cart-checkout-wrapper-desktop">
-  <a href="/checkout" class="ffwinks-soul-action-bottom cart-overlay__floating-btn" aria-label="Checkout">
+  <a href="/checkout" class="ffwinks-soul-action-bottom cart-overlay__floating-btn" aria-label="Checkout" data-ffw-direct-checkout>
     <div class="ffwinks-img-btn-wrap">
       <img src="{{ 'soul.svg' | asset_url }}" alt="Star" class="ffwinks-action-img cart-overlay__floating-svg">
       <span class="ffwinks-img-label cart-overlay__text" data-shimmer-text="Checkout">Checkout</span>
@@ -67,7 +67,7 @@
     </div>
 
     <div class="ffwinks-soul-checkout-wrapper" id="cart-checkout-wrapper-mobile">
-      <a href="/checkout" class="ffwinks-soul-action-bottom" aria-label="Checkout">
+      <a href="/checkout" class="ffwinks-soul-action-bottom" aria-label="Checkout" data-ffw-direct-checkout>
         <div class="ffwinks-img-btn-wrap">
           <img src="{{ 'soul.svg' | asset_url }}" alt="Star" class="ffwinks-action-img mobile-star">
           <span class="ffwinks-img-label">Checkout</span>

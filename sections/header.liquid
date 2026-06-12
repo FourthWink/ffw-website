@@ -400,6 +400,7 @@
     
     // Intercept clicks on any checkout links or checkout form buttons
     document.addEventListener('click', (e) => {
+      if (e.target.closest('[data-ffw-direct-checkout]')) return;
       const checkoutLink = e.target.closest('a[href*="/checkout"]');
       const checkoutBtn = e.target.closest('button[name="checkout"], input[name="checkout"]');
       
@@ -3026,6 +3027,7 @@ header-component .header__menu-item:hover,
     // accidentally hitting the checkout path
     // ============================================================
     document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-ffw-direct-checkout]')) return;
       if (isCartIconTarget(e.target)) return;
       if (!isCheckoutTarget(e.target)) return;
 
