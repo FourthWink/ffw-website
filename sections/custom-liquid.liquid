@@ -209,14 +209,25 @@
 
     // Move the overlay to <body> before opening so fixed positioning is not
     // affected by section wrappers or Shopify view-transition containers.
-    function openCart() {
+    function showCartLoading(message) {
+      message = message || 'Loading cart…';
+      if (itemsWrapDesktop) itemsWrapDesktop.innerHTML = '<div class="cart-overlay__loading">' + message + '</div>';
+      if (itemsWrapMobile) itemsWrapMobile.innerHTML = '<div class="ffwinks-empty-msg">' + message + '</div>';
+    }
+
+    function openCart(options) {
+      options = options || {};
       mountDesktopFloatingWrapper();
       if (overlay.parentNode !== document.body) {
         document.body.appendChild(overlay);
       }
       overlay.classList.add('is-open');
       document.body.classList.add('cart-overlay-open');
-      fetchCart();
+      if (options.loadingOnly) {
+        showCartLoading();
+      } else {
+        fetchCart();
+      }
     }
 
     function closeCart() {
@@ -228,8 +239,7 @@
     }
 
     function fetchCart() {
-      if (itemsWrapDesktop) itemsWrapDesktop.innerHTML = '<div class="cart-overlay__loading">Loading cart…</div>';
-      if (itemsWrapMobile) itemsWrapMobile.innerHTML = '<div class="ffwinks-empty-msg">Loading cart…</div>';
+      showCartLoading();
       
       fetchOverlayCartJson().then(renderCart).catch(function () {
         if (itemsWrapDesktop) itemsWrapDesktop.innerHTML = '<div class="cart-overlay__loading">Unable to load cart.</div>';
@@ -572,11 +582,16 @@
 
         atcBtn.disabled = true;
         document.body.classList.add('ffwinks-adding');
+        var opensLegacyOverlay = window.innerWidth > 749;
+        if (opensLegacyOverlay) {
+          openCart({ loadingOnly: true });
+        }
+
         function finishAdd(success) {
           atcBtn.disabled = false;
           document.body.classList.remove('ffwinks-adding');
           if (success) {
-            if (window.innerWidth <= 749) {
+            if (!opensLegacyOverlay) {
               var headerCartIcon = document.querySelector('.header__icon--cart, a[href*="/cart"]');
               if (headerCartIcon) {
                 headerCartIcon.click();
@@ -584,8 +599,10 @@
                 window.location.href = '/cart';
               }
             } else {
-              openCart();
+              fetchCart();
             }
+          } else if (opensLegacyOverlay) {
+            showCartLoading('Unable to add item.');
           }
         }
 
