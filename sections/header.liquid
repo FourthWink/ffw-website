@@ -1167,7 +1167,7 @@ body.ffw-filter-open #ffwinks-global-overlay {
 .ffwinks-suggestions-label {
   font-size: 10px;
   font-weight: 400;
-  color: #000000;
+  color: #666666;
   
   text-transform: capitalize;
   white-space: nowrap;
@@ -1175,17 +1175,22 @@ body.ffw-filter-open #ffwinks-global-overlay {
 .ffwinks-suggestions-list { display: flex; flex-direction: row; gap: 25px; flex-wrap: wrap; }
 .ffwinks-suggestion-link {
   font-size: 10px;
-  font-weight: 700;
-  color: #666666;
+  font-weight: 400;
+  color: #000000;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color 0.3s, font-weight 0.3s;
   
   text-transform: capitalize;
   min-height: 28px;
   display: inline-flex;
   align-items: center;
 }
-.ffwinks-suggestion-link:hover { color: #000; }
+@media (hover: hover) and (pointer: fine) {
+  .ffwinks-suggestion-link:hover {
+    color: #000;
+    font-weight: 700;
+  }
+}
 
 .ffwinks-suggestions-list--products {
   width: min(100%, 900px);
@@ -1280,7 +1285,7 @@ button.ffwinks-submit-btn:hover { color: #000; }
   pointer-events: auto;
   text-align: center;
   white-space: nowrap;
-  color: #666666;
+  color: #000000;
   font-size: 10px;
   font-weight: 700;
   transition: color 0.3s ease;
