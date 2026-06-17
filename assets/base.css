@@ -30,6 +30,13 @@ body {
   font-variation-settings: 'slnt' 0;
 }
 
+/* Temporarily hide the custom collection filter entry point without removing the filter system. */
+.ffw-filter-trigger.filter-trigger {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 :root {
   --hover-lift-amount: 4px;
   --hover-scale-amount: 1.03;
