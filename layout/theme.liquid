@@ -603,8 +603,6 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
         var touchStartY = null;
         var HOMEPAGE_SNAP_TOUCH_THRESHOLD = 32;
         var HOMEPAGE_SNAP_VERTICAL_BIAS = 1.25;
-        var HOMEPAGE_SNAP_DURATION = 1100;
-        var HOMEPAGE_SNAP_SETTLE = 160;
 
         function getScrollElement() {
           var scrollingElement = document.scrollingElement || document.documentElement;
@@ -623,7 +621,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
           var scrollElement = getScrollElement();
           var start = getScrollTop();
           var distance = target - start;
-          var duration = HOMEPAGE_SNAP_DURATION;
+          var duration = 1100;
           var startTime = performance.now();
 
           if (snapAnimationFrame) cancelAnimationFrame(snapAnimationFrame);
@@ -650,10 +648,6 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
           snapAnimationFrame = requestAnimationFrame(step);
         }
 
-        function isMobileHomepageSnap() {
-          return window.matchMedia('(max-width: 768px)').matches;
-        }
-
         function getDreamPicksTarget() {
           var grids = document.querySelectorAll("[class*='ai-picks-grid-container']");
           for (var i = 0; i < grids.length; i++) {
@@ -665,52 +659,10 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
           return null;
         }
 
-        function getFooterTarget() {
-          var footer = document.querySelector('.shopify-section-group-footer-group') || document.querySelector('footer');
-          if (!footer) return null;
-          var rect = footer.getBoundingClientRect();
-          if (rect.height < 20) return null;
-          var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-          return Math.min(maxScroll, Math.max(0, getScrollTop() + rect.top));
-        }
-
-        function getMobileSnapTargets() {
-          var productTarget = getDreamPicksTarget();
-          var footerTarget = getFooterTarget();
-          if (productTarget === null || footerTarget === null) return [];
-          return [0, productTarget, footerTarget].sort(function(a, b) { return a - b; });
-        }
-
-        function getNearestSnapIndex(targets) {
-          var current = getScrollTop();
-          var closestIndex = 0;
-          var closestDistance = Infinity;
-          targets.forEach(function(target, index) {
-            var distance = Math.abs(target - current);
-            if (distance < closestDistance) {
-              closestDistance = distance;
-              closestIndex = index;
-            }
-          });
-          return closestIndex;
-        }
-
-        function snapMobileHomepage(direction) {
-          if (Date.now() < snapLockUntil || snapAnimationFrame) return true;
-          var targets = getMobileSnapTargets();
-          if (targets.length < 3) return false;
-          var currentIndex = getNearestSnapIndex(targets);
-          var nextIndex = Math.max(0, Math.min(targets.length - 1, currentIndex + direction));
-          if (nextIndex === currentIndex) return true;
-          snapLockUntil = Date.now() + HOMEPAGE_SNAP_DURATION + HOMEPAGE_SNAP_SETTLE;
-          scrollToPosition(targets[nextIndex]);
-          return true;
-        }
-
         function snapToDreamPicks() {
           var target = getDreamPicksTarget();
           if (target === null) return;
-          snapLockUntil = Date.now() + HOMEPAGE_SNAP_DURATION + HOMEPAGE_SNAP_SETTLE;
+          snapLockUntil = Date.now() + 1200;
           scrollToPosition(target);
         }
 
@@ -728,12 +680,6 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
 
         window.addEventListener('wheel', function(event) {
           if (hasBlockingOverlay()) return;
-          if (isMobileHomepageSnap()) {
-            if (Math.abs(event.deltaY) < 1) return;
-            event.preventDefault();
-            snapMobileHomepage(event.deltaY > 0 ? 1 : -1);
-            return;
-          }
           if (event.deltaY <= 0) return;
           if (Date.now() < snapLockUntil) {
             event.preventDefault();
@@ -756,13 +702,7 @@ body .product-grid__item:has(product-card[data-tags~="preorder"]) .product-badge
           var deltaX = touchStartX === null ? 0 : Math.abs(touchStartX - event.touches[0].clientX);
           var deltaY = touchStartY - event.touches[0].clientY;
           var isVerticalIntent = Math.abs(deltaY) > deltaX * HOMEPAGE_SNAP_VERTICAL_BIAS;
-          if (!isVerticalIntent || Math.abs(deltaY) <= HOMEPAGE_SNAP_TOUCH_THRESHOLD) return;
-          if (isMobileHomepageSnap()) {
-            event.preventDefault();
-            snapMobileHomepage(deltaY > 0 ? 1 : -1);
-            return;
-          }
-          var isScrollingDown = deltaY > HOMEPAGE_SNAP_TOUCH_THRESHOLD;
+          var isScrollingDown = deltaY > HOMEPAGE_SNAP_TOUCH_THRESHOLD && isVerticalIntent;
           if (!isScrollingDown) return;
           if (Date.now() < snapLockUntil) {
             event.preventDefault();
