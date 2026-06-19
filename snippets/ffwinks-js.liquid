@@ -1530,7 +1530,7 @@
     closeAll();
     closeFullscreen(wishlistOverlay);
     openFullscreen(cartOverlay);
-    refreshCartOverlay({ useCache: opts.useCache !== false });
+    refreshCartOverlay({ cart: opts.cart || null, useCache: opts.useCache !== false });
     setTimeout(ffwinksUpdateStar, 100);
   }
 
@@ -1794,17 +1794,21 @@
     fetch('/cart/add.js', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ items: itemsToCart })
+      body:    JSON.stringify({ items: itemsToCart }),
+      ffwinksOwnedCartMutation: true
     })
-    .then(function () {
+    .then(function (response) {
+      if (!response.ok) throw new Error('Unable to add wishlist items to cart.');
+      cartFetchPromise = null;
+      return fetchCartJson(0);
+    })
+    .then(function (cart) {
       btn.disabled = false;
+      writeCartCache(cart);
       saveWishlist([]);
       updateAllSparkleStates();
       renderWishlistOverlay();
-      refreshCartOverlay();
-      closeFullscreen(wishlistOverlay);
-      openFullscreen(cartOverlay);
-      setTimeout(ffwinksUpdateStar, 100);
+      openCartFullscreen({ cart: cart, useCache: true });
     })
     .catch(function () {
       btn.disabled = false;
@@ -1814,6 +1818,7 @@
   var CART_CACHE_KEY = 'ffwinks_cart_cache_v1';
   var CART_CACHE_TTL_MS = 8000;
   var cartRenderInFlight = false;
+  var cartRenderGeneration = 0;
   var cartRefreshTimer;
 
   function readCartCache() {
@@ -2056,8 +2061,9 @@
 
   function refreshCartOverlay(opts) {
     opts = opts || {};
-    if (cartRenderInFlight) return;
+    if (cartRenderInFlight && !opts.cart) return;
     cartRenderInFlight = true;
+    var renderGeneration = ++cartRenderGeneration;
 
     var listEl  = document.getElementById('ffwinks-cart-list');
     var emptyEl = document.getElementById('ffwinks-cart-empty');
@@ -2101,6 +2107,7 @@
     }
 
     function renderCart(cart) {
+      if (renderGeneration !== cartRenderGeneration) return;
       if (!listEl || !emptyEl || !totalEl) return;
 
       setBadge(cartBadge, cart.item_count || 0);
@@ -2194,6 +2201,15 @@
       }
       updateFfwinksCartSubtotalInfo(cart);
       setTimeout(ffwinksUpdateStar, 50);
+    }
+
+    if (opts.cart) {
+      try {
+        renderCart(opts.cart);
+      } finally {
+        cartRenderInFlight = false;
+      }
+      return;
     }
 
     if (opts.useCache !== false) {
