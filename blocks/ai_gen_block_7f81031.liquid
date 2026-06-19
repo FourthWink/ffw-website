@@ -39,6 +39,16 @@
     transition: transform 0.3s ease;
   }
 
+  .ai-picks-box--coming-soon-{{ ai_gen_id }} {
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .ai-picks-box--coming-soon-{{ ai_gen_id }} .ai-picks-text-group-{{ ai_gen_id }} {
+    bottom: 0;
+    transform: none;
+  }
+
   .ai-picks-box-media-{{ ai_gen_id }} {
     width: 100%;
     height: 100%;
@@ -280,7 +290,13 @@
     {% for i in (1..4) %}
       {% capture prod_setting %}product_{{ i }}{% endcapture %}
       {% capture title_setting %}title_{{ i }}{% endcapture %}
+      {% capture coming_image_setting %}coming_soon_image_{{ i }}{% endcapture %}
+      {% capture coming_title_setting %}coming_soon_title_{{ i }}{% endcapture %}
       {% assign prod = block.settings[prod_setting] %}
+      {% assign is_coming_soon = false %}
+      {% if i > 2 %}
+        {% assign is_coming_soon = true %}
+      {% endif %}
 
       {%- comment -%}
         Gather product data for the wishlist.
@@ -295,6 +311,8 @@
       {% assign wl_image       = prod.featured_image | image_url: width: 400 %}
       {% assign wl_url         = prod.url | default: '#' %}
       {% assign hover_image    = blank %}
+      {% assign coming_image   = block.settings[coming_image_setting] | default: prod.featured_image %}
+      {% assign coming_title   = block.settings[coming_title_setting] | default: block.settings[title_setting] | default: 'Coming soon' %}
 
       {% if prod != blank %}
         {% for image in prod.images %}
@@ -305,10 +323,23 @@
         {% endfor %}
       {% endif %}
 
-      <div class="ai-picks-box-{{ ai_gen_id }}">
-        <a href="{{ wl_url }}" style="position: absolute; inset: 0; z-index: 1;"></a>
+      <div class="ai-picks-box-{{ ai_gen_id }}{% if is_coming_soon %} ai-picks-box--coming-soon-{{ ai_gen_id }}{% endif %}"{% if is_coming_soon %} aria-label="{{ coming_title | escape }}"{% endif %}>
+        {% unless is_coming_soon %}
+          <a href="{{ wl_url }}" style="position: absolute; inset: 0; z-index: 1;"></a>
+        {% endunless %}
 
-        {% if prod.featured_image %}
+        {% if is_coming_soon and coming_image != blank %}
+          <div class="ai-picks-box-media-{{ ai_gen_id }}">
+            <img
+              src="{{ coming_image | image_url: width: 800 }}"
+              alt="{{ coming_title | escape }}"
+              class="ai-picks-box-image-{{ ai_gen_id }} ai-picks-box-image-primary-{{ ai_gen_id }}"
+              loading="lazy"
+              width="800"
+              height="{{ 800 | divided_by: coming_image.aspect_ratio | round }}"
+            >
+          </div>
+        {% elsif prod.featured_image %}
           <div class="ai-picks-box-media-{{ ai_gen_id }}{% if hover_image != blank %} ai-picks-box-media--has-hover-{{ ai_gen_id }}{% endif %}">
             <img
               src="{{ prod.featured_image | image_url: width: 800 }}"
@@ -336,10 +367,12 @@
 
           <!-- Text slides up on hover -->
           <div class="ai-picks-text-group-{{ ai_gen_id }}">
-            <h3 class="ai-picks-box-title-{{ ai_gen_id }}">{{ wl_title }}</h3>
-            <div class="ai-picks-box-price-{{ ai_gen_id }}">
-              {{ prod.price | default: 10000 | money }}
-            </div>
+            <h3 class="ai-picks-box-title-{{ ai_gen_id }}">{% if is_coming_soon %}{{ coming_title }}{% else %}{{ wl_title }}{% endif %}</h3>
+            {% unless is_coming_soon %}
+              <div class="ai-picks-box-price-{{ ai_gen_id }}">
+                {{ prod.price | default: 10000 | money }}
+              </div>
+            {% endunless %}
           </div>
           <!--
             Sparkle button — all product data lives here as data-* attributes.
@@ -347,6 +380,7 @@
             data-svg-empty  = outline sparkle (not wishlisted)
             data-svg-filled = filled sparkle (wishlisted)
           -->
+          {% unless is_coming_soon %}
           <button
   class="sparkle-btn-{{ ai_gen_id }}"
   data-ffwinks-sparkle
@@ -374,6 +408,7 @@ data-available-colors="{{ color_names | escape }}"
   data-svg-filled="{{ 'sparkle-icon.svg' | asset_url }}">
             <img src="{{ 'sparkle.svg' | asset_url }}" alt="Wishlist">
           </button>
+          {% endunless %}
 
         </div>
       </div>
@@ -508,33 +543,55 @@ data-available-colors="{{ color_names | escape }}"
     },
     {
       "type": "header",
-      "content": "Product 3"
+      "content": "Coming soon card 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "coming_soon_image_3",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "coming_soon_title_3",
+      "label": "Title text",
+      "default": "Coming soon"
     },
     {
       "type": "product",
       "id": "product_3",
-      "label": "Product"
+      "label": "Fallback image product (optional)"
     },
     {
       "type": "text",
       "id": "title_3",
-      "label": "Fallback title",
-      "default": "Product 3"
+      "label": "Legacy title fallback",
+      "default": "Coming soon"
     },
     {
       "type": "header",
-      "content": "Product 4"
+      "content": "Coming soon card 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "coming_soon_image_4",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "coming_soon_title_4",
+      "label": "Title text",
+      "default": "Coming soon"
     },
     {
       "type": "product",
       "id": "product_4",
-      "label": "Product"
+      "label": "Fallback image product (optional)"
     },
     {
       "type": "text",
       "id": "title_4",
-      "label": "Fallback title",
-      "default": "Product 4"
+      "label": "Legacy title fallback",
+      "default": "Coming soon"
     }
   ],
   "presets": [
