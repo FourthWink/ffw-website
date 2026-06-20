@@ -192,6 +192,9 @@
     .ffw-snapper-eye { height: 150px; }
     .ffw-about-text, .ffw-about-subtitle, .ffw-about-vision-title { font-size: 11px; }
     .ffw-snap-block { padding-top: calc(49dvh); }
+    .ffw-about-scroll-cue {
+      bottom: max(14px, calc(env(safe-area-inset-bottom) + 10px));
+    }
   }
 </style>
 
@@ -236,7 +239,8 @@
 
 </div>
 <script>
-  window.addEventListener('DOMContentLoaded', function() {
+  (function() {
+  function initFfwAboutPage() {
     var footerGroup = document.querySelector('.shopify-section-group-footer-group') || document.querySelector('footer');
     var snapper = document.querySelector('.ffw-snapper-wrapper');
     var scrollCue = document.querySelector('.ffw-about-scroll-cue');
@@ -245,16 +249,24 @@
 
     if (snapper && scrollCue && snapBlocks.length > 1) {
       window.setTimeout(function() {
+        scrollCue.classList.remove('is-bouncing');
+        void scrollCue.offsetWidth;
         scrollCue.classList.add('is-bouncing');
       }, 150);
 
-      scrollCue.addEventListener('click', function() {
-        snapBlocks[1].scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+      if (!scrollCue.dataset.ffwAboutCueBound) {
+        scrollCue.dataset.ffwAboutCueBound = 'true';
+        scrollCue.addEventListener('click', function() {
+          snapBlocks[1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
 
-      snapper.addEventListener('scroll', function() {
-        scrollCue.classList.toggle('is-hidden', snapper.scrollTop > 20);
-      }, { passive: true });
+      if (!snapper.dataset.ffwAboutScrollBound) {
+        snapper.dataset.ffwAboutScrollBound = 'true';
+        snapper.addEventListener('scroll', function() {
+          scrollCue.classList.toggle('is-hidden', snapper.scrollTop > 20);
+        }, { passive: true });
+      }
     }
     
     if (finalBlock && footerGroup) {
@@ -274,7 +286,17 @@
       // 3. Move the footer inside
       finalBlock.appendChild(footerGroup);
     }
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initFfwAboutPage);
+  } else {
+    initFfwAboutPage();
+  }
+
+  window.addEventListener('pageshow', initFfwAboutPage);
+  document.addEventListener('shopify:section:load', initFfwAboutPage);
+  })();
 </script>
 {% schema %}
 {
