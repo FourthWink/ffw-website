@@ -2404,7 +2404,7 @@ header-actions { overflow: visible !important; }
   /* ffwinks-cart.liquid & ffwinks-wishlist.liquid — mobile soul tokens */
   :root {
     --soul-img-h:                39vh;
-    --soul-mobile-img-edge-x:    50vw;
+    --soul-mobile-img-edge-x:    calc(50vw - clamp(4px, 1.2vw, 6px));
     --soul-img-w:                calc(var(--soul-mobile-img-edge-x) - var(--soul-remove-ml) - var(--soul-remove-w) - var(--soul-remove-mr));
     --soul-img-aspect:           unset;
     --soul-row-min-h:            var(--soul-img-h);
