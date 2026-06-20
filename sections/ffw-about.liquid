@@ -74,11 +74,11 @@
 
   @keyframes ffw-about-scroll-bounce {
     0%, 12%, 100% { transform: translate(-50%, 0); }
-    32% { transform: translate(-50%, -10px); }
+    32% { transform: translate(-50%, 10px); }
     50% { transform: translate(-50%, 0); }
-    65% { transform: translate(-50%, -5px); }
+    65% { transform: translate(-50%, 5px); }
     78% { transform: translate(-50%, 0); }
-    88% { transform: translate(-50%, -2px); }
+    88% { transform: translate(-50%, 2px); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -193,7 +193,15 @@
     .ffw-about-text, .ffw-about-subtitle, .ffw-about-vision-title { font-size: 11px; }
     .ffw-snap-block { padding-top: calc(49dvh); }
     .ffw-about-scroll-cue {
-      bottom: max(14px, calc(env(safe-area-inset-bottom) + 10px));
+      bottom: max(10px, calc(env(safe-area-inset-bottom) + 8px));
+    }
+  }
+
+  @media screen and (max-width: 340px) {
+    .ffw-about-scroll-cue {
+      width: 42px;
+      height: 42px;
+      bottom: max(0px, env(safe-area-inset-bottom));
     }
   }
 </style>
