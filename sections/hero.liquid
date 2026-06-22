@@ -452,6 +452,8 @@
     {% else %}
       --hero-min-height: var(--section-height-{{ section.settings.section_height }});
     {% endif %}
+  "
+>
 
   {% comment %}
     Hardcoded to section--full-width bc the media has to be full width in all cases.
@@ -465,6 +467,17 @@
    <div class="hero__media-wrapper" style="--hero-media-count: {{ media_count }};--hero-media-count-mobile: {{ media_count_mobile }};">
   {% if media_count > 0 %}
     {{ media }}
+  {% endif %}
+  {% if section.settings.link != blank %}
+    <a
+      href="{{ section.settings.link }}"
+      class="hero__link"
+      aria-label="Open section link"
+      {% if section.settings.open_in_new_tab %}
+        target="_blank"
+        rel="noopener noreferrer"
+      {% endif %}
+    ></a>
   {% endif %}
 </div>
 
