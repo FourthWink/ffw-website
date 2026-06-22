@@ -123,7 +123,6 @@
           ]
         }
       },
-      "disabled": true,
       "settings": {
         "layout_type": "grid",
         "product_card_size": "medium",
@@ -155,6 +154,7 @@
     },
     "ffw_newin_wn7JeT": {
       "type": "ffw-newin",
+      "disabled": true,
       "name": "FFW – New In",
       "settings": {
         "heading": "",
