@@ -73,10 +73,8 @@
             "title_1": "{{ closest.product.metafields.shopify.size | metafield_text: field: 'label' }}{{ closest.product.metafields.shopify[\"color-pattern\"] | metafield_text: field: 'label' }}",
             "product_2": "peek-a-boo-striped",
             "title_2": "",
-            "coming_soon_title_3": "Coming soon",
             "product_3": "coming-soon-1",
             "title_3": "",
-            "coming_soon_title_4": "Coming soon",
             "product_4": "coming-soon",
             "title_4": ""
           },
