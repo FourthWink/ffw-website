@@ -261,6 +261,14 @@
     height: 15px;
   }
 
+  .product-details .ffw-linked-colors__option.is-active {
+    order: -1;
+  }
+
+  .product-details .ffw-linked-colors ~ [class^='ai-variant-picker-']:not([class*='__']) [data-option-name='color'] {
+    display: none !important;
+  }
+
   /* Hide mobile row on desktop */
   @media screen and (min-width: 750px) {
     .ffw-pdp-header-row {
