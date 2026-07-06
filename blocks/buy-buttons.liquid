@@ -59,7 +59,6 @@
     assign preorder_balance_amount = variant.compare_at_price | minus: variant.price
   endif
 %}
-<!-- DEBUG: tags={{ product.tags | join: ',' }} | is_preorder={{ is_preorder_product }} | can_add={{ can_add_to_cart }} | inventory_policy={{ variant.inventory_policy }} -->
 <span
   class="buy-buttons-block buy-buttons-block--{{ block.id }}"
   {{ block.shopify_attributes }}
