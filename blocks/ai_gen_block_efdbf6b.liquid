@@ -188,6 +188,24 @@ selector .details-content > *:first-child {
 }
 {% endstyle %}
 
+{% liquid
+  assign product_size_guide = product.metafields.custom.size_guide
+  assign is_peekaboo_size_guide = false
+  if product.handle == 'peek-a-boo' or product.handle == 'peek-a-boo-striped'
+    assign is_peekaboo_size_guide = true
+  endif
+%}
+
+{% capture tab2_content %}
+  {% if product_size_guide != blank %}
+    {{ product_size_guide | metafield_tag }}
+  {% elsif is_peekaboo_size_guide %}
+    <p><strong>S:</strong></p><p>Body Length (HPS edge): 23.75"</p><p>Chest: 22.5<strong>"</strong></p><p>Sleeve: 19<strong>"</strong></p><p><strong>M:</strong></p><p>Body Length (HPS edge): 24.25"</p><p>Chest: 23.25<strong>"</strong></p><p>Sleeve: 19.5<strong>"</strong></p><p><strong>L:</strong></p><p>Body Length (HPS edge): 24.75"</p><p>Chest: 24<strong>"</strong></p><p>Sleeve: 20<strong>"</strong></p>
+  {% else %}
+    {{ block.settings.tab2_content }}
+  {% endif %}
+{% endcapture %}
+
 <product-tabs-{{ ai_gen_id }} class="ai-product-tabs-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-product-tabs-container-{{ ai_gen_id }}">
     <div class="ai-product-tabs-layout-{{ ai_gen_id }}">
@@ -236,7 +254,7 @@ selector .details-content > *:first-child {
           data-tab="tab2"
           role="tabpanel"
         >
-          {{ block.settings.tab2_content }}
+          {{ tab2_content }}
         </div>
         <div
           id="content-tab3-{{ ai_gen_id }}"
@@ -327,6 +345,10 @@ selector .details-content > *:first-child {
       "id": "tab2_content",
       "label": "Content",
       "default": "<p>Premium materials and expert craftsmanship come together in this exceptional piece. Made with attention to every detail, ensuring lasting quality and timeless style.</p>"
+    },
+    {
+      "type": "paragraph",
+      "content": "Product metafield custom.size_guide overrides this shared fallback when present."
     },
     {
       "type": "header",
