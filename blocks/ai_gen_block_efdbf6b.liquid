@@ -200,7 +200,7 @@ selector .details-content > *:first-child {
   {% if product_size_guide != blank %}
     {{ product_size_guide | metafield_tag }}
   {% elsif is_peekaboo_size_guide %}
-    <p><strong>S:</strong></p><p>Body Length (HPS edge): 23.75"</p><p>Chest: 22.5<strong>"</strong></p><p>Sleeve: 19<strong>"</strong></p><p><strong>M:</strong></p><p>Body Length (HPS edge): 24.25"</p><p>Chest: 23.25<strong>"</strong></p><p>Sleeve: 19.5<strong>"</strong></p><p><strong>L:</strong></p><p>Body Length (HPS edge): 24.75"</p><p>Chest: 24<strong>"</strong></p><p>Sleeve: 20<strong>"</strong></p>
+    <p><strong>S:</strong></p><p>Body Length: <strong>40 CM</strong> ____ Chest: <strong>98 CM</strong> ____ Sleeve: <strong>58 CM</strong></p><p><strong>M:</strong></p><p>Body Length: <strong>42 CM</strong> ____ Chest: <strong>100 CM</strong> ____ Sleeve: <strong>60 CM</strong></p><p><strong>L:</strong></p><p>Body Length: <strong>45 CM</strong> ____ Chest: <strong>108 CM</strong> ____ Sleeve: <strong>62 CM</strong></p>
   {% else %}
     {{ block.settings.tab2_content }}
   {% endif %}
