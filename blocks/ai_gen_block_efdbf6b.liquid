@@ -271,45 +271,42 @@ selector .details-content > *:first-child {
 
 <script>
   (function() {
-    class ProductTabs{{ ai_gen_id }} extends HTMLElement {
-      constructor() {
-        super();
-      }
+    function switchTab(container, targetTab) {
+      container.querySelectorAll('.ai-product-tabs-button-{{ ai_gen_id }}').forEach(function(btn) {
+        var isActive = btn.getAttribute('data-tab') === targetTab;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive);
+      });
 
-      connectedCallback() {
-        this.buttons = this.querySelectorAll('.ai-product-tabs-button-{{ ai_gen_id }}');
-        this.contents = this.querySelectorAll('.ai-product-tabs-content-{{ ai_gen_id }}');
-        if (this.dataset.tabsReady === 'true') return;
-        this.dataset.tabsReady = 'true';
-        this.setupEventListeners();
-      }
-
-      setupEventListeners() {
-        this.addEventListener('click', (event) => {
-          const button = event.target.closest('.ai-product-tabs-button-{{ ai_gen_id }}');
-          if (!button || !this.contains(button)) return;
-          event.preventDefault();
-          this.switchTab(button.getAttribute('data-tab'));
-        });
-      }
-
-      switchTab(targetTab) {
-        this.buttons.forEach((btn) => {
-          const isActive = btn.getAttribute('data-tab') === targetTab;
-          btn.classList.toggle('active', isActive);
-          btn.setAttribute('aria-selected', isActive);
-        });
-
-        this.contents.forEach((content) => {
-          const isActive = content.getAttribute('data-tab') === targetTab;
-          content.classList.toggle('active', isActive);
-        });
-      }
+      container.querySelectorAll('.ai-product-tabs-content-{{ ai_gen_id }}').forEach(function(content) {
+        var isActive = content.getAttribute('data-tab') === targetTab;
+        content.classList.toggle('active', isActive);
+      });
     }
 
-    if (!customElements.get('product-tabs-{{ ai_gen_id }}')) {
-      customElements.define('product-tabs-{{ ai_gen_id }}', ProductTabs{{ ai_gen_id }});
+    function initProductTabs(container) {
+      if (!container || container.dataset.tabsClickReady === 'true') return;
+      container.dataset.tabsClickReady = 'true';
+
+      container.addEventListener('click', function(event) {
+        var button = event.target.closest('.ai-product-tabs-button-{{ ai_gen_id }}');
+        if (!button || !container.contains(button)) return;
+        event.preventDefault();
+        switchTab(container, button.getAttribute('data-tab'));
+      });
     }
+
+    function initAllProductTabs() {
+      document.querySelectorAll('product-tabs-{{ ai_gen_id }}').forEach(initProductTabs);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAllProductTabs);
+    } else {
+      initAllProductTabs();
+    }
+
+    document.addEventListener('shopify:section:load', initAllProductTabs);
   })();
 </script>
 
