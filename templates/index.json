@@ -25,6 +25,7 @@
         "media_type_1_mobile": "image",
         "image_1_mobile": "shopify://shop_images/f22_copy2.webp",
         "media_type_2_mobile": "image",
+        "image_2_mobile": "shopify://shop_images/phone.webp",
         "link": "shopify://collections/new-in",
         "open_in_new_tab": false,
         "enable_slideshow": true,
