@@ -6,6 +6,8 @@
   assign media_2 = 'none'
   assign media_1_mobile = 'none'
   assign media_2_mobile = 'none'
+  assign slideshow_media_count = 0
+  assign enable_slideshow = false
   assign has_only_video = false
   assign has_only_video_mobile = false
 
@@ -16,6 +18,7 @@
   if section.settings.image_1 != blank and section.settings.media_type_1 == 'image'
     assign media_1 = 'image'
     assign media_count = media_count | plus: 1
+    assign slideshow_media_count = slideshow_media_count | plus: 1
   endif
   if section.settings.video_1 != blank and section.settings.media_type_1 == 'video'
     assign media_1 = 'video'
@@ -24,6 +27,7 @@
   if section.settings.image_2 != blank and section.settings.media_type_2 == 'image'
     assign media_2 = 'image'
     assign media_count = media_count | plus: 1
+    assign slideshow_media_count = slideshow_media_count | plus: 1
   endif
   if section.settings.video_2 != blank and section.settings.media_type_2 == 'video'
     assign media_2 = 'video'
@@ -57,6 +61,18 @@
     assign has_only_video_mobile = true
   endif
 
+  if section.settings.enable_slideshow
+    if section.settings.image_3 != blank
+      assign slideshow_media_count = slideshow_media_count | plus: 1
+    endif
+    if section.settings.image_4 != blank
+      assign slideshow_media_count = slideshow_media_count | plus: 1
+    endif
+    if slideshow_media_count > 1
+      assign enable_slideshow = true
+    endif
+  endif
+
   assign media_image_desktop_class = 'hero__image hero__image--desktop'
   assign media_video_desktop_class = 'hero__video hero__video--desktop'
   assign media_video_poster_desktop_class = 'hero__video-poster--desktop'
@@ -83,7 +99,9 @@
     endif
   endif
 
-  if media_1 == 'image' and media_2 == 'image'
+  if enable_slideshow
+    assign media_width_desktop = '100vw'
+  elsif media_1 == 'image' and media_2 == 'image'
     assign media_width_desktop = '50vw'
   else
     assign media_width_desktop = '100vw'
@@ -95,7 +113,9 @@
     assign fallback_to_desktop = true
   endif
 
-  if fallback_to_desktop
+  if enable_slideshow
+    assign media_width_mobile = '100vw'
+  elsif fallback_to_desktop
     assign media_width_mobile = media_width_desktop
   elsif section.settings.stack_media_on_mobile or media_1_mobile != 'image' or media_2_mobile != 'image'
     assign media_width_mobile = '100vw'
@@ -321,6 +341,184 @@
   {{ media_slot_2 }}
 {% endcapture %}
 
+{% capture slideshow_media %}
+  {% if media_1 == 'image' %}
+    <div class="hero__slide">
+      <picture class="hero__image">
+        {% if section.settings.custom_mobile_media and section.settings.image_1_mobile != blank and section.settings.media_type_1_mobile == 'image' %}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {%- for mobile_width in mobile_widths_array -%}
+                {{ section.settings.image_1_mobile | image_url: width: mobile_width }} {{ mobile_width }}w{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+            "
+            sizes="{{ sizes_mobile }}"
+            width="{{ section.settings.image_1_mobile.width }}"
+            height="{{ section.settings.image_1_mobile.height }}"
+          >
+        {% endif %}
+        {{
+          section.settings.image_1
+          | image_url: width: 3840
+          | image_tag:
+            width: section.settings.image_1.width,
+            widths: widths,
+            height: section.settings.image_1.height,
+            alt: section.settings.image_1.alt,
+            class: 'hero__image',
+            sizes: sizes,
+            fetchpriority: fetch_priority,
+            data-testid: 'hero-slideshow-image-1'
+        }}
+      </picture>
+      {% if section.settings.link != blank %}
+        <a
+          href="{{ section.settings.link }}"
+          class="hero__slide-link"
+          aria-label="Open section link"
+          {% if section.settings.open_in_new_tab %}
+            target="_blank"
+            rel="noopener noreferrer"
+          {% endif %}
+        ></a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if media_2 == 'image' %}
+    <div class="hero__slide">
+      <picture class="hero__image">
+        {% if section.settings.custom_mobile_media and section.settings.image_2_mobile != blank and section.settings.media_type_2_mobile == 'image' %}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {%- for mobile_width in mobile_widths_array -%}
+                {{ section.settings.image_2_mobile | image_url: width: mobile_width }} {{ mobile_width }}w{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+            "
+            sizes="{{ sizes_mobile }}"
+            width="{{ section.settings.image_2_mobile.width }}"
+            height="{{ section.settings.image_2_mobile.height }}"
+          >
+        {% endif %}
+        {{
+          section.settings.image_2
+          | image_url: width: 3840
+          | image_tag:
+            width: section.settings.image_2.width,
+            widths: widths,
+            height: section.settings.image_2.height,
+            alt: section.settings.image_2.alt,
+            class: 'hero__image',
+            sizes: sizes,
+            fetchpriority: 'auto',
+            data-testid: 'hero-slideshow-image-2'
+        }}
+      </picture>
+      {% if section.settings.link != blank %}
+        <a
+          href="{{ section.settings.link }}"
+          class="hero__slide-link"
+          aria-label="Open section link"
+          {% if section.settings.open_in_new_tab %}
+            target="_blank"
+            rel="noopener noreferrer"
+          {% endif %}
+        ></a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if section.settings.image_3 != blank %}
+    <div class="hero__slide">
+      <picture class="hero__image">
+        {% if section.settings.custom_mobile_media and section.settings.image_3_mobile != blank %}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {%- for mobile_width in mobile_widths_array -%}
+                {{ section.settings.image_3_mobile | image_url: width: mobile_width }} {{ mobile_width }}w{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+            "
+            sizes="{{ sizes_mobile }}"
+            width="{{ section.settings.image_3_mobile.width }}"
+            height="{{ section.settings.image_3_mobile.height }}"
+          >
+        {% endif %}
+        {{
+          section.settings.image_3
+          | image_url: width: 3840
+          | image_tag:
+            width: section.settings.image_3.width,
+            widths: widths,
+            height: section.settings.image_3.height,
+            alt: section.settings.image_3.alt,
+            class: 'hero__image',
+            sizes: sizes,
+            fetchpriority: 'auto',
+            data-testid: 'hero-slideshow-image-3'
+        }}
+      </picture>
+      {% if section.settings.link != blank %}
+        <a
+          href="{{ section.settings.link }}"
+          class="hero__slide-link"
+          aria-label="Open section link"
+          {% if section.settings.open_in_new_tab %}
+            target="_blank"
+            rel="noopener noreferrer"
+          {% endif %}
+        ></a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if section.settings.image_4 != blank %}
+    <div class="hero__slide">
+      <picture class="hero__image">
+        {% if section.settings.custom_mobile_media and section.settings.image_4_mobile != blank %}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {%- for mobile_width in mobile_widths_array -%}
+                {{ section.settings.image_4_mobile | image_url: width: mobile_width }} {{ mobile_width }}w{% unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+            "
+            sizes="{{ sizes_mobile }}"
+            width="{{ section.settings.image_4_mobile.width }}"
+            height="{{ section.settings.image_4_mobile.height }}"
+          >
+        {% endif %}
+        {{
+          section.settings.image_4
+          | image_url: width: 3840
+          | image_tag:
+            width: section.settings.image_4.width,
+            widths: widths,
+            height: section.settings.image_4.height,
+            alt: section.settings.image_4.alt,
+            class: 'hero__image',
+            sizes: sizes,
+            fetchpriority: 'auto',
+            data-testid: 'hero-slideshow-image-4'
+        }}
+      </picture>
+      {% if section.settings.link != blank %}
+        <a
+          href="{{ section.settings.link }}"
+          class="hero__slide-link"
+          aria-label="Open section link"
+          {% if section.settings.open_in_new_tab %}
+            target="_blank"
+            rel="noopener noreferrer"
+          {% endif %}
+        ></a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endcapture %}
+
 {% capture media_blurred %}
   {% if media_1 == 'image' %}
     {{
@@ -439,7 +637,7 @@
 
 <div
   id="Hero-{{ section.id }}"
-  class="hero color-{{ section.settings.color_scheme }}{% if section.blocks.size == 0 and section.settings.section_height == 'auto' %} hero--no-blocks-auto-height{% endif %}{% if section.settings.stack_media_on_mobile %} hero--stack-mobile{% endif %}"
+  class="hero color-{{ section.settings.color_scheme }}{% if section.blocks.size == 0 and section.settings.section_height == 'auto' %} hero--no-blocks-auto-height{% endif %}{% if section.settings.stack_media_on_mobile %} hero--stack-mobile{% endif %}{% if enable_slideshow %} hero--slideshow{% endif %}"
   style="
     --hero-border-style: {{ section.settings.border }};
     --hero-border-width: {{ section.settings.border_width }}px;
@@ -464,11 +662,20 @@
     class="hero__container spacing-style section section--full-width"
     style="{% render 'spacing-style', settings: section.settings %}"
   >
-   <div class="hero__media-wrapper" style="--hero-media-count: {{ media_count }};--hero-media-count-mobile: {{ media_count_mobile }};">
-  {% if media_count > 0 %}
+   <div
+    class="hero__media-wrapper"
+    style="--hero-media-count: {% if enable_slideshow %}1{% else %}{{ media_count }}{% endif %};--hero-media-count-mobile: {% if enable_slideshow %}1{% else %}{{ media_count_mobile }}{% endif %};"
+    {% if enable_slideshow %}
+      data-hero-slideshow-track
+      data-autoplay-ms="{{ section.settings.slideshow_autoplay_seconds | default: 5 | times: 1000 }}"
+    {% endif %}
+  >
+  {% if enable_slideshow %}
+    {{ slideshow_media }}
+  {% elsif media_count > 0 %}
     {{ media }}
   {% endif %}
-  {% if section.settings.link != blank %}
+  {% if section.settings.link != blank and enable_slideshow == false %}
     <a
       href="{{ section.settings.link }}"
       class="hero__link"
@@ -555,6 +762,44 @@
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: repeat(var(--hero-media-count, 1), 1fr);
+  }
+
+  .hero--slideshow .hero__media-wrapper {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    pointer-events: auto;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .hero--slideshow .hero__media-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero--slideshow .hero__media-wrapper.is-dragging {
+    cursor: grabbing;
+    scroll-behavior: auto;
+  }
+
+  .hero__slide {
+    position: relative;
+    flex: 0 0 100%;
+    height: 100%;
+    min-width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .hero__slide-link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
   }
 
   .hero--auto .hero__image,
@@ -721,6 +966,120 @@
     }
   }
 {% endstylesheet %}
+
+<script>
+  (() => {
+    const initHeroSlideshow = (section = document) => {
+      section.querySelectorAll('[data-hero-slideshow-track]').forEach((track) => {
+        if (track.dataset.heroSlideshowReady === 'true') return;
+
+        const slides = Array.from(track.querySelectorAll('.hero__slide'));
+        if (slides.length < 2) return;
+
+        track.dataset.heroSlideshowReady = 'true';
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const autoplayMs = Number(track.dataset.autoplayMs) || 5000;
+        let currentIndex = 0;
+        let timer = null;
+        let scrollTimer = null;
+        let pointerDown = false;
+        let dragged = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        const nearestIndex = () => {
+          if (!track.clientWidth) return 0;
+          return Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / track.clientWidth)));
+        };
+
+        const goToSlide = (index, behavior = 'smooth') => {
+          currentIndex = (index + slides.length) % slides.length;
+          track.scrollTo({
+            left: slides[currentIndex].offsetLeft,
+            behavior,
+          });
+        };
+
+        const stopAutoplay = () => {
+          window.clearInterval(timer);
+          timer = null;
+        };
+
+        const startAutoplay = () => {
+          if (reduceMotion || timer) return;
+          timer = window.setInterval(() => {
+            goToSlide(currentIndex + 1);
+          }, autoplayMs);
+        };
+
+        track.addEventListener(
+          'scroll',
+          () => {
+            window.clearTimeout(scrollTimer);
+            scrollTimer = window.setTimeout(() => {
+              currentIndex = nearestIndex();
+            }, 120);
+          },
+          { passive: true }
+        );
+
+        track.addEventListener('pointerdown', (event) => {
+          if (event.pointerType === 'mouse' && event.button !== 0) return;
+          pointerDown = true;
+          dragged = false;
+          startX = event.clientX;
+          startScrollLeft = track.scrollLeft;
+          track.classList.add('is-dragging');
+          stopAutoplay();
+          track.setPointerCapture?.(event.pointerId);
+        });
+
+        track.addEventListener('pointermove', (event) => {
+          if (!pointerDown) return;
+          const deltaX = event.clientX - startX;
+          if (Math.abs(deltaX) > 4) {
+            dragged = true;
+            track.scrollLeft = startScrollLeft - deltaX;
+          }
+        });
+
+        const finishDrag = () => {
+          if (!pointerDown) return;
+          pointerDown = false;
+          track.classList.remove('is-dragging');
+          goToSlide(nearestIndex());
+          startAutoplay();
+        };
+
+        track.addEventListener('pointerup', finishDrag);
+        track.addEventListener('pointercancel', finishDrag);
+        track.addEventListener('mouseleave', finishDrag);
+
+        track.addEventListener(
+          'click',
+          (event) => {
+            if (!dragged) return;
+            event.preventDefault();
+            event.stopPropagation();
+            dragged = false;
+          },
+          true
+        );
+
+        track.addEventListener('mouseenter', stopAutoplay);
+        track.addEventListener('mouseleave', startAutoplay);
+        track.addEventListener('focusin', stopAutoplay);
+        track.addEventListener('focusout', startAutoplay);
+
+        startAutoplay();
+      });
+    };
+
+    initHeroSlideshow();
+    document.addEventListener('shopify:section:load', (event) => initHeroSlideshow(event.target));
+  })();
+</script>
 
 {% schema %}
 {
@@ -916,6 +1275,51 @@
       "id": "open_in_new_tab",
       "label": "t:settings.open_new_tab",
       "default": false
+    },
+    {
+      "type": "header",
+      "content": "Slideshow"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_slideshow",
+      "label": "Show media as slideshow",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "slideshow_autoplay_seconds",
+      "label": "Seconds between slides",
+      "min": 3,
+      "max": 9,
+      "step": 1,
+      "unit": "s",
+      "default": 5,
+      "visible_if": "{{ section.settings.enable_slideshow }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Slide 3 image",
+      "visible_if": "{{ section.settings.enable_slideshow }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3_mobile",
+      "label": "Slide 3 mobile image",
+      "visible_if": "{{ section.settings.enable_slideshow and section.settings.custom_mobile_media }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4",
+      "label": "Slide 4 image",
+      "visible_if": "{{ section.settings.enable_slideshow }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_4_mobile",
+      "label": "Slide 4 mobile image",
+      "visible_if": "{{ section.settings.enable_slideshow and section.settings.custom_mobile_media }}"
     },
     {
       "type": "header",
