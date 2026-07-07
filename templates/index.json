@@ -73,13 +73,13 @@
             "box_background_color": "#f4f4f4",
             "title_color": "#ffffff",
             "title_font_size": 10,
-            "product_1": "peek-a-boo-striped",
+            "product_1": "call-before-you-wake-up-shirt",
             "title_1": "{{ closest.product.metafields.shopify.size | metafield_text: field: 'label' }}{{ closest.product.metafields.shopify[\"color-pattern\"] | metafield_text: field: 'label' }}",
             "product_2": "call-before-you-wake-up-shirt-grey",
             "title_2": "",
-            "product_3": "call-before-you-wake-up-shirt",
+            "product_3": "call-before-you-wake-up-shirt-burgundy",
             "title_3": "",
-            "product_4": "call-before-you-wake-up-shirt-burgundy",
+            "product_4": "peek-a-boo-striped",
             "title_4": ""
           },
           "blocks": {}
