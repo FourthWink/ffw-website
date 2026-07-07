@@ -688,6 +688,27 @@
   {% endif %}
 </div>
 
+{% if enable_slideshow %}
+  <div class="hero__slideshow-dots" data-hero-slideshow-dots aria-label="Cover image position">
+    {%- assign slideshow_dot_index = 0 -%}
+    {% if media_1 == 'image' %}
+      <button class="hero__slideshow-dot" type="button" data-hero-slideshow-dot data-slide-index="{{ slideshow_dot_index }}" aria-label="Show cover image {{ slideshow_dot_index | plus: 1 }}" aria-current="true"></button>
+      {%- assign slideshow_dot_index = slideshow_dot_index | plus: 1 -%}
+    {% endif %}
+    {% if media_2 == 'image' %}
+      <button class="hero__slideshow-dot" type="button" data-hero-slideshow-dot data-slide-index="{{ slideshow_dot_index }}" aria-label="Show cover image {{ slideshow_dot_index | plus: 1 }}" aria-current="false"></button>
+      {%- assign slideshow_dot_index = slideshow_dot_index | plus: 1 -%}
+    {% endif %}
+    {% if section.settings.image_3 != blank %}
+      <button class="hero__slideshow-dot" type="button" data-hero-slideshow-dot data-slide-index="{{ slideshow_dot_index }}" aria-label="Show cover image {{ slideshow_dot_index | plus: 1 }}" aria-current="false"></button>
+      {%- assign slideshow_dot_index = slideshow_dot_index | plus: 1 -%}
+    {% endif %}
+    {% if section.settings.image_4 != blank %}
+      <button class="hero__slideshow-dot" type="button" data-hero-slideshow-dot data-slide-index="{{ slideshow_dot_index }}" aria-label="Show cover image {{ slideshow_dot_index | plus: 1 }}" aria-current="false"></button>
+    {% endif %}
+  </div>
+{% endif %}
+
     <div
       class="
         hero__content-wrapper
@@ -800,6 +821,42 @@
     inset: 0;
     z-index: 2;
     display: block;
+  }
+
+  .hero__slideshow-dots {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(18px, 4svh, 36px);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 16px;
+    transform: translateX(-50%);
+    pointer-events: auto;
+  }
+
+  .hero__slideshow-dot {
+    width: 4px;
+    min-width: 4px;
+    height: 4px;
+    flex: 0 0 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #e8e8e8;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .hero__slideshow-dot[aria-current='true'] {
+    background: #a9a9a9;
+  }
+
+  .hero__slideshow-dot:focus-visible {
+    outline: 1px solid #777;
+    outline-offset: 3px;
   }
 
   .hero--auto .hero__image,
@@ -980,9 +1037,12 @@
 
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const autoplayMs = Number(track.dataset.autoplayMs) || 5000;
+        const slideDurationMs = 2200;
+        const dots = Array.from(track.parentElement?.querySelectorAll('[data-hero-slideshow-dot]') || []);
         let currentIndex = 0;
         let timer = null;
         let scrollTimer = null;
+        let animationFrame = null;
         let pointerDown = false;
         let dragged = false;
         let startX = 0;
@@ -993,12 +1053,46 @@
           return Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / track.clientWidth)));
         };
 
-        const goToSlide = (index, behavior = 'smooth') => {
-          currentIndex = (index + slides.length) % slides.length;
-          track.scrollTo({
-            left: slides[currentIndex].offsetLeft,
-            behavior,
+        const setActiveDot = (index) => {
+          dots.forEach((dot, dotIndex) => {
+            const dotSlideIndex = Number(dot.dataset.slideIndex || dotIndex);
+            dot.setAttribute('aria-current', dotSlideIndex === index ? 'true' : 'false');
           });
+        };
+
+        const easeInOutCubic = (progress) => {
+          return progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        };
+
+        const animateTo = (targetLeft, duration = slideDurationMs) => {
+          window.cancelAnimationFrame(animationFrame);
+
+          if (reduceMotion || duration <= 0) {
+            track.scrollLeft = targetLeft;
+            return;
+          }
+
+          const startLeft = track.scrollLeft;
+          const distance = targetLeft - startLeft;
+          const startTime = window.performance.now();
+
+          const step = (timestamp) => {
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            track.scrollLeft = startLeft + distance * easeInOutCubic(progress);
+
+            if (progress < 1) {
+              animationFrame = window.requestAnimationFrame(step);
+            }
+          };
+
+          animationFrame = window.requestAnimationFrame(step);
+        };
+
+        const goToSlide = (index, duration = slideDurationMs) => {
+          currentIndex = (index + slides.length) % slides.length;
+          setActiveDot(currentIndex);
+          animateTo(slides[currentIndex].offsetLeft, duration);
         };
 
         const stopAutoplay = () => {
@@ -1019,6 +1113,7 @@
             window.clearTimeout(scrollTimer);
             scrollTimer = window.setTimeout(() => {
               currentIndex = nearestIndex();
+              setActiveDot(currentIndex);
             }, 120);
           },
           { passive: true }
@@ -1031,6 +1126,7 @@
           startX = event.clientX;
           startScrollLeft = track.scrollLeft;
           track.classList.add('is-dragging');
+          window.cancelAnimationFrame(animationFrame);
           stopAutoplay();
           track.setPointerCapture?.(event.pointerId);
         });
@@ -1048,7 +1144,7 @@
           if (!pointerDown) return;
           pointerDown = false;
           track.classList.remove('is-dragging');
-          goToSlide(nearestIndex());
+          goToSlide(nearestIndex(), 450);
           startAutoplay();
         };
 
@@ -1072,6 +1168,15 @@
         track.addEventListener('focusin', stopAutoplay);
         track.addEventListener('focusout', startAutoplay);
 
+        dots.forEach((dot) => {
+          dot.addEventListener('click', () => {
+            stopAutoplay();
+            goToSlide(Number(dot.dataset.slideIndex || 0));
+            startAutoplay();
+          });
+        });
+
+        setActiveDot(currentIndex);
         startAutoplay();
       });
     };
