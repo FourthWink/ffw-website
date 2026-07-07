@@ -667,7 +667,7 @@
     style="--hero-media-count: {% if enable_slideshow %}1{% else %}{{ media_count }}{% endif %};--hero-media-count-mobile: {% if enable_slideshow %}1{% else %}{{ media_count_mobile }}{% endif %};"
     {% if enable_slideshow %}
       data-hero-slideshow-track
-      data-autoplay-ms="{{ section.settings.slideshow_autoplay_seconds | default: 5 | times: 1000 }}"
+      data-autoplay-ms="{{ section.settings.slideshow_autoplay_seconds | default: 4 | times: 1000 }}"
     {% endif %}
   >
   {% if enable_slideshow %}
@@ -1036,7 +1036,7 @@
 
         track.dataset.heroSlideshowReady = 'true';
 
-        const autoplayMs = Number(track.dataset.autoplayMs) || 5000;
+        const autoplayMs = Number(track.dataset.autoplayMs) || 4000;
         const dots = Array.from(track.parentElement?.querySelectorAll('[data-hero-slideshow-dot]') || []);
         const hero = track.closest('.hero');
         let currentIndex = 0;
@@ -1362,7 +1362,7 @@
       "max": 9,
       "step": 1,
       "unit": "s",
-      "default": 5,
+      "default": 4,
       "visible_if": "{{ section.settings.enable_slideshow }}"
     },
     {

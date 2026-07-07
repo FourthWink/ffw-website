@@ -29,7 +29,7 @@
         "link": "shopify://collections/new-in",
         "open_in_new_tab": false,
         "enable_slideshow": true,
-        "slideshow_autoplay_seconds": 5,
+        "slideshow_autoplay_seconds": 4,
         "content_direction": "column",
         "vertical_on_mobile": true,
         "horizontal_alignment": "flex-start",
