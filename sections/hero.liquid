@@ -786,34 +786,35 @@
   }
 
   .hero--slideshow .hero__media-wrapper {
-    display: flex;
+    display: block;
     grid-template-columns: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
+    overflow: hidden;
     pointer-events: auto;
     cursor: grab;
     user-select: none;
   }
 
-  .hero--slideshow .hero__media-wrapper::-webkit-scrollbar {
-    display: none;
-  }
-
   .hero--slideshow .hero__media-wrapper.is-dragging {
     cursor: grabbing;
-    scroll-behavior: auto;
   }
 
   .hero__slide {
-    position: relative;
-    flex: 0 0 100%;
+    position: absolute;
+    inset: 0;
     height: 100%;
-    min-width: 100%;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 2.2s ease-in-out, visibility 0s linear 2.2s;
+  }
+
+  .hero__slide.is-active,
+  .hero--slideshow:not(.hero--slideshow-ready) .hero__slide:first-child {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 2.2s ease-in-out, visibility 0s;
   }
 
   .hero__slide-link {
@@ -1035,23 +1036,15 @@
 
         track.dataset.heroSlideshowReady = 'true';
 
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const autoplayMs = Number(track.dataset.autoplayMs) || 5000;
-        const slideDurationMs = 2200;
         const dots = Array.from(track.parentElement?.querySelectorAll('[data-hero-slideshow-dot]') || []);
+        const hero = track.closest('.hero');
         let currentIndex = 0;
         let timer = null;
-        let scrollTimer = null;
-        let animationFrame = null;
         let pointerDown = false;
         let dragged = false;
         let startX = 0;
-        let startScrollLeft = 0;
-
-        const nearestIndex = () => {
-          if (!track.clientWidth) return 0;
-          return Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / track.clientWidth)));
-        };
+        let lastX = 0;
 
         const setActiveDot = (index) => {
           dots.forEach((dot, dotIndex) => {
@@ -1060,39 +1053,17 @@
           });
         };
 
-        const easeInOutCubic = (progress) => {
-          return progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        const setActiveSlide = (index) => {
+          slides.forEach((slide, slideIndex) => {
+            slide.classList.toggle('is-active', slideIndex === index);
+            slide.setAttribute('aria-hidden', slideIndex === index ? 'false' : 'true');
+          });
         };
 
-        const animateTo = (targetLeft, duration = slideDurationMs) => {
-          window.cancelAnimationFrame(animationFrame);
-
-          if (reduceMotion || duration <= 0) {
-            track.scrollLeft = targetLeft;
-            return;
-          }
-
-          const startLeft = track.scrollLeft;
-          const distance = targetLeft - startLeft;
-          const startTime = window.performance.now();
-
-          const step = (timestamp) => {
-            const elapsed = timestamp - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            track.scrollLeft = startLeft + distance * easeInOutCubic(progress);
-
-            if (progress < 1) {
-              animationFrame = window.requestAnimationFrame(step);
-            }
-          };
-
-          animationFrame = window.requestAnimationFrame(step);
-        };
-
-        const goToSlide = (index, duration = slideDurationMs) => {
+        const goToSlide = (index) => {
           currentIndex = (index + slides.length) % slides.length;
+          setActiveSlide(currentIndex);
           setActiveDot(currentIndex);
-          animateTo(slides[currentIndex].offsetLeft, duration);
         };
 
         const stopAutoplay = () => {
@@ -1101,32 +1072,19 @@
         };
 
         const startAutoplay = () => {
-          if (reduceMotion || timer) return;
+          if (timer) return;
           timer = window.setInterval(() => {
             goToSlide(currentIndex + 1);
           }, autoplayMs);
         };
-
-        track.addEventListener(
-          'scroll',
-          () => {
-            window.clearTimeout(scrollTimer);
-            scrollTimer = window.setTimeout(() => {
-              currentIndex = nearestIndex();
-              setActiveDot(currentIndex);
-            }, 120);
-          },
-          { passive: true }
-        );
 
         track.addEventListener('pointerdown', (event) => {
           if (event.pointerType === 'mouse' && event.button !== 0) return;
           pointerDown = true;
           dragged = false;
           startX = event.clientX;
-          startScrollLeft = track.scrollLeft;
+          lastX = event.clientX;
           track.classList.add('is-dragging');
-          window.cancelAnimationFrame(animationFrame);
           stopAutoplay();
           track.setPointerCapture?.(event.pointerId);
         });
@@ -1134,17 +1092,20 @@
         track.addEventListener('pointermove', (event) => {
           if (!pointerDown) return;
           const deltaX = event.clientX - startX;
+          lastX = event.clientX;
           if (Math.abs(deltaX) > 4) {
             dragged = true;
-            track.scrollLeft = startScrollLeft - deltaX;
           }
         });
 
         const finishDrag = () => {
           if (!pointerDown) return;
+          const deltaX = lastX - startX;
           pointerDown = false;
           track.classList.remove('is-dragging');
-          goToSlide(nearestIndex(), 450);
+          if (Math.abs(deltaX) > 36) {
+            goToSlide(currentIndex + (deltaX < 0 ? 1 : -1));
+          }
           startAutoplay();
         };
 
@@ -1176,7 +1137,9 @@
           });
         });
 
+        setActiveSlide(currentIndex);
         setActiveDot(currentIndex);
+        hero?.classList.add('hero--slideshow-ready');
         startAutoplay();
       });
     };
