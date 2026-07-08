@@ -21,8 +21,13 @@
   Filter
 </div>
 
+  <div class="ffw-shop-mobile-view-toggle" role="group" aria-label="Product view">
+    <button class="ffw-shop-mobile-view-toggle__btn is-active" type="button" data-view="2" aria-label="Show two products per row" aria-pressed="true">2</button>
+    <button class="ffw-shop-mobile-view-toggle__btn" type="button" data-view="1" aria-label="Show one product per row" aria-pressed="false">1</button>
+  </div>
+
   {%- comment -%} Product grid {%- endcomment -%}
-  <div class="ffw-shop-grid" id="ffw-shop-grid" data-section-id="{{ section.id }}">
+  <div class="ffw-shop-grid" id="ffw-shop-grid" data-section-id="{{ section.id }}" data-mobile-view="2">
     {%- if collection != blank and collection.products.size > 0 -%}
       {%- for product in collection.products limit: products_to_show -%}
         {%- liquid
@@ -184,6 +189,28 @@
     transition: opacity 0.3s ease;
   }
   .ffw-filter-trigger:hover { opacity: 0.85; }
+
+  .ffw-shop-mobile-view-toggle {
+    display: none;
+  }
+
+  .ffw-shop-mobile-view-toggle__btn {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: #666666;
+    cursor: pointer;
+    font: inherit;
+    font-size: 10px;
+    line-height: 1;
+    padding: 8px;
+  }
+
+  .ffw-shop-mobile-view-toggle__btn.is-active,
+  .ffw-shop-mobile-view-toggle__btn:hover {
+    color: #000000;
+    font-weight: 700;
+  }
 
   /* Grid */
   .ffw-shop-grid {
@@ -410,10 +437,37 @@
     .ffw-shop-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
     .ffw-shop-section { padding: 30px 20px; }
   }
+  @media (max-width: 767px) {
+    .ffw-shop-mobile-view-toggle {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      max-width: 1400px;
+      margin: 0 auto 18px;
+    }
+    .ffw-shop-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .ffw-shop-product {
+      aspect-ratio: auto;
+      height: 34vh;
+      border-radius: 70px;
+      padding: 5% 4%;
+    }
+    .ffw-shop-grid[data-mobile-view="1"] {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .ffw-shop-grid[data-mobile-view="1"] .ffw-shop-product {
+      aspect-ratio: 0.7;
+      height: auto;
+      border-radius: 80px;
+      padding: 40px 12px 25px;
+    }
+  }
   @media (max-width: 575px) {
-    .ffw-shop-grid { grid-template-columns: 1fr; gap: 12px; }
     .ffw-shop-section { padding: 25px 15px; }
-    .ffw-shop-product { border-radius: 80px; padding: 40px 12px 25px; }
     .ffw-shop-product-image img {
       width: auto;
       max-width: 96%;
@@ -461,6 +515,26 @@
         trigger.onclick = function(e) {
           e.stopPropagation();
           document.dispatchEvent(new CustomEvent('ffw:filter:open', { detail: { source: 'shop' } }));
+        };
+      }
+
+      const viewToggle = document.querySelector('#ffw-shop-section .ffw-shop-mobile-view-toggle');
+      const grid = document.getElementById('ffw-shop-grid');
+      if (viewToggle && grid) {
+        function setMobileView(view) {
+          const normalizedView = view === '1' ? '1' : '2';
+          grid.setAttribute('data-mobile-view', normalizedView);
+          viewToggle.querySelectorAll('[data-view]').forEach(function(button) {
+            const isActive = button.dataset.view === normalizedView;
+            button.classList.toggle('is-active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+          });
+        }
+
+        viewToggle.onclick = function(e) {
+          const button = e.target.closest('[data-view]');
+          if (!button) return;
+          setMobileView(button.dataset.view);
         };
       }
       
