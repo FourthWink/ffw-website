@@ -34,6 +34,23 @@
 
     {{ content_for_header }}
 
+    {%- liquid
+      assign ffw_load_contentsquare = false
+
+      if template.name == 'index' or template.name == 'product'
+        assign ffw_load_contentsquare = true
+      elsif template.name == 'collection'
+        if collection.handle == 'shop' or collection.handle == 'new-in'
+          assign ffw_load_contentsquare = true
+        endif
+      endif
+    -%}
+    {%- if ffw_load_contentsquare -%}
+      {% # theme-check-disable RemoteAsset %}
+      <script src="https://t.contentsquare.net/uxa/fd1c6e38c4115.js" defer></script>
+      {% # theme-check-enable RemoteAsset %}
+    {%- endif -%}
+
 <style>
   :root {
     --ffw-hover-default-color: #666666;
